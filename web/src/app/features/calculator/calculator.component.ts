@@ -5,6 +5,7 @@ import type {
   CalculateRequest,
   CalculateResponse,
   CommuteDaysPerMonth,
+  CompanyCarInput,
   EmploymentType,
   FamilyBonusType,
   IncomePeriod,
@@ -18,6 +19,7 @@ import { I18nService } from '../../core/i18n/i18n.service';
 import { SessionService } from '../../core/services/session.service';
 import { PaymentModalComponent } from '../payment/payment-modal.component';
 import { EurPipe, TranslatePipe } from '../../shared/pipes/app.pipes';
+import { exportOfficialCalculationPdf } from '../../core/pdf/text-pdf.util';
 
 type ResultTab = 'recurring' | 'thirteenth' | 'fourteenth' | 'annual';
 
@@ -83,6 +85,12 @@ export class CalculatorComponent {
   });
 
   readonly canCalculate = computed(() => true);
+  readonly commuteBlocked = computed(
+    () => this.form().benefitInKindFromCompanyCar,
+  );
+  readonly showCompanyCarFields = computed(
+    () => this.form().benefitInKindFromCompanyCar,
+  );
 
   readonly activeBreakdown = computed<PaymentBreakdown | null>(() => {
     const data = this.result();
@@ -130,7 +138,62 @@ export class CalculatorComponent {
     key: 'soleEarnerDeduction' | 'benefitInKindFromCompanyCar' | 'publicTransportReasonable',
     value: boolean,
   ): void {
+    if (key === 'benefitInKindFromCompanyCar' && value) {
+      this.form.update((current) => ({
+        ...current,
+        benefitInKindFromCompanyCar: true,
+        commuteOneWayKm: 0,
+        publicTransportReasonable: true,
+        commuteDaysPerMonth: 'more_than_10',
+      }));
+      return;
+    }
+
+    if (key === 'benefitInKindFromCompanyCar' && !value) {
+      this.form.update((current) => ({
+        ...current,
+        benefitInKindFromCompanyCar: false,
+        companyCar: undefined,
+      }));
+      return;
+    }
+
     this.updateForm(key, value);
+  }
+
+  updateCompanyCar<K extends keyof CompanyCarInput>(
+    key: K,
+    value: CompanyCarInput[K],
+  ): void {
+    this.form.update((current) => ({
+      ...current,
+      companyCar: {
+        acquisitionCost: current.companyCar?.acquisitionCost ?? 0,
+        co2GramsPerKm: current.companyCar?.co2GramsPerKm ?? 0,
+        firstRegistrationYear:
+          current.companyCar?.firstRegistrationYear ?? new Date().getFullYear(),
+        halfBenefit: current.companyCar?.halfBenefit ?? false,
+        ...current.companyCar,
+        [key]: value,
+      },
+    }));
+  }
+
+  private buildCalculateRequest(): CalculateRequest {
+    const form = this.form();
+    const request: CalculateRequest = { ...form };
+
+    if (!form.benefitInKindFromCompanyCar) {
+      delete request.companyCar;
+      return request;
+    }
+
+    const car = form.companyCar;
+    if (!car?.acquisitionCost || car.acquisitionCost <= 0) {
+      delete request.companyCar;
+    }
+
+    return request;
   }
 
   submit(): void {
@@ -141,7 +204,7 @@ export class CalculatorComponent {
     this.loading.set(true);
     this.error.set(null);
 
-    this.calculatorApi.calculate(this.form()).subscribe({
+    this.calculatorApi.calculate(this.buildCalculateRequest()).subscribe({
       next: (response) => {
         this.result.set(response);
         this.activeTab.set('recurring');
@@ -164,5 +227,17 @@ export class CalculatorComponent {
 
   closePaymentModal(): void {
     this.paymentModalOpen.set(false);
+  }
+
+  exportPdf(): void {
+    const data = this.result();
+    if (!data) {
+      return;
+    }
+    if (!this.session.status()?.isPro) {
+      this.paymentModalOpen.set(true);
+      return;
+    }
+    exportOfficialCalculationPdf(this.buildCalculateRequest(), data);
   }
 }

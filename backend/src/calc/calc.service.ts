@@ -22,6 +22,7 @@ export class CalcService {
         dto.childrenOver18WithFamilyAllowance,
       benefitInKindMonthly: eurosToCents(dto.benefitInKindMonthly),
       benefitInKindFromCompanyCar: dto.benefitInKindFromCompanyCar,
+      companyCar: dto.companyCar,
       taxFreeAllowanceMonthly: eurosToCents(dto.taxFreeAllowanceMonthly),
       commuteOneWayKm: dto.commuteOneWayKm,
       publicTransportReasonable: dto.publicTransportReasonable,

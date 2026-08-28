@@ -5,7 +5,9 @@ import {
   IsNumber,
   IsOptional,
   Min,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import {
   AustrianState,
   CommuteDaysPerMonth,
@@ -13,6 +15,7 @@ import {
   FamilyBonusType,
   IncomePeriod,
 } from '../tax-engine/types';
+import { CompanyCarDto } from './company-car.dto';
 
 export class CalculateRequestDto {
   @IsEnum(EmploymentType)
@@ -50,6 +53,11 @@ export class CalculateRequestDto {
 
   @IsBoolean()
   benefitInKindFromCompanyCar = false;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CompanyCarDto)
+  companyCar?: CompanyCarDto;
 
   @IsOptional()
   @IsNumber({ maxDecimalPlaces: 2 })

@@ -292,5 +292,42 @@
         "net": 53779.1
       }
     }
+  },
+  {
+    "id": "ak-employee-wien-7000-hbgl",
+    "source": "https://bruttonetto.arbeiterkammer.at",
+    "stand": "2026-01",
+    "note": "HBGL laufend 6930 — SV capped, LS on full Brutto",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 7000,
+      "incomePeriod": "monthly",
+      "state": "wien",
+      "soleEarnerDeduction": false,
+      "familyBonus": "none",
+      "commuteOneWayKm": 0,
+      "publicTransportReasonable": true,
+      "commuteDaysPerMonth": "more_than_10"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 7000,
+        "socialInsurance": 1269.58,
+        "incomeTax": 1533.7,
+        "net": 4196.72
+      },
+      "thirteenth": {
+        "gross": 7000,
+        "socialInsurance": 1194.9,
+        "incomeTax": 311.11,
+        "net": 5493.99
+      },
+      "fourteenth": {
+        "gross": 7000,
+        "socialInsurance": 1171,
+        "incomeTax": 349.74,
+        "net": 5479.26
+      }
+    }
   }
 ]

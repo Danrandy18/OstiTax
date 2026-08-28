@@ -32,8 +32,13 @@ export interface TranslationSchema {
   benefitInKind: string;
   companyCarBenefit: string;
   companyCarHint: string;
+  companyCarAcquisitionCost: string;
+  companyCarCo2: string;
+  companyCarRegistrationYear: string;
+  companyCarHalfBenefit: string;
   taxFreeAllowance: string;
   commute: string;
+  commuteBlockedByCompanyCar: string;
   commuteHint: string;
   commuteKm: string;
   commuteDays: string;
@@ -52,6 +57,8 @@ export interface TranslationSchema {
   incomeTax: string;
   net: string;
   tableYear: string;
+  exportPdf: string;
+  exportPdfProHint: string;
   attemptsRemaining: string;
   proBadge: string;
   paymentRequired: string;
@@ -132,9 +139,15 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     benefitInKind: 'Monatlicher Sachbezug (€)',
     companyCarBenefit: 'Sachbezug wegen Firmenauto',
     companyCarHint:
-      'Ja = Firmenauto vorhanden. Den Sachbezug-Betrag oben in Euro eintragen (das Flag allein ändert die Berechnung nicht).',
+      'Bei Firmenauto entfällt die Pendlerpauschale. Optional: Fahrzeugdaten für automatischen KFZ-Sachbezug (BMF).',
+    companyCarAcquisitionCost: 'Anschaffungskosten inkl. USt/NoVA (€)',
+    companyCarCo2: 'CO₂-Ausstoß (g/km, WLTP)',
+    companyCarRegistrationYear: 'Erstzulassung (Jahr)',
+    companyCarHalfBenefit: 'Halber Sachbezug',
     taxFreeAllowance: 'Monatlicher Freibetrag (€)',
     commute: 'Pendlerpauschale',
+    commuteBlockedByCompanyCar:
+      'Bei Firmenauto für den Arbeitsweg entfällt die Pendlerpauschale (kein Pendlerabzug).',
     commuteHint:
       'Der Pendlerrechner des BMF hilft bei Entfernung und Zumutbarkeit öffentlicher Verkehrsmittel:',
     commuteKm: 'Einfache Wegstrecke (km)',
@@ -154,6 +167,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     incomeTax: 'Lohnsteuer',
     net: 'Netto',
     tableYear: 'Tabellenjahr',
+    exportPdf: 'PDF exportieren',
+    exportPdfProHint: 'PDF-Export ist eine Pro-Funktion.',
     attemptsRemaining: 'Gratis-Versuche',
     proBadge: 'Pro',
     paymentRequired: 'Gratis-Versuche aufgebraucht',
@@ -229,9 +244,15 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     benefitInKind: 'Monthly benefit in kind (€)',
     companyCarBenefit: 'Benefit in kind from company car',
     companyCarHint:
-      'Yes = company car. Enter the benefit amount in euros above (the flag alone does not change the calculation).',
+      'Company car excludes commuter allowance. Optional: vehicle data for automatic KFZ benefit (BMF).',
+    companyCarAcquisitionCost: 'Acquisition cost incl. VAT/NoVA (€)',
+    companyCarCo2: 'CO₂ emissions (g/km, WLTP)',
+    companyCarRegistrationYear: 'First registration (year)',
+    companyCarHalfBenefit: 'Half benefit',
     taxFreeAllowance: 'Monthly tax-free allowance (€)',
     commute: 'Commuter allowance',
+    commuteBlockedByCompanyCar:
+      'Company car used for commuting excludes the Pendlerpauschale (no commuter deduction).',
     commuteHint:
       'The BMF commuter calculator helps with distance and public transport:',
     commuteKm: 'One-way distance (km)',
@@ -251,6 +272,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     incomeTax: 'Income tax',
     net: 'Net',
     tableYear: 'Table year',
+    exportPdf: 'Export PDF',
+    exportPdfProHint: 'PDF export is a Pro feature.',
     attemptsRemaining: 'Free tries left',
     proBadge: 'Pro',
     paymentRequired: 'Free tries used up',
@@ -325,9 +348,15 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     benefitInKind: 'Subsidio mensual en especie (€)',
     companyCarBenefit: 'Beneficio en especie por automóvil',
     companyCarHint:
-      'Sí = coche de empresa. Introduce el importe del Sachbezug arriba en euros (el flag solo no cambia el cálculo).',
+      'Con coche de empresa no hay Pendlerpauschale. Opcional: datos del vehículo para calcular el Sachbezug KFZ (BMF).',
+    companyCarAcquisitionCost: 'Coste de adquisición incl. IVA/NoVA (€)',
+    companyCarCo2: 'Emisiones CO₂ (g/km, WLTP)',
+    companyCarRegistrationYear: 'Primera matriculación (año)',
+    companyCarHalfBenefit: 'Beneficio a medias',
     taxFreeAllowance: 'Asignación mensual libre de impuestos (€)',
     commute: 'Subsidio por desplazamiento',
+    commuteBlockedByCompanyCar:
+      'Con coche de empresa para ir al trabajo no hay derecho a Pendlerpauschale.',
     commuteHint:
       'La calculadora de viajeros del BMF ayuda con la distancia y el transporte público:',
     commuteKm: 'Ruta de ida en km',
@@ -347,6 +376,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     incomeTax: 'Impuesto sobre la renta',
     net: 'Neto',
     tableYear: 'Año de tablas',
+    exportPdf: 'Exportar PDF',
+    exportPdfProHint: 'La exportación PDF es una función Pro.',
     attemptsRemaining: 'Intentos gratis',
     proBadge: 'Pro',
     paymentRequired: 'Sin intentos gratis',
@@ -421,9 +452,15 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     benefitInKind: 'Aylık ayni menfaat (€)',
     companyCarBenefit: 'Şirket arabası ayni menfaati',
     companyCarHint:
-      'Evet = şirket arabası. Tutarı yukarıya euro olarak girin (yalnızca bayrak hesabı değiştirmez).',
+      'Şirket arabasında Pendlerpauschale yok. İsteğe bağlı: BMF KFZ menfaati için araç bilgileri.',
+    companyCarAcquisitionCost: 'Edinme maliyeti KDV/NoVA dahil (€)',
+    companyCarCo2: 'CO₂ emisyonu (g/km, WLTP)',
+    companyCarRegistrationYear: 'İlk tescil (yıl)',
+    companyCarHalfBenefit: 'Yarım menfaat',
     taxFreeAllowance: 'Aylık vergi muafiyeti (€)',
     commute: 'Yol parası',
+    commuteBlockedByCompanyCar:
+      'İşe gidiş için şirket arabası varsa Pendlerpauschale uygulanmaz.',
     commuteHint:
       'BMF yol hesabı mesafe ve toplu taşıma için yardımcı olur:',
     commuteKm: 'Tek yön mesafe (km)',
@@ -443,6 +480,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     incomeTax: 'Gelir vergisi',
     net: 'Net',
     tableYear: 'Tablo yılı',
+    exportPdf: 'PDF indir',
+    exportPdfProHint: 'PDF dışa aktarma Pro özelliğidir.',
     attemptsRemaining: 'Ücretsiz deneme',
     proBadge: 'Pro',
     paymentRequired: 'Ücretsiz denemeler bitti',
@@ -517,9 +556,15 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     benefitInKind: 'Mjesečna naknada u naturi (€)',
     companyCarBenefit: 'Naknada zbog službenog auta',
     companyCarHint:
-      'Da = službeni auto. Iznos unesite gore u eurima (samo oznaka ne mijenja izračun).',
+      'Službeni auto isključuje Pendlerpauschale. Opcionalno: podaci vozila za KFZ naknadu (BMF).',
+    companyCarAcquisitionCost: 'Nabavna cijena s PDV/NoVA (€)',
+    companyCarCo2: 'CO₂ emisije (g/km, WLTP)',
+    companyCarRegistrationYear: 'Prva registracija (godina)',
+    companyCarHalfBenefit: 'Polovina naknade',
     taxFreeAllowance: 'Mjesečni neoporezivi iznos (€)',
     commute: 'Putni trošak',
+    commuteBlockedByCompanyCar:
+      'Službeni auto za posao isključuje Pendlerpauschale.',
     commuteHint:
       'BMF kalkulator putovanja pomaže oko udaljenosti i javnog prevoza:',
     commuteKm: 'Udaljenost u jednom smjeru (km)',
@@ -539,6 +584,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     incomeTax: 'Porez na dohodak',
     net: 'Neto',
     tableYear: 'Godina tabele',
+    exportPdf: 'Izvezi PDF',
+    exportPdfProHint: 'Izvoz PDF-a je Pro funkcija.',
     attemptsRemaining: 'Besplatni pokušaji',
     proBadge: 'Pro',
     paymentRequired: 'Besplatni pokušaji iskorišteni',
@@ -613,9 +660,15 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     benefitInKind: 'Щомісячна натуральна вигода (€)',
     companyCarBenefit: 'Вигода від службового авто',
     companyCarHint:
-      'Так = службове авто. Суму вкажіть вище в євро (лише позначка не змінює розрахунок).',
+      'Службове авто скасовує Pendlerpauschale. За бажанням: дані авто для KFZ (BMF).',
+    companyCarAcquisitionCost: 'Вартість придбання з ПДВ/NoVA (€)',
+    companyCarCo2: 'Викиди CO₂ (г/км, WLTP)',
+    companyCarRegistrationYear: 'Перша реєстрація (рік)',
+    companyCarHalfBenefit: 'Половина вигоди',
     taxFreeAllowance: 'Щомісячна неоподатковувана сума (€)',
     commute: 'Компенсація за дорогу',
+    commuteBlockedByCompanyCar:
+      'Службове авто для роботи — Pendlerpauschale не застосовується.',
     commuteHint:
       'Калькулятор BMF допомагає з відстанню та громадським транспортом:',
     commuteKm: 'Відстань в один бік (км)',
@@ -635,6 +688,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     incomeTax: 'Податок на доходи',
     net: 'Нетто',
     tableYear: 'Рік таблиць',
+    exportPdf: 'Експорт PDF',
+    exportPdfProHint: 'Експорт PDF — функція Pro.',
     attemptsRemaining: 'Безкоштовні спроби',
     proBadge: 'Pro',
     paymentRequired: 'Безкоштовні спроби вичерпано',

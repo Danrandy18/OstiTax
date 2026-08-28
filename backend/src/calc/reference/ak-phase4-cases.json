@@ -1,0 +1,94 @@
+[
+  {
+    "id": "ak-employee-wien-85000-bracket-55",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 85000,
+      "incomePeriod": "monthly",
+      "state": "wien"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 85000,
+        "socialInsurance": 1269.58,
+        "incomeTax": 40481.08,
+        "net": 43249.34
+      }
+    }
+  },
+  {
+    "id": "ak-employee-wien-90000-bracket-55",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 90000,
+      "incomePeriod": "monthly",
+      "state": "wien"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 90000,
+        "socialInsurance": 1269.58,
+        "incomeTax": 43231.08,
+        "net": 45499.34
+      }
+    }
+  },
+  {
+    "id": "ak-employee-wien-3000-kfz-sachbezug-600",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 3000,
+      "incomePeriod": "monthly",
+      "state": "wien",
+      "benefitInKindFromCompanyCar": true,
+      "benefitInKindMonthly": 600
+    },
+    "expected": {
+      "recurring": {
+        "gross": 3000,
+        "socialInsurance": 645,
+        "incomeTax": 432.95,
+        "net": 1922.05
+      },
+      "thirteenth": {
+        "gross": 3000,
+        "socialInsurance": 512.1,
+        "incomeTax": 112.07,
+        "net": 2375.83
+      },
+      "fourteenth": {
+        "gross": 3000,
+        "socialInsurance": 512.1,
+        "incomeTax": 149.28,
+        "net": 2338.62
+      }
+    }
+  },
+  {
+    "id": "ak-employee-wien-3000-kfz-auto-40000",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 3000,
+      "incomePeriod": "monthly",
+      "state": "wien",
+      "benefitInKindFromCompanyCar": true,
+      "companyCar": {
+        "acquisitionCost": 40000,
+        "co2GramsPerKm": 100,
+        "firstRegistrationYear": 2024
+      }
+    },
+    "expected": {
+      "recurring": {
+        "gross": 3000,
+        "socialInsurance": 645,
+        "incomeTax": 432.95,
+        "net": 1922.05
+      }
+    }
+  }
+]

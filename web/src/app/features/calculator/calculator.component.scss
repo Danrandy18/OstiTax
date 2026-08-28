@@ -168,6 +168,29 @@ fieldset.field {
   }
 }
 
+.field-checkbox {
+  align-content: end;
+
+  input {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+}
+
+.subsection-disabled {
+  opacity: 0.55;
+
+  input,
+  select,
+  button {
+    pointer-events: none;
+  }
+}
+
+.field-hint-warn {
+  color: #b45309;
+}
+
 .results-column {
   display: grid;
   gap: 1rem;
@@ -177,8 +200,13 @@ fieldset.field {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  align-items: baseline;
+  align-items: flex-start;
   margin-bottom: 1rem;
+
+  .result-header-main {
+    display: grid;
+    gap: 0.25rem;
+  }
 
   h2 {
     margin: 0;
@@ -188,6 +216,24 @@ fieldset.field {
   .meta {
     font-size: 0.8125rem;
     color: var(--color-text-secondary);
+  }
+}
+
+.btn-export-pdf {
+  flex-shrink: 0;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-elevated);
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: var(--color-primary);
+    background: rgb(from var(--color-primary) r g b / 8%);
   }
 }
 

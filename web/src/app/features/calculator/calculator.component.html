@@ -184,6 +184,59 @@
           <p class="field-hint">{{ 'companyCarHint' | translate }}</p>
         </fieldset>
 
+        @if (showCompanyCarFields()) {
+          <div class="field-row">
+            <label class="field">
+              <span>{{ 'companyCarAcquisitionCost' | translate }}</span>
+              <input
+                type="number"
+                min="0"
+                step="100"
+                class="input-field"
+                [ngModel]="form().companyCar?.acquisitionCost ?? ''"
+                (ngModelChange)="updateCompanyCar('acquisitionCost', $event || 0)"
+                name="companyCarAcquisitionCost"
+              />
+            </label>
+            <label class="field">
+              <span>{{ 'companyCarCo2' | translate }}</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                class="input-field"
+                [ngModel]="form().companyCar?.co2GramsPerKm ?? ''"
+                (ngModelChange)="updateCompanyCar('co2GramsPerKm', $event || 0)"
+                name="companyCarCo2"
+              />
+            </label>
+          </div>
+          <div class="field-row">
+            <label class="field">
+              <span>{{ 'companyCarRegistrationYear' | translate }}</span>
+              <input
+                type="number"
+                min="1990"
+                max="2100"
+                step="1"
+                class="input-field"
+                [ngModel]="form().companyCar?.firstRegistrationYear ?? 2026"
+                (ngModelChange)="updateCompanyCar('firstRegistrationYear', $event || 2026)"
+                name="companyCarRegistrationYear"
+              />
+            </label>
+            <label class="field field-checkbox">
+              <span>{{ 'companyCarHalfBenefit' | translate }}</span>
+              <input
+                type="checkbox"
+                [ngModel]="form().companyCar?.halfBenefit ?? false"
+                (ngModelChange)="updateCompanyCar('halfBenefit', $event)"
+                name="companyCarHalfBenefit"
+              />
+            </label>
+          </div>
+        }
+
         <label class="field">
           <span>{{ 'taxFreeAllowance' | translate }}</span>
           <input
@@ -198,8 +251,11 @@
         </label>
       </div>
 
-      <div class="subsection">
+      <div class="subsection" [class.subsection-disabled]="commuteBlocked()">
         <h3>{{ 'commute' | translate }}</h3>
+        @if (commuteBlocked()) {
+          <p class="field-hint field-hint-warn">{{ 'commuteBlockedByCompanyCar' | translate }}</p>
+        }
         <p class="field-hint">
           {{ 'commuteHint' | translate }}
           <a [href]="bmfPendlerUrl" target="_blank" rel="noopener noreferrer">
@@ -217,6 +273,7 @@
             [ngModel]="form().commuteOneWayKm"
             (ngModelChange)="updateNumber('commuteOneWayKm', $event)"
             name="commuteOneWayKm"
+            [disabled]="commuteBlocked()"
           />
         </label>
 
@@ -227,6 +284,7 @@
               type="button"
               [class.active]="form().publicTransportReasonable"
               (click)="setYesNo('publicTransportReasonable', true)"
+              [disabled]="commuteBlocked()"
             >
               {{ 'yes' | translate }}
             </button>
@@ -234,6 +292,7 @@
               type="button"
               [class.active]="!form().publicTransportReasonable"
               (click)="setYesNo('publicTransportReasonable', false)"
+              [disabled]="commuteBlocked()"
             >
               {{ 'no' | translate }}
             </button>
@@ -247,6 +306,7 @@
             [ngModel]="form().commuteDaysPerMonth"
             (ngModelChange)="setCommuteDays($event)"
             name="commuteDaysPerMonth"
+            [disabled]="commuteBlocked()"
           >
             <option value="less_than_4">{{ 'commuteDaysLess4' | translate }}</option>
             <option value="from_4_to_7">{{ 'commuteDays4to7' | translate }}</option>
@@ -277,8 +337,18 @@
       @if (result(); as data) {
         <article class="card card-result">
           <header class="result-header">
-            <h2>{{ 'results' | translate }}</h2>
-            <span class="meta">{{ 'tableYear' | translate }}: {{ data.tableYear }}</span>
+            <div class="result-header-main">
+              <h2>{{ 'results' | translate }}</h2>
+              <span class="meta">{{ 'tableYear' | translate }}: {{ data.tableYear }}</span>
+            </div>
+            <button
+              type="button"
+              class="btn-export-pdf"
+              (click)="exportPdf()"
+              [title]="session.status()?.isPro ? ('exportPdf' | translate) : ('exportPdfProHint' | translate)"
+            >
+              {{ 'exportPdf' | translate }}
+            </button>
           </header>
 
           <div class="tabs" role="tablist">

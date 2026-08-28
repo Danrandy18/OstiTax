@@ -1,6 +1,10 @@
 import type { Cents } from './money.util';
 import { assertCents } from './money.util';
 import { calculateIncomeTax } from './income-tax.calculator';
+import {
+  hasCompanyCarBenefit,
+  resolveBenefitInKindMonthly,
+} from './benefit-in-kind.util';
 import { calculateSocialInsurance } from './social-insurance.calculator';
 import { TAX_TABLE_YEAR } from './tables/tax-tables-2026';
 import type {
@@ -29,7 +33,7 @@ function recurringAssessmentGross(
   monthlyCashGross: Cents,
   input: CalculationInput,
 ): Cents {
-  return assertCents(monthlyCashGross + input.benefitInKindMonthly);
+  return assertCents(monthlyCashGross + resolveBenefitInKindMonthly(input));
 }
 
 function buildPaymentBreakdown(
@@ -41,10 +45,17 @@ function buildPaymentBreakdown(
   const assessment = isBonusMonth
     ? monthlyCashGross
     : recurringAssessmentGross(monthlyCashGross, input);
+  const companyCarBenefit =
+    !isBonusMonth && hasCompanyCarBenefit(input)
+      ? resolveBenefitInKindMonthly(input)
+      : 0;
 
   const socialInsurance = calculateSocialInsurance(assessment, {
     employmentType: input.employmentType,
     bonusMonth: isBonusMonth,
+    bonusKind: isBonusMonth ? paymentType : undefined,
+    monthlyCashGross,
+    companyCarBenefitMonthly: companyCarBenefit,
     state: input.state,
   });
   const incomeTax = calculateIncomeTax(
@@ -52,6 +63,7 @@ function buildPaymentBreakdown(
     socialInsurance,
     input,
     paymentType,
+    monthlyCashGross,
   );
 
   return {

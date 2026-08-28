@@ -36,6 +36,8 @@ export enum CommuteDaysPerMonth {
   MORE_THAN_10 = 'more_than_10',
 }
 
+import type { CompanyCarBenefitInput } from './company-car-benefit.calculator';
+
 export interface CalculationInput {
   employmentType: EmploymentType;
   grossAmount: Cents;
@@ -47,6 +49,8 @@ export interface CalculationInput {
   childrenOver18WithFamilyAllowance: number;
   benefitInKindMonthly: Cents;
   benefitInKindFromCompanyCar: boolean;
+  /** Calcula Sachbezug KFZ y lo suma a benefitInKindMonthly (laufend). */
+  companyCar?: CompanyCarBenefitInput;
   taxFreeAllowanceMonthly: Cents;
   commuteOneWayKm: number;
   publicTransportReasonable: boolean;

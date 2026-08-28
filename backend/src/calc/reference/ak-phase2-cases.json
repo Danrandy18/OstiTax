@@ -1,0 +1,146 @@
+[
+  {
+    "id": "ak-employee-wien-1000-freigrenze",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 1000,
+      "incomePeriod": "monthly",
+      "state": "wien"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 1000,
+        "socialInsurance": 153.7,
+        "incomeTax": 0,
+        "net": 846.3
+      },
+      "thirteenth": {
+        "gross": 1000,
+        "socialInsurance": 141.2,
+        "incomeTax": 0,
+        "net": 858.8
+      },
+      "fourteenth": {
+        "gross": 1000,
+        "socialInsurance": 141.2,
+        "incomeTax": 0,
+        "net": 858.8
+      }
+    }
+  },
+  {
+    "id": "ak-employee-wien-1300-freigrenze",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 1300,
+      "incomePeriod": "monthly",
+      "state": "wien"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 1300,
+        "socialInsurance": 199.81,
+        "incomeTax": 0,
+        "net": 1100.19
+      },
+      "thirteenth": {
+        "gross": 1300,
+        "socialInsurance": 183.56,
+        "incomeTax": 0,
+        "net": 1116.44
+      },
+      "fourteenth": {
+        "gross": 1300,
+        "socialInsurance": 183.56,
+        "incomeTax": 0,
+        "net": 1116.44
+      }
+    }
+  },
+  {
+    "id": "ak-employee-wien-1310-freigrenze",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 1310,
+      "incomePeriod": "monthly",
+      "state": "wien"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 1310,
+        "socialInsurance": 201.35,
+        "incomeTax": 0,
+        "net": 1108.65
+      },
+      "thirteenth": {
+        "gross": 1310,
+        "socialInsurance": 184.97,
+        "incomeTax": 30.3,
+        "net": 1094.73
+      },
+      "fourteenth": {
+        "gross": 1310,
+        "socialInsurance": 184.97,
+        "incomeTax": 67.5,
+        "net": 1057.53
+      }
+    }
+  },
+  {
+    "id": "ak-employee-wien-7500-high-bracket",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 7500,
+      "incomePeriod": "monthly",
+      "state": "wien"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 7500,
+        "socialInsurance": 1269.58,
+        "incomeTax": 1762.16,
+        "net": 4468.26
+      }
+    }
+  },
+  {
+    "id": "ak-employee-wien-8000-high-bracket",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 8000,
+      "incomePeriod": "monthly",
+      "state": "wien"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 8000,
+        "socialInsurance": 1269.58,
+        "incomeTax": 2002.16,
+        "net": 4728.26
+      }
+    }
+  },
+  {
+    "id": "ak-employee-wien-10000-high-bracket",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 10000,
+      "incomePeriod": "monthly",
+      "state": "wien"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 10000,
+        "socialInsurance": 1269.58,
+        "incomeTax": 2962.16,
+        "net": 5768.26
+      }
+    }
+  }
+]

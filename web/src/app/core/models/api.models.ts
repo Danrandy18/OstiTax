@@ -18,6 +18,13 @@ export type CommuteDaysPerMonth =
   | 'more_than_10';
 export type UserPlan = 'free' | 'pro';
 
+export interface CompanyCarInput {
+  acquisitionCost: number;
+  co2GramsPerKm: number;
+  firstRegistrationYear: number;
+  halfBenefit?: boolean;
+}
+
 export interface CalculateRequest {
   employmentType: EmploymentType;
   grossAmount: number;
@@ -29,6 +36,7 @@ export interface CalculateRequest {
   childrenOver18WithFamilyAllowance: number;
   benefitInKindMonthly: number;
   benefitInKindFromCompanyCar: boolean;
+  companyCar?: CompanyCarInput;
   taxFreeAllowanceMonthly: number;
   commuteOneWayKm: number;
   publicTransportReasonable: boolean;

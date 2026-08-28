@@ -1,6 +1,9 @@
 import akReferenceCases from './reference/ak-reference-cases.json';
 import akDeductionCases from './reference/ak-deduction-reference-cases.json';
 import akExtraFieldsCases from './reference/ak-extra-fields-cases.json';
+import akPhase2Cases from './reference/ak-phase2-cases.json';
+import akPhase3Cases from './reference/ak-phase3-cases.json';
+import akPhase4Cases from './reference/ak-phase4-cases.json';
 import { AustrianTaxEngine } from './tax-engine/austrian-tax.engine';
 import { centsToEuros, eurosToCents } from './tax-engine/money.util';
 import type { CalculationInput } from './tax-engine/types';
@@ -37,6 +40,7 @@ function toInput(raw: AkCase['input']): CalculationInput {
     benefitInKindMonthly: eurosToCents((raw.benefitInKindMonthly as number) ?? 0),
     benefitInKindFromCompanyCar:
       (raw.benefitInKindFromCompanyCar as boolean) ?? false,
+    companyCar: raw.companyCar as CalculationInput['companyCar'],
     taxFreeAllowanceMonthly: eurosToCents(
       (raw.taxFreeAllowanceMonthly as number) ?? 0,
     ),
@@ -86,4 +90,30 @@ describe('AustrianTaxEngine — Sachbezug, Freibetrag, Lehrling, Pensionist', ()
     'thirteenth',
     'fourteenth',
   ]);
+});
+
+describe('AustrianTaxEngine — Jahressechstel exceso', () => {
+  it('applies tarifa normal al excedente sobre el sechstel en el 13.º', () => {
+    const input = toInput({
+      employmentType: 'employee',
+      grossAmount: 5000,
+      incomePeriod: 'monthly',
+      state: 'wien',
+    });
+    const result = engine.calculate(input);
+    // Jahressechstel = 10000; base 13.º tras SV ≈ 4142 → sin excedente, solo 6 %
+    expectEuros(result.thirteenth.incomeTax, 211.59);
+  });
+});
+
+describe('AustrianTaxEngine — Fase 2 (48 %, Freigrenze, pensiones altas)', () => {
+  runAkSuite(akPhase2Cases as AkCase[], ['recurring', 'thirteenth', 'fourteenth']);
+});
+
+describe('AustrianTaxEngine — Fase 3 (pensiones, SV acumulada 13./14.)', () => {
+  runAkSuite(akPhase3Cases as AkCase[]);
+});
+
+describe('AustrianTaxEngine — Fase 4 (55 %, KFZ integrado)', () => {
+  runAkSuite(akPhase4Cases as AkCase[]);
 });
