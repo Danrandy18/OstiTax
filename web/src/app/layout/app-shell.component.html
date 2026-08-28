@@ -1,0 +1,38 @@
+<header class="app-header">
+  <div class="container header-inner">
+    <a routerLink="/" class="brand" aria-label="NettoKlar">
+      <span class="brand-mark" aria-hidden="true">NK</span>
+      <span class="brand-text">
+        <span class="brand-title">{{ 'appTitle' | translate }}</span>
+        <span class="brand-subtitle">{{ 'appSubtitle' | translate }}</span>
+      </span>
+    </a>
+
+    <div class="header-actions">
+      @if (session.status()?.isPro) {
+        <span class="badge-pro">{{ 'proBadge' | translate }}</span>
+      } @else if (session.status(); as status) {
+        <span class="badge-attempts">{{ 'attemptsRemaining' | translate }}: {{ status.freeAttemptsRemaining }}</span>
+      }
+
+      <label class="lang-select">
+        <span class="sr-only">{{ 'language' | translate }}</span>
+        <select [value]="i18n.currentLang()" (change)="onLanguageChange($event)">
+          @for (lang of i18n.langOptions; track lang.code) {
+            <option [value]="lang.code">{{ lang.label }}</option>
+          }
+        </select>
+      </label>
+    </div>
+  </div>
+</header>
+
+<main class="app-main container">
+  @if (!session.ready()) {
+    <p class="loading-state">{{ 'loading' | translate }}</p>
+  } @else if (session.error()) {
+    <p class="loading-state error-text" role="alert">{{ 'errorGeneric' | translate }}</p>
+  } @else {
+    <router-outlet />
+  }
+</main>

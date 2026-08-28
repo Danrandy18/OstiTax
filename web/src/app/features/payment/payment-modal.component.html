@@ -1,0 +1,59 @@
+@if (open()) {
+  <div
+    class="modal-backdrop"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="'paymentModalTitle' | translate"
+    (click)="onBackdropClick($event)"
+  >
+    <div class="modal-shell">
+      <header class="modal-header">
+        <div>
+          <h2>{{ 'paymentModalTitle' | translate }}</h2>
+          <p>{{ 'paymentModalSubtitle' | translate }}</p>
+        </div>
+        <button type="button" class="icon-btn" (click)="close()" [attr.aria-label]="'close' | translate">
+          ×
+        </button>
+      </header>
+
+      <div class="modal-actions">
+        <button
+          type="button"
+          class="btn-primary"
+          [disabled]="loading() !== null"
+          (click)="payWithStripe()"
+        >
+          @if (loading() === 'stripe') {
+            {{ 'loading' | translate }}
+          } @else {
+            {{ 'payWithStripe' | translate }}
+          }
+        </button>
+
+        <button
+          type="button"
+          class="btn-secondary"
+          [disabled]="loading() !== null"
+          (click)="payWithPaypal()"
+        >
+          @if (loading() === 'paypal') {
+            {{ 'loading' | translate }}
+          } @else {
+            {{ 'payWithPaypal' | translate }}
+          }
+        </button>
+      </div>
+
+      @if (error()) {
+        <p class="error-text" role="alert">{{ error() }}</p>
+      }
+
+      <footer class="modal-footer">
+        <button type="button" class="btn-ghost" (click)="close()">
+          {{ 'cancel' | translate }}
+        </button>
+      </footer>
+    </div>
+  </div>
+}

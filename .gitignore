@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+tools/flutter/
+
+# Environment
+.env
+backend/.env
+tools/claude-api-mcp/node_modules/
+tools/claude-api-mcp/dist/
+
+# Build outputs
+dist/
+web/dist/
+backend/dist/
+mobile/build/
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Flutter/Dart
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.packages
+mobile/.pub-cache/
+mobile/.pub/
+mobile/**/doc/api/
+mobile/ios/Flutter/.last_build_id
+
+# Test coverage
+coverage/
+web/playwright-report/
+web/test-results/
+web/blob-report/
+web/.playwright/

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+	<title>Online Brutto-Netto-Rechner der Arbeiterkammern</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="keywords" content="Arbeiterkammer,AK,Arbeitsrecht,Steuer,Geld,Bildung,Beruf,Konsumentenschutz,Abfertigung,Arbeitslosigkeit,Arbeitsvertrag,Arbeitszeit,Bewerbung,Lehre,Pension,Urlaub,Mindestsicherung,Altersteilzeit,Elternteilzeit,Pendlerpauschale,Kündigungsfrist">
+	<meta name="description" content="Berechnen Sie, wie viel Lohn oder Gehalt Ihnen netto nach Abzug von Lohnsteuer und Sozialversicherung übrig bleibt.">
+
+	<meta property="og:title" content="Brutto-Netto-Rechner der Arbeiterkammern"> 
+	<meta property="og:site_name" content="Brutto-Netto-Rechner der Arbeiterkammern"> 
+	<meta property="og:url" content="https://bruttonetto.arbeiterkammer.at/"> 
+	<meta property="og:description" content="Berechnen Sie, wie viel Lohn oder Gehalt Ihnen netto nach Abzug von Lohnsteuer und Sozialversicherung übrig bleibt."> 
+	<meta property="og:image" content="https://bruttonetto.arbeiterkammer.at/images/bn_image.png"> 
+
+	<link href="c/bootstrap.min.css?v=15" rel="stylesheet">
+	<link href="c/bootstrap-datepicker.css?v=15" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="c/bruttoNetto.css?v=15">
+	<link rel="stylesheet" type="text/css" href="c/bruttoNetto_print.css?v=15" media="print">
+	
+	<script src="j/jquery.min.js"></script>
+	<script src="j/bootstrap.min.js"></script>
+	<script src="j/bootstrap-datepicker.js?v=15"></script>
+	<script src="j/bootstrap-datepicker.de.min.js"></script>
+	<script src="j/bruttonetto.js?v=15"></script>
+
+</head>
+<body>
+<a class="sr-only" href="#mainContent">
+  Zum Inhalt dieser Seite
+</a>
+<div id="top-bar">
+    <div class="container">
+        <div class="row">
+	   <div class="logo col-sm-6">
+		<a href="https://arbeiterkammer.at" target="_blank"><img class="rechnerLogo" src="images/AKPortal.svg" alt="AK Portal"></a>
+	   </div>
+	   <div class="headerTeaser col-sm-6 hidden-xs">
+	      <span>Brutto-Netto-Rechner</span>Berechnen Sie Ihr Einkommen
+	   </div>
+	</div>
+   </div>
+</div>
+<div id="menu">
+</div>
+<section id="content">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="mainContent" id="mainContent">
+		<h4 aria-hidden="true">RECHNER</h4>
+		<span class="icon-brutto_netto"></span>
+		<div class="esraBnRechnerInputBlock" role="main" tabindex="0">
+	
+			<h1 id="firstElement">Online Brutto-Netto-Rechner</h1>
+			<p class="hidden-print">Wie viel vom Bruttogehalt am Ende tatsächlich in der Tasche bleibt, ist oft gar nicht so leicht zu berechnen. Der Brutto-Netto-Rechner der AK hilft Ihnen dabei.</p>
+			<p class="hidden-print">So sehen Sie wie viel Netto Ihnen nach Abzug von Steuern und Abgaben tatsächlich zusteht.</p>
+
+					
+<script>
+	
+
+	$(document).ready(function() {
+		$('#esraBnRechnerResult').focus();
+	});
+	
+</script>
+
+			<div id="esraBnRechnerInput">
+				Ich bin Arbeiter(In) / Angestellte(r), Sachbezug 0 Euro 
+			</div>
+			<div id="esraBnRechnerResult" tabindex="0">
+				<h2 id="esraBnRechnerResultHeader">Ihr Einkommen</h2>
+				
+				<div class="esraBnRechnerResultTable hidden-xs">
+					<table class="table">
+					    <thead>
+						<tr>
+							<th></th>
+							<th>Bezug laufend</th>
+							<th>13. Bezug <span>(Urlaubszuschuss)</span></th>
+							<th>14. Bezug <span>(Weihnachtsgeld)</span></th>
+							<th class="rechnerSumme">Jahresbezug</th>
+						</tr>
+					    </thead>
+					    <tbody>
+						<tr>
+							<td class="rechnerLinks">Brutto</td>
+							<td class="rechnerRechts">2,90 &euro;</td>
+							<td class="rechnerRechts">2,90 &euro;</td>
+							<td class="rechnerRechts">2,90 &euro;</td>
+							<td class="rechnerRechts rechnerSumme">40,60 &euro;</td>
+						</tr>
+						<tr>
+							<td class="rechnerLinks">
+							  Sozialversicherung
+							
+							</td>
+							<td class="rechnerRechts">
+							  0,00 &euro;
+							
+							</td>
+							<td class="rechnerRechts">0,00 &euro;</td>
+							<td class="rechnerRechts">0,00 &euro;</td>
+							<td class="rechnerRechts rechnerSumme">0,00 &euro;</td>
+						</tr>
+						<tr>
+							<td class="rechnerLinks">
+							  Lohnsteuer
+							</td>
+							<td class="rechnerRechts">
+							  0,00 &euro;
+							</td>
+							<td class="rechnerRechts">0,00 &euro;</td>
+							<td class="rechnerRechts">0,00 &euro;</td>
+							<td class="rechnerRechts rechnerSumme">0,00 &euro;</td>
+						</tr>
+						<tr>
+							<td class="rechnerLinks">
+							  Netto
+							</td>
+							<td class="rechnerRechts">
+							  2,90 &euro;
+							</td>
+							<td class="rechnerRechts">2,90 &euro;</td>
+							<td class="rechnerRechts">2,90 &euro;</td>
+							<td class="rechnerRechts rechnerSumme">40,60 &euro;</td>
+						</tr>
+					   </tbody>
+					</table>
+				</div>
+				<div class="esraBnRechnerResultTableMobile hidden-notxs">
+					<table class="table">
+					    <thead>
+						<tr>
+							<th colspan="2">Bezug laufend</th>
+						</tr>
+					    </thead>
+					    <tbody>
+						<tr>
+							<td class="rechnerLinks">Brutto</td>
+							<td class="rechnerRechts">2,90 &euro;</td>
+						</tr>
+						<tr>
+							<td class="rechnerLinks">
+							  Sozialversicherung
+							
+							</td>
+							<td class="rechnerRechts">
+							  0,00 &euro;
+							
+							</td>
+							
+						</tr>
+						<tr>
+							<td class="rechnerLinks">
+							  Lohnsteuer
+							
+							</td>
+							<td class="rechnerRechts">
+							  0,00 &euro;
+							
+							</td>
+						</tr>
+						<tr>
+							<td class="rechnerLinks">
+							  Netto
+							</td>
+							<td class="rechnerRechts">
+							  2,90 &euro;
+							
+							</td>
+						</tr>
+					   </tbody>
+					</table>
+					<table class="table">
+					    <thead>
+						<tr>
+							<th colspan="2">13. Bezug <span>(Urlaubszuschuss)</span></th>
+						</tr>
+					    </thead>
+					    <tbody>
+						<tr>
+							<td class="rechnerLinks">Brutto</td>
+							<td class="rechnerRechts">2,90 &euro;</td>
+						</tr>
+						<tr>
+							<td class="rechnerLinks">Sozialversicherung</td>
+							<td class="rechnerRechts">0,00 &euro;</td>
+						</tr>
+						<tr>
+							<td class="rechnerLinks">Lohnsteuer</td>
+							<td class="rechnerRechts">0,00 &euro;</td>
+						</tr>
+						<tr>
+							<td class="rechnerLinks">Netto</td>
+							<td class="rechnerRechts">2,90 &euro;</td>
+						</tr>
+					   </tbody>
+					</table>
+					<table class="table">
+					    <thead>
+						<tr>
+							<th colspan="2">14. Bezug <span>(Weihnachtsgeld)</span></th>
+						</tr>
+					    </thead>
+					    <tbody>
+						<tr>
+							<td class="rechnerLinks">Brutto</td>
+							<td class="rechnerRechts">2,90 &euro;</td>
+						</tr>
+						<tr>
+							<td class="rechnerLinks">Sozialversicherung</td>
+							<td class="rechnerRechts">0,00 &euro;</td>
+						</tr>
+						<tr>
+							<td class="rechnerLinks">Lohnsteuer</td>
+							<td class="rechnerRechts">0,00 &euro;</td>
+						</tr>
+						<tr>
+							<td class="rechnerLinks">Netto</td>
+							<td class="rechnerRechts">2,90 &euro;</td>
+						</tr>
+					   </tbody>
+					</table>
+					<table class="table">
+					    <thead>
+						<tr>
+							<th colspan="2" class="rechnerSumme">Jahresbezug</th>
+						</tr>
+					    </thead>
+					    <tbody>
+						<tr>
+							<td class="rechnerLinks">Brutto</td>
+							<td class="rechnerRechts rechnerSumme">40,60 &euro;</td>
+						</tr>
+						<tr>
+							<td class="rechnerLinks">Sozialversicherung</td>
+							<td class="rechnerRechts rechnerSumme">0,00 &euro;</td>
+						</tr>
+						<tr>
+							<td class="rechnerLinks">Lohnsteuer</td>
+							<td class="rechnerRechts rechnerSumme">0,00 &euro;</td>
+						</tr>
+						<tr>
+							<td class="rechnerLinks">Netto</td>
+							<td class="rechnerRechts rechnerSumme">40,60 &euro;</td>
+						</tr>
+					   </tbody>
+					</table>
+				</div>
+
+
+				
+				<form id="esraBNselfResultForm" method="POST" action="/" novalidate>
+					
+					<input type="hidden" name="arbeitsverhaeltnis" value="1">
+					<input type="hidden" name="brutto" value="2,90">
+					<input type="hidden" name="bundesland" value="1">
+					<input type="hidden" name="bruttoEingabe" value="2.9">
+					<input type="hidden" name="einkommen" value="">
+					<input type="hidden" name="submitAction" id="submitActionResult" value="new">
+					<input type="hidden" name="mehrKinder" value="0">
+					<input type="hidden" name='alleinverdienerabsetzbetrag' value="0">
+					<input type="hidden" name="kinder17" value="0">
+					<input type="hidden" name="kinder18" value="0">
+					<input type="hidden" name="sachbezug" value="0,00">
+					<input type="hidden" name='sachbezugKFZ' value="0">
+					<input type="hidden" name="freibetrag" value="0,00">
+					<input type="hidden" name="wegstrecke" value="0,00">
+					<input type="hidden" name="verkehrsmittel" value="1">
+					<input type="hidden" name="pendeltage" value="3">
+					<input type="hidden" name="familienBonus" value="0">
+
+					<input id="tab1" type="submit" value="neu berechnen" class="btn btn-primary">
+					<input type="button" value="Löschen und neu berechnen" class="btn btn-primary hidden-xxs" onclick="javascript: bruttoNettoSelfResetSubmit();">
+					<input type="button" value="Löschen" class="btn btn-primary hidden-notxxs" onclick="javascript: bruttoNettoSelfResetSubmit();">
+					<input type="button" value="Ergebnis drucken" class="btn btn-primary" onclick="javascript:print();">
+				</form>
+
+				<div class="esraBnRechnerTextBlock">
+					<h3>Zu den Ergebnissen</h3>
+					<p>Der Brutto-Netto-Rechner stellt eine Orientierungshilfe dar.</p>
+					<p>Das Ergebnis des Brutto-Netto-Rechners entspricht dem dargestellten Bezug, wenn Sie 14 gleich hohe Monatsbezüge erhalten.<p>
+					<p>Das monatliche Nettoergebnis kann bei Bezug von Überstundenentgelt, steuerfreien Zulagen, zusätzlichen Sonderzahlungen, usw. abweichen. Außerdem gibt es für ältere ArbeitnehmerInnen unter bestimmten Voraussetzungen Begünstigungen im Bereich der Arbeitslosen- und Pensionsversicherung. Dieser Brutto-Netto-Rechner berücksichtigt diese begünstigende Regelung nicht, weshalb Ihr tatsächliches Nettogehalt von dem hier ausgewiesenen Betrag abweichen kann.</p>
+				</div><!-- End rechnerTextBlock -->
+
+			</div>
+		
+		<div id="extraSize"></div>
+	
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div id="footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+			<p>© 2026 Bundesarbeiterkammer (BAK)</p>
+			<p><a href="https://www.arbeiterkammer.at/impressum.html" target="_blank">Impressum</a></p>
+			<p><a href="https://www.arbeiterkammer.at/datenschutz.html" target="_blank">Datenschutzerklärung DVR: 0063673</a></p>
+			<p>Stand: Jänner 2026</p>
+			<div class="esra-only"><a href="https://www.esrasoft.at" target="_blank">Gestaltung und Umsetzung</a>: <a href="https://www.kaindl.info" target="_blank">Kaindl Informatics GmbH</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+	<img src="c/i/kind_over.png" alt="" style="display: none;">
+	<img src="c/i/kind_act.png" alt="" style="display: none;">
+	<img src="c/i/kind2_over.png" alt="" style="display: none;">
+	<img src="c/i/kind2_act.png" alt="" style="display: none;">
+	<img src="c/i/kind3_over.png" alt="" style="display: none;">
+	<img src="c/i/kind3_act.png" alt="" style="display: none;">
+
+<script>
+
+	var windowWidth = window.innerWidth || document.documentElement.clientWidth;
+
+	if (windowWidth < 768) {
+		
+							window.setTimeout("window.scrollTo(0,$('#esraBnRechnerResult').position().top+100)", 500);
+					
+	}
+	else {
+		window.setTimeout("window.scrollTo(0,0)", 500);
+	}
+
+</script>
+
+
+
+<!-- Matomo -->
+<script>
+
+	var _paq = _paq || []
+	_paq.push(['trackPageView']);
+	_paq.push(['enableLinkTracking']);
+
+	function embedTrackingCode() {
+		
+		var u = '//piwik.arbeiterkammer.at/';
+		_paq.push(['setTrackerUrl', u + 'matomo.php']);
+		_paq.push(['setSiteId', '8']);
+		var d = document,
+		    g = d.createElement('script'),
+		    s = d.getElementsByTagName('script')[0];
+		g.type = 'text/javascript';
+		g.async = true;
+		g.defer = true;
+		g.src = u + 'matomo.js';
+		s.parentNode.insertBefore(g, s);
+
+	}
+	setTimeout(function() {
+		embedTrackingCode();
+	}, 1500);
+</script>
+<noscript><p><img src="//piwik.arbeiterkammer.at/matomo.php?idsite=8&amp;rec=1" style="border:0;" alt=""></p></noscript>
+<!-- End Matomo Code -->
+
+
+</body>
+</html>

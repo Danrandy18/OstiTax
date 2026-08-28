@@ -1,0 +1,382 @@
+<section class="calculator-page">
+  <header class="page-hero">
+    <h1>{{ 'seoHero' | translate }}</h1>
+    <p>{{ 'seoLead' | translate }}</p>
+  </header>
+
+  <div class="layout-grid">
+    <form class="card form-card" (ngSubmit)="submit()">
+      <fieldset class="field">
+        <legend>{{ 'iAm' | translate }}</legend>
+        <div class="employment-grid">
+          <button
+            type="button"
+            class="employment-option"
+            [class.active]="form().employmentType === 'employee'"
+            (click)="setEmploymentType('employee')"
+          >
+            {{ 'employmentEmployee' | translate }}
+          </button>
+          <button
+            type="button"
+            class="employment-option"
+            [class.active]="form().employmentType === 'apprentice'"
+            (click)="setEmploymentType('apprentice')"
+          >
+            {{ 'employmentApprentice' | translate }}
+          </button>
+          <button
+            type="button"
+            class="employment-option"
+            [class.active]="form().employmentType === 'pensioner'"
+            (click)="setEmploymentType('pensioner')"
+          >
+            {{ 'employmentPensioner' | translate }}
+          </button>
+        </div>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend>{{ 'incomePeriod' | translate }}</legend>
+        <div class="segmented">
+          <button
+            type="button"
+            [class.active]="form().incomePeriod === 'monthly'"
+            (click)="setIncomePeriod('monthly')"
+          >
+            {{ 'monthly' | translate }}
+          </button>
+          <button
+            type="button"
+            [class.active]="form().incomePeriod === 'yearly'"
+            (click)="setIncomePeriod('yearly')"
+          >
+            {{ 'yearly' | translate }}
+          </button>
+        </div>
+      </fieldset>
+
+      <label class="field">
+        <span>{{ grossLabel() }}</span>
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          class="input-field"
+          [ngModel]="form().grossAmount"
+          (ngModelChange)="updateNumber('grossAmount', $event)"
+          name="grossAmount"
+          required
+        />
+      </label>
+
+      <label class="field">
+        <span>{{ 'state' | translate }}</span>
+        <select
+          class="input-field"
+          [ngModel]="form().state"
+          (ngModelChange)="updateForm('state', $event)"
+          name="state"
+        >
+          @for (option of stateOptions(); track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
+
+      <div class="subsection">
+        <h3>{{ 'deductions' | translate }}</h3>
+
+        <fieldset class="field">
+          <legend>{{ 'soleEarner' | translate }}</legend>
+          <div class="segmented">
+            <button
+              type="button"
+              [class.active]="form().soleEarnerDeduction"
+              (click)="setYesNo('soleEarnerDeduction', true)"
+            >
+              {{ 'yes' | translate }}
+            </button>
+            <button
+              type="button"
+              [class.active]="!form().soleEarnerDeduction"
+              (click)="setYesNo('soleEarnerDeduction', false)"
+            >
+              {{ 'no' | translate }}
+            </button>
+          </div>
+        </fieldset>
+
+        <label class="field">
+          <span>{{ 'familyBonus' | translate }}</span>
+          <select
+            class="input-field"
+            [ngModel]="form().familyBonus"
+            (ngModelChange)="setFamilyBonus($event)"
+            name="familyBonus"
+          >
+            <option value="none">{{ 'familyBonusNone' | translate }}</option>
+            <option value="full">{{ 'familyBonusFull' | translate }}</option>
+            <option value="shared">{{ 'familyBonusShared' | translate }}</option>
+          </select>
+        </label>
+
+        @if (showChildrenFields()) {
+          <div class="field-row">
+            <label class="field">
+              <span>{{ 'childrenUnder18' | translate }}</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                class="input-field"
+                [ngModel]="form().childrenUnder18"
+                (ngModelChange)="updateNumber('childrenUnder18', $event)"
+                name="childrenUnder18"
+              />
+            </label>
+            <label class="field">
+              <span>{{ 'childrenOver18' | translate }}</span>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                class="input-field"
+                [ngModel]="form().childrenOver18WithFamilyAllowance"
+                (ngModelChange)="updateNumber('childrenOver18WithFamilyAllowance', $event)"
+                name="childrenOver18"
+              />
+            </label>
+          </div>
+        }
+
+        <label class="field">
+          <span>{{ 'benefitInKind' | translate }}</span>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            class="input-field"
+            [ngModel]="form().benefitInKindMonthly"
+            (ngModelChange)="updateNumber('benefitInKindMonthly', $event)"
+            name="benefitInKindMonthly"
+          />
+        </label>
+
+        <fieldset class="field">
+          <legend>{{ 'companyCarBenefit' | translate }}</legend>
+          <div class="segmented">
+            <button
+              type="button"
+              [class.active]="form().benefitInKindFromCompanyCar"
+              (click)="setYesNo('benefitInKindFromCompanyCar', true)"
+            >
+              {{ 'yes' | translate }}
+            </button>
+            <button
+              type="button"
+              [class.active]="!form().benefitInKindFromCompanyCar"
+              (click)="setYesNo('benefitInKindFromCompanyCar', false)"
+            >
+              {{ 'no' | translate }}
+            </button>
+          </div>
+          <p class="field-hint">{{ 'companyCarHint' | translate }}</p>
+        </fieldset>
+
+        <label class="field">
+          <span>{{ 'taxFreeAllowance' | translate }}</span>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            class="input-field"
+            [ngModel]="form().taxFreeAllowanceMonthly"
+            (ngModelChange)="updateNumber('taxFreeAllowanceMonthly', $event)"
+            name="taxFreeAllowanceMonthly"
+          />
+        </label>
+      </div>
+
+      <div class="subsection">
+        <h3>{{ 'commute' | translate }}</h3>
+        <p class="field-hint">
+          {{ 'commuteHint' | translate }}
+          <a [href]="bmfPendlerUrl" target="_blank" rel="noopener noreferrer">
+            www.bmf.gv.at/pendlerrechner
+          </a>
+        </p>
+
+        <label class="field">
+          <span>{{ 'commuteKm' | translate }}</span>
+          <input
+            type="number"
+            min="0"
+            step="0.1"
+            class="input-field"
+            [ngModel]="form().commuteOneWayKm"
+            (ngModelChange)="updateNumber('commuteOneWayKm', $event)"
+            name="commuteOneWayKm"
+          />
+        </label>
+
+        <fieldset class="field">
+          <legend>{{ 'publicTransportReasonable' | translate }}</legend>
+          <div class="segmented">
+            <button
+              type="button"
+              [class.active]="form().publicTransportReasonable"
+              (click)="setYesNo('publicTransportReasonable', true)"
+            >
+              {{ 'yes' | translate }}
+            </button>
+            <button
+              type="button"
+              [class.active]="!form().publicTransportReasonable"
+              (click)="setYesNo('publicTransportReasonable', false)"
+            >
+              {{ 'no' | translate }}
+            </button>
+          </div>
+        </fieldset>
+
+        <label class="field">
+          <span>{{ 'commuteDays' | translate }}</span>
+          <select
+            class="input-field"
+            [ngModel]="form().commuteDaysPerMonth"
+            (ngModelChange)="setCommuteDays($event)"
+            name="commuteDaysPerMonth"
+          >
+            <option value="less_than_4">{{ 'commuteDaysLess4' | translate }}</option>
+            <option value="from_4_to_7">{{ 'commuteDays4to7' | translate }}</option>
+            <option value="from_8_to_10">{{ 'commuteDays8to10' | translate }}</option>
+            <option value="more_than_10">{{ 'commuteDaysMore10' | translate }}</option>
+          </select>
+        </label>
+      </div>
+
+      @if (error()) {
+        <p class="error-text" role="alert">{{ error() }}</p>
+      }
+
+      <button
+        type="submit"
+        class="btn-primary btn-block"
+        [disabled]="loading() || !canCalculate()"
+      >
+        @if (loading()) {
+          {{ 'calculating' | translate }}
+        } @else {
+          {{ 'calculate' | translate }}
+        }
+      </button>
+    </form>
+
+    <div class="results-column">
+      @if (result(); as data) {
+        <article class="card card-result">
+          <header class="result-header">
+            <h2>{{ 'results' | translate }}</h2>
+            <span class="meta">{{ 'tableYear' | translate }}: {{ data.tableYear }}</span>
+          </header>
+
+          <div class="tabs" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              [class.active]="activeTab() === 'recurring'"
+              (click)="activeTab.set('recurring')"
+            >
+              {{ 'recurring' | translate }}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              [class.active]="activeTab() === 'thirteenth'"
+              (click)="activeTab.set('thirteenth')"
+            >
+              {{ 'thirteenth' | translate }}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              [class.active]="activeTab() === 'fourteenth'"
+              (click)="activeTab.set('fourteenth')"
+            >
+              {{ 'fourteenth' | translate }}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              [class.active]="activeTab() === 'annual'"
+              (click)="activeTab.set('annual')"
+            >
+              {{ 'annual' | translate }}
+            </button>
+          </div>
+
+          @if (activeBreakdown(); as row) {
+            <dl class="breakdown">
+              <div>
+                <dt>{{ 'gross' | translate }}</dt>
+                <dd>{{ row.gross | eur }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'socialInsurance' | translate }}</dt>
+                <dd class="deduction">− {{ row.socialInsurance | eur }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'incomeTax' | translate }}</dt>
+                <dd class="deduction">− {{ row.incomeTax | eur }}</dd>
+              </div>
+              <div class="net-row">
+                <dt>{{ 'net' | translate }}</dt>
+                <dd>{{ row.net | eur }}</dd>
+              </div>
+            </dl>
+          }
+        </article>
+      } @else {
+        <div class="card card-empty">
+          <p>{{ 'results' | translate }}</p>
+        </div>
+      }
+
+      @if (showAttemptsBadge()) {
+        <div
+          class="attempts-banner"
+          [class.warning]="session.status()?.freeAttemptsRemaining === 0"
+        >
+          <span
+            >{{ 'attemptsRemaining' | translate }}:
+            {{ session.status()?.freeAttemptsRemaining }}</span
+          >
+          @if (session.status()?.freeAttemptsRemaining === 0) {
+            <button type="button" class="btn-primary btn-sm" (click)="openPaymentModal()">
+              {{ 'upgradeToPro' | translate }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <section class="seo-faq" aria-labelledby="faq-heading">
+    <h2 id="faq-heading">{{ 'faqTitle' | translate }}</h2>
+    <details>
+      <summary>{{ 'faqQ1' | translate }}</summary>
+      <p>{{ 'faqA1' | translate }}</p>
+    </details>
+    <details>
+      <summary>{{ 'faqQ2' | translate }}</summary>
+      <p>{{ 'faqA2' | translate }}</p>
+    </details>
+    <details>
+      <summary>{{ 'faqQ3' | translate }}</summary>
+      <p>{{ 'faqA3' | translate }}</p>
+    </details>
+  </section>
+</section>
+
+<app-payment-modal [open]="paymentModalOpen()" (closed)="closePaymentModal()" />

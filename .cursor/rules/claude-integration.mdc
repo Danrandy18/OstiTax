@@ -1,0 +1,68 @@
+---
+description: Usar Claude Skills y la API de Claude junto con Cursor en este proyecto
+alwaysApply: true
+---
+
+# Integración Claude + Cursor
+
+Servidores MCP en `.cursor/mcp.json` (**terceros + local**, no productos oficiales de Anthropic):
+
+## 1. skills-mcp
+
+Paquete npm: [agustinustheo/skills-mcp](https://github.com/agustinustheo/skills-mcp). Escanea la carpeta `skills/`.
+
+Antes de tareas especializadas:
+
+1. Llamar `list_skills` para ver skills disponibles
+2. Llamar `get_skill` con el id adecuado
+3. Seguir SKILL.md; leer `references/`, `scripts/` o `assets/` si hace falta
+
+Skills instalados:
+
+| Id | Tipo |
+|----|------|
+| `skill-creator` | Anthropic (ejemplo) |
+| `mcp-builder` | Anthropic (ejemplo) |
+| `frontend-design` | Anthropic (ejemplo) |
+| `webapp-testing` | Anthropic (ejemplo) |
+| `claude-api` | Anthropic (ejemplo) |
+| `web-design-guidelines` | Vercel Labs — auditoría UI |
+| `find-skills` | Vercel Labs — descubrir/instalar skills ([skills.sh](https://skills.sh)) |
+| `awesome-design` | TypeUI Clean — [awesome-design-skills](https://github.com/bergside/awesome-design-skills) |
+| `taste-skill` | Comunidad — diseño premium ([Leonxlnx](https://github.com/Leonxlnx/taste-skill)) |
+| `frontend-style` | **Proyecto** — UI de este producto |
+
+Para pantallas de la calculadora: preferir `frontend-style`. Usar `web-design-guidelines` para revisar accesibilidad/UX de componentes ya creados.
+
+## 2. claude-api
+
+Servidor local en `tools/claude-api-mcp/`. Requiere `ANTHROPIC_API_KEY`.
+
+- `ask_claude` — consulta general
+- `review_with_claude` — revisión de código/arquitectura
+- `count_tokens` — estimación de tokens
+
+## 3. playwright (MCP)
+
+Paquete npm: `@playwright/mcp` (headless). E2E local en `web/`: `npm run e2e`.
+
+## 4. agent-browser (MCP)
+
+CLI global: `agent-browser` ([vercel-labs/agent-browser](https://github.com/vercel-labs/agent-browser)). Navegador real vía CDP con snapshots compactos — ideal para que el agente **testee la UI** (`open`, `snapshot`, `click`, `screenshot`).
+
+Requisito: `npm i -g agent-browser && agent-browser install` (Chrome for Testing).
+
+Skill de descubrimiento: `skills/agent-browser/` → cargar con `get_skill` o `agent-browser skills get core --full`.
+
+## Flujo recomendado
+
+1. Cursor implementa en `web/`, `backend/`, `mobile/`
+2. Tarea especializada → `list_skills` + `get_skill`
+3. Segunda opinión → `ask_claude` o `review_with_claude`
+4. Validar UI → MCP `agent-browser` (exploración) o `playwright` / `npm run e2e` en `web/`
+
+## Activación
+
+- Configurar `ANTHROPIC_API_KEY` (solo para `claude-api`)
+- Activar `skills-mcp`, `claude-api`, `playwright` y `agent-browser` en **Settings → Tools & MCP**
+- Reiniciar Cursor tras cambiar `.cursor/mcp.json`

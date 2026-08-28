@@ -1,0 +1,296 @@
+[
+  {
+    "id": "ak-employee-wien-1800-basic",
+    "source": "https://bruttonetto.arbeiterkammer.at",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 1800,
+      "incomePeriod": "monthly",
+      "state": "wien",
+      "soleEarnerDeduction": false,
+      "familyBonus": "none",
+      "commuteOneWayKm": 0,
+      "publicTransportReasonable": true,
+      "commuteDaysPerMonth": "more_than_10"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 1800,
+        "socialInsurance": 276.66,
+        "incomeTax": 35.49,
+        "net": 1487.85
+      },
+      "thirteenth": {
+        "gross": 1800,
+        "socialInsurance": 254.16,
+        "incomeTax": 55.55,
+        "net": 1490.29
+      },
+      "fourteenth": {
+        "gross": 1800,
+        "socialInsurance": 254.16,
+        "incomeTax": 92.75,
+        "net": 1453.09
+      },
+      "annual": {
+        "gross": 25200,
+        "socialInsurance": 3828.24,
+        "incomeTax": 574.18,
+        "net": 20797.58
+      }
+    }
+  },
+  {
+    "id": "ak-employee-wien-2500-basic",
+    "source": "https://bruttonetto.arbeiterkammer.at",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 2500,
+      "incomePeriod": "monthly",
+      "state": "wien",
+      "soleEarnerDeduction": false,
+      "familyBonus": "none",
+      "commuteOneWayKm": 0,
+      "publicTransportReasonable": true,
+      "commuteDaysPerMonth": "more_than_10"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 2500,
+        "socialInsurance": 434.25,
+        "incomeTax": 166.18,
+        "net": 1899.57
+      },
+      "thirteenth": {
+        "gross": 2500,
+        "socialInsurance": 403,
+        "incomeTax": 88.62,
+        "net": 2008.38
+      },
+      "fourteenth": {
+        "gross": 2500,
+        "socialInsurance": 403,
+        "incomeTax": 125.82,
+        "net": 1971.18
+      },
+      "annual": {
+        "gross": 35000,
+        "socialInsurance": 6017,
+        "incomeTax": 2208.6,
+        "net": 26774.4
+      }
+    }
+  },
+  {
+    "id": "ak-employee-wien-3000-basic",
+    "source": "https://bruttonetto.arbeiterkammer.at",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 3000,
+      "incomePeriod": "monthly",
+      "state": "wien",
+      "soleEarnerDeduction": false,
+      "familyBonus": "none",
+      "commuteOneWayKm": 0,
+      "publicTransportReasonable": true,
+      "commuteDaysPerMonth": "more_than_10"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 3000,
+        "socialInsurance": 549.6,
+        "incomeTax": 281.57,
+        "net": 2168.83
+      },
+      "thirteenth": {
+        "gross": 3000,
+        "socialInsurance": 512.1,
+        "incomeTax": 112.07,
+        "net": 2375.83
+      },
+      "fourteenth": {
+        "gross": 3000,
+        "socialInsurance": 512.1,
+        "incomeTax": 149.28,
+        "net": 2338.62
+      },
+      "annual": {
+        "gross": 42000,
+        "socialInsurance": 7619.4,
+        "incomeTax": 3640.19,
+        "net": 30740.41
+      }
+    }
+  },
+  {
+    "id": "ak-employee-wien-3500-basic",
+    "source": "https://bruttonetto.arbeiterkammer.at",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 3500,
+      "incomePeriod": "monthly",
+      "state": "wien",
+      "soleEarnerDeduction": false,
+      "familyBonus": "none",
+      "commuteOneWayKm": 0,
+      "publicTransportReasonable": true,
+      "commuteDaysPerMonth": "more_than_10"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 3500,
+        "socialInsurance": 641.2,
+        "incomeTax": 404.09,
+        "net": 2454.71
+      },
+      "thirteenth": {
+        "gross": 3500,
+        "socialInsurance": 597.45,
+        "incomeTax": 136.95,
+        "net": 2765.6
+      },
+      "fourteenth": {
+        "gross": 3500,
+        "socialInsurance": 597.45,
+        "incomeTax": 174.16,
+        "net": 2728.39
+      },
+      "annual": {
+        "gross": 49000,
+        "socialInsurance": 8889.3,
+        "incomeTax": 5160.19,
+        "net": 34950.51
+      }
+    }
+  },
+  {
+    "id": "ak-employee-wien-4000-basic",
+    "source": "https://bruttonetto.arbeiterkammer.at",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 4000,
+      "incomePeriod": "monthly",
+      "state": "wien",
+      "soleEarnerDeduction": false,
+      "familyBonus": "none",
+      "commuteOneWayKm": 0,
+      "publicTransportReasonable": true,
+      "commuteDaysPerMonth": "more_than_10"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 4000,
+        "socialInsurance": 732.8,
+        "incomeTax": 548.41,
+        "net": 2718.79
+      },
+      "thirteenth": {
+        "gross": 4000,
+        "socialInsurance": 682.8,
+        "incomeTax": 161.83,
+        "net": 3155.37
+      },
+      "fourteenth": {
+        "gross": 4000,
+        "socialInsurance": 682.8,
+        "incomeTax": 199.03,
+        "net": 3118.17
+      },
+      "annual": {
+        "gross": 56000,
+        "socialInsurance": 10159.2,
+        "incomeTax": 6941.78,
+        "net": 38899.02
+      }
+    }
+  },
+  {
+    "id": "ak-employee-wien-5000-basic",
+    "source": "https://bruttonetto.arbeiterkammer.at",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 5000,
+      "incomePeriod": "monthly",
+      "state": "wien",
+      "soleEarnerDeduction": false,
+      "familyBonus": "none",
+      "commuteOneWayKm": 0,
+      "publicTransportReasonable": true,
+      "commuteDaysPerMonth": "more_than_10"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 5000,
+        "socialInsurance": 916,
+        "incomeTax": 875.13,
+        "net": 3208.87
+      },
+      "thirteenth": {
+        "gross": 5000,
+        "socialInsurance": 853.5,
+        "incomeTax": 211.59,
+        "net": 3934.91
+      },
+      "fourteenth": {
+        "gross": 5000,
+        "socialInsurance": 853.5,
+        "incomeTax": 248.79,
+        "net": 3897.71
+      },
+      "annual": {
+        "gross": 70000,
+        "socialInsurance": 12699,
+        "incomeTax": 10961.94,
+        "net": 46339.06
+      }
+    }
+  },
+  {
+    "id": "ak-employee-wien-6000-basic",
+    "source": "https://bruttonetto.arbeiterkammer.at",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 6000,
+      "incomePeriod": "monthly",
+      "state": "wien",
+      "soleEarnerDeduction": false,
+      "familyBonus": "none",
+      "commuteOneWayKm": 0,
+      "publicTransportReasonable": true,
+      "commuteDaysPerMonth": "more_than_10"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 6000,
+        "socialInsurance": 1099.2,
+        "incomeTax": 1201.85,
+        "net": 3698.95
+      },
+      "thirteenth": {
+        "gross": 6000,
+        "socialInsurance": 1024.2,
+        "incomeTax": 261.35,
+        "net": 4714.45
+      },
+      "fourteenth": {
+        "gross": 6000,
+        "socialInsurance": 1024.2,
+        "incomeTax": 298.55,
+        "net": 4677.25
+      },
+      "annual": {
+        "gross": 84000,
+        "socialInsurance": 15238.8,
+        "incomeTax": 14982.1,
+        "net": 53779.1
+      }
+    }
+  }
+]

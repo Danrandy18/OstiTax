@@ -1,0 +1,251 @@
+[
+  {
+    "id": "ak-employee-wien-3000-sachbezug-200",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 3000,
+      "incomePeriod": "monthly",
+      "state": "wien",
+      "benefitInKindMonthly": 200,
+      "taxFreeAllowanceMonthly": 0,
+      "benefitInKindFromCompanyCar": false
+    },
+    "expected": {
+      "recurring": {
+        "gross": 3000,
+        "socialInsurance": 586.24,
+        "incomeTax": 330.58,
+        "net": 2083.18
+      },
+      "thirteenth": {
+        "gross": 3000,
+        "socialInsurance": 512.1,
+        "incomeTax": 112.07,
+        "net": 2375.83
+      },
+      "fourteenth": {
+        "gross": 3000,
+        "socialInsurance": 512.1,
+        "incomeTax": 149.27,
+        "net": 2338.63
+      }
+    }
+  },
+  {
+    "id": "ak-employee-wien-3000-freibetrag-100",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 3000,
+      "incomePeriod": "monthly",
+      "state": "wien",
+      "benefitInKindMonthly": 0,
+      "taxFreeAllowanceMonthly": 100,
+      "benefitInKindFromCompanyCar": false
+    },
+    "expected": {
+      "recurring": {
+        "gross": 3000,
+        "socialInsurance": 549.6,
+        "incomeTax": 251.57,
+        "net": 2198.83
+      },
+      "thirteenth": {
+        "gross": 3000,
+        "socialInsurance": 512.1,
+        "incomeTax": 112.07,
+        "net": 2375.83
+      },
+      "fourteenth": {
+        "gross": 3000,
+        "socialInsurance": 512.1,
+        "incomeTax": 149.27,
+        "net": 2338.63
+      }
+    }
+  },
+  {
+    "id": "ak-employee-wien-3000-sachbezug-200-freibetrag-100",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "employee",
+      "grossAmount": 3000,
+      "incomePeriod": "monthly",
+      "state": "wien",
+      "benefitInKindMonthly": 200,
+      "taxFreeAllowanceMonthly": 100,
+      "benefitInKindFromCompanyCar": false
+    },
+    "expected": {
+      "recurring": {
+        "gross": 3000,
+        "socialInsurance": 586.24,
+        "incomeTax": 300.58,
+        "net": 2113.18
+      },
+      "thirteenth": {
+        "gross": 3000,
+        "socialInsurance": 512.1,
+        "incomeTax": 112.07,
+        "net": 2375.83
+      },
+      "fourteenth": {
+        "gross": 3000,
+        "socialInsurance": 512.1,
+        "incomeTax": 149.27,
+        "net": 2338.63
+      }
+    }
+  },
+  {
+    "id": "ak-lehrling-wien-1800",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "apprentice",
+      "grossAmount": 1800,
+      "incomePeriod": "monthly",
+      "state": "wien"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 1800,
+        "socialInsurance": 276.66,
+        "incomeTax": 35.49,
+        "net": 1487.85
+      },
+      "thirteenth": {
+        "gross": 1800,
+        "socialInsurance": 254.16,
+        "incomeTax": 55.55,
+        "net": 1490.29
+      },
+      "fourteenth": {
+        "gross": 1800,
+        "socialInsurance": 254.16,
+        "incomeTax": 92.75,
+        "net": 1453.09
+      }
+    }
+  },
+  {
+    "id": "ak-pensionist-wien-1500",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "pensioner",
+      "grossAmount": 1500,
+      "incomePeriod": "monthly",
+      "state": "wien"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 1500,
+        "socialInsurance": 90,
+        "incomeTax": 0,
+        "net": 1410
+      },
+      "thirteenth": {
+        "gross": 1500,
+        "socialInsurance": 90,
+        "incomeTax": 47.4,
+        "net": 1362.6
+      },
+      "fourteenth": {
+        "gross": 1500,
+        "socialInsurance": 90,
+        "incomeTax": 84.6,
+        "net": 1325.4
+      }
+    }
+  },
+  {
+    "id": "ak-pensionist-wien-2000",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "pensioner",
+      "grossAmount": 2000,
+      "incomePeriod": "monthly",
+      "state": "wien"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 2000,
+        "socialInsurance": 120,
+        "incomeTax": 78.22,
+        "net": 1801.78
+      },
+      "thirteenth": {
+        "gross": 2000,
+        "socialInsurance": 120,
+        "incomeTax": 75.6,
+        "net": 1804.4
+      },
+      "fourteenth": {
+        "gross": 2000,
+        "socialInsurance": 120,
+        "incomeTax": 112.8,
+        "net": 1767.2
+      }
+    }
+  },
+  {
+    "id": "ak-pensionist-wien-2500",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "pensioner",
+      "grossAmount": 2500,
+      "incomePeriod": "monthly",
+      "state": "wien"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 2500,
+        "socialInsurance": 150,
+        "incomeTax": 267.74,
+        "net": 2082.26
+      },
+      "thirteenth": {
+        "gross": 2500,
+        "socialInsurance": 150,
+        "incomeTax": 103.8,
+        "net": 2246.2
+      },
+      "fourteenth": {
+        "gross": 2500,
+        "socialInsurance": 150,
+        "incomeTax": 141,
+        "net": 2209
+      }
+    }
+  },
+  {
+    "id": "ak-pensionist-wien-3000",
+    "stand": "2026-01",
+    "input": {
+      "employmentType": "pensioner",
+      "grossAmount": 3000,
+      "incomePeriod": "monthly",
+      "state": "wien"
+    },
+    "expected": {
+      "recurring": {
+        "gross": 3000,
+        "socialInsurance": 180,
+        "incomeTax": 437.08,
+        "net": 2382.92
+      },
+      "thirteenth": {
+        "gross": 3000,
+        "socialInsurance": 180,
+        "incomeTax": 132,
+        "net": 2688
+      },
+      "fourteenth": {
+        "gross": 3000,
+        "socialInsurance": 180,
+        "incomeTax": 169.2,
+        "net": 2650.8
+      }
+    }
+  }
+]

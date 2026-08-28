@@ -1,0 +1,39 @@
+{
+  "mcpServers": {
+    "skills-mcp": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "skills-mcp@0.0.5",
+        "-s",
+        "C:\\Users\\ronau\\Desktop\\proyectos\\app_calculos\\skills"
+      ]
+    },
+    "claude-api": {
+      "command": "node",
+      "args": [
+        "C:\\Users\\ronau\\Desktop\\proyectos\\app_calculos\\tools\\claude-api-mcp\\dist\\index.js"
+      ],
+      "env": {
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
+        "CLAUDE_MODEL": "claude-sonnet-4-5-20250929"
+      }
+    },
+    "playwright": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@playwright/mcp@latest",
+        "--headless"
+      ]
+    },
+    "agent-browser": {
+      "command": "cmd",
+      "args": ["/c", "agent-browser", "mcp"]
+    }
+  }
+}
