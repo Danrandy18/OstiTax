@@ -1,5 +1,5 @@
 <section class="calculator-page">
-  <header class="page-hero">
+  <header class="page-hero reveal">
     <h1>{{ 'seoHero' | translate }}</h1>
     <p>{{ 'seoLead' | translate }}</p>
   </header>
@@ -8,6 +8,7 @@
     <form class="card form-card" (ngSubmit)="submit()">
       <fieldset class="field">
         <legend>{{ 'iAm' | translate }}</legend>
+        <p class="field-hint">{{ 'iAmHint' | translate }}</p>
         <div class="employment-grid">
           <button
             type="button"
@@ -15,7 +16,14 @@
             [class.active]="form().employmentType === 'employee'"
             (click)="setEmploymentType('employee')"
           >
-            {{ 'employmentEmployee' | translate }}
+            <span class="icon-badge" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24">
+                <rect x="3" y="7" width="18" height="12" rx="2" />
+                <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                <path d="M3 12h18" />
+              </svg>
+            </span>
+            <span>{{ 'employmentEmployee' | translate }}</span>
           </button>
           <button
             type="button"
@@ -23,7 +31,14 @@
             [class.active]="form().employmentType === 'apprentice'"
             (click)="setEmploymentType('apprentice')"
           >
-            {{ 'employmentApprentice' | translate }}
+            <span class="icon-badge" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M2 9.5 12 5l10 4.5-10 4.5L2 9.5Z" />
+                <path d="M6 11.5v4c0 1.1 2.7 2.5 6 2.5s6-1.4 6-2.5v-4" />
+                <path d="M20 9.5v5" />
+              </svg>
+            </span>
+            <span>{{ 'employmentApprentice' | translate }}</span>
           </button>
           <button
             type="button"
@@ -31,14 +46,24 @@
             [class.active]="form().employmentType === 'pensioner'"
             (click)="setEmploymentType('pensioner')"
           >
-            {{ 'employmentPensioner' | translate }}
+            <span class="icon-badge" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="4" />
+                <path
+                  d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"
+                />
+              </svg>
+            </span>
+            <span>{{ 'employmentPensioner' | translate }}</span>
           </button>
         </div>
       </fieldset>
 
       <fieldset class="field">
         <legend>{{ 'incomePeriod' | translate }}</legend>
-        <div class="segmented">
+        <p class="field-hint">{{ 'incomePeriodHint' | translate }}</p>
+        <div class="segmented" [class.segmented-right]="form().incomePeriod === 'yearly'">
+          <span class="segmented-thumb" aria-hidden="true"></span>
           <button
             type="button"
             [class.active]="form().incomePeriod === 'monthly'"
@@ -72,6 +97,7 @@
 
       <label class="field">
         <span>{{ 'state' | translate }}</span>
+        <p class="field-hint">{{ 'stateHint' | translate }}</p>
         <select
           class="input-field"
           [ngModel]="form().state"
@@ -89,7 +115,9 @@
 
         <fieldset class="field">
           <legend>{{ 'soleEarner' | translate }}</legend>
-          <div class="segmented">
+          <p class="field-hint">{{ 'soleEarnerHint' | translate }}</p>
+          <div class="segmented" [class.segmented-right]="!form().soleEarnerDeduction">
+            <span class="segmented-thumb" aria-hidden="true"></span>
             <button
               type="button"
               [class.active]="form().soleEarnerDeduction"
@@ -109,6 +137,7 @@
 
         <label class="field">
           <span>{{ 'familyBonus' | translate }}</span>
+          <p class="field-hint">{{ 'familyBonusHint' | translate }}</p>
           <select
             class="input-field"
             [ngModel]="form().familyBonus"
@@ -122,7 +151,7 @@
         </label>
 
         @if (showChildrenFields()) {
-          <div class="field-row">
+          <div class="field-row reveal">
             <label class="field">
               <span>{{ 'childrenUnder18' | translate }}</span>
               <input
@@ -152,6 +181,7 @@
 
         <label class="field">
           <span>{{ 'benefitInKind' | translate }}</span>
+          <p class="field-hint">{{ 'benefitInKindHint' | translate }}</p>
           <input
             type="number"
             min="0"
@@ -165,7 +195,8 @@
 
         <fieldset class="field">
           <legend>{{ 'companyCarBenefit' | translate }}</legend>
-          <div class="segmented">
+          <div class="segmented" [class.segmented-right]="!form().benefitInKindFromCompanyCar">
+            <span class="segmented-thumb" aria-hidden="true"></span>
             <button
               type="button"
               [class.active]="form().benefitInKindFromCompanyCar"
@@ -185,7 +216,7 @@
         </fieldset>
 
         @if (showCompanyCarFields()) {
-          <div class="field-row">
+          <div class="field-row reveal">
             <label class="field">
               <span>{{ 'companyCarAcquisitionCost' | translate }}</span>
               <input
@@ -211,7 +242,7 @@
               />
             </label>
           </div>
-          <div class="field-row">
+          <div class="field-row reveal">
             <label class="field">
               <span>{{ 'companyCarRegistrationYear' | translate }}</span>
               <input
@@ -239,6 +270,7 @@
 
         <label class="field">
           <span>{{ 'taxFreeAllowance' | translate }}</span>
+          <p class="field-hint">{{ 'taxFreeAllowanceHint' | translate }}</p>
           <input
             type="number"
             min="0"
@@ -279,7 +311,8 @@
 
         <fieldset class="field">
           <legend>{{ 'publicTransportReasonable' | translate }}</legend>
-          <div class="segmented">
+          <div class="segmented" [class.segmented-right]="!form().publicTransportReasonable">
+            <span class="segmented-thumb" aria-hidden="true"></span>
             <button
               type="button"
               [class.active]="form().publicTransportReasonable"
@@ -322,10 +355,11 @@
 
       <button
         type="submit"
-        class="btn-primary btn-block"
+        class="btn-primary btn-block btn-submit"
         [disabled]="loading() || !canCalculate()"
       >
         @if (loading()) {
+          <span class="spinner" aria-hidden="true"></span>
           {{ 'calculating' | translate }}
         } @else {
           {{ 'calculate' | translate }}
@@ -341,14 +375,28 @@
               <h2>{{ 'results' | translate }}</h2>
               <span class="meta">{{ 'tableYear' | translate }}: {{ data.tableYear }}</span>
             </div>
-            <button
-              type="button"
-              class="btn-export-pdf"
-              (click)="exportPdf()"
-              [title]="session.status()?.isPro ? ('exportPdf' | translate) : ('exportPdfProHint' | translate)"
-            >
-              {{ 'exportPdf' | translate }}
-            </button>
+            <div class="export-pdf-group">
+              <label class="pdf-lang-select" [title]="'PDF: ' + (session.status()?.isPro ? '' : ('exportPdfProHint' | translate))">
+                <span class="sr-only">PDF</span>
+                <select
+                  [ngModel]="pdfLang()"
+                  (ngModelChange)="setPdfLang($event)"
+                  name="pdfLang"
+                >
+                  @for (option of pdfLangOptions; track option.code) {
+                    <option [value]="option.code">{{ option.label }}</option>
+                  }
+                </select>
+              </label>
+              <button
+                type="button"
+                class="btn-export-pdf"
+                (click)="exportPdf()"
+                [title]="session.status()?.isPro ? ('exportPdf' | translate) : ('exportPdfProHint' | translate)"
+              >
+                {{ 'exportPdf' | translate }}
+              </button>
+            </div>
           </header>
 
           <div class="tabs" role="tablist">
@@ -387,28 +435,48 @@
           </div>
 
           @if (activeBreakdown(); as row) {
-            <dl class="breakdown">
+            <dl class="breakdown" #breakdownEl>
               <div>
                 <dt>{{ 'gross' | translate }}</dt>
-                <dd>{{ row.gross | eur }}</dd>
+                <dd [countUp]="row.gross"></dd>
               </div>
               <div>
                 <dt>{{ 'socialInsurance' | translate }}</dt>
-                <dd class="deduction">− {{ row.socialInsurance | eur }}</dd>
+                <dd class="deduction">
+                  <span aria-hidden="true">− </span><span [countUp]="row.socialInsurance"></span>
+                </dd>
               </div>
               <div>
                 <dt>{{ 'incomeTax' | translate }}</dt>
-                <dd class="deduction">− {{ row.incomeTax | eur }}</dd>
+                <dd class="deduction">
+                  <span aria-hidden="true">− </span><span [countUp]="row.incomeTax"></span>
+                </dd>
               </div>
               <div class="net-row">
-                <dt>{{ 'net' | translate }}</dt>
-                <dd>{{ row.net | eur }}</dd>
+                <dt>
+                  <svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10" />
+                    <path class="icon-check-mark" d="m7.5 12.5 3 3 6-6.5" />
+                  </svg>
+                  {{ 'net' | translate }}
+                </dt>
+                <dd [countUp]="row.net"></dd>
               </div>
             </dl>
           }
         </article>
+      } @else if (loading()) {
+        <div class="card card-result-skeleton" aria-hidden="true">
+          <div class="skeleton skel-line skel-line-lg"></div>
+          <div class="skeleton skel-line"></div>
+          <div class="skeleton skel-block"></div>
+        </div>
       } @else {
         <div class="card card-empty">
+          <svg class="icon icon-lg" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 2h12v20l-3-2-3 2-3-2-3 2V2Z" />
+            <path d="M9 7h6M9 11h6M9 15h4" />
+          </svg>
           <p>{{ 'results' | translate }}</p>
         </div>
       }
@@ -429,21 +497,49 @@
           }
         </div>
       }
+
+      @if (devMode) {
+        <div class="qa-panel">
+          <span class="qa-panel-label">QA (solo desarrollo)</span>
+          <button
+            type="button"
+            class="btn-secondary btn-sm"
+            [disabled]="resettingAttempts()"
+            (click)="resetAttemptsForTesting()"
+          >
+            {{ resettingAttempts() ? '...' : 'Reiniciar intentos' }}
+          </button>
+          @if (result()) {
+            <button type="button" class="btn-secondary btn-sm" (click)="exportPdfForTesting()">
+              Descargar PDF en {{ pdfLang() }} (sin Pro)
+            </button>
+          }
+        </div>
+      }
     </div>
   </div>
 
   <section class="seo-faq" aria-labelledby="faq-heading">
     <h2 id="faq-heading">{{ 'faqTitle' | translate }}</h2>
     <details>
-      <summary>{{ 'faqQ1' | translate }}</summary>
+      <summary>
+        <span>{{ 'faqQ1' | translate }}</span>
+        <svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+      </summary>
       <p>{{ 'faqA1' | translate }}</p>
     </details>
     <details>
-      <summary>{{ 'faqQ2' | translate }}</summary>
+      <summary>
+        <span>{{ 'faqQ2' | translate }}</span>
+        <svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+      </summary>
       <p>{{ 'faqA2' | translate }}</p>
     </details>
     <details>
-      <summary>{{ 'faqQ3' | translate }}</summary>
+      <summary>
+        <span>{{ 'faqQ3' | translate }}</span>
+        <svg class="icon chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+      </summary>
       <p>{{ 'faqA3' | translate }}</p>
     </details>
   </section>

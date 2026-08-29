@@ -49,4 +49,14 @@ export class SessionService {
       }),
     );
   }
+
+  /** Solo QA: el backend rechaza esto fuera de development. */
+  resetAttemptsForTesting() {
+    return this.http.post<UserStatus>('/api/users/dev/reset-attempts', {}).pipe(
+      tap((status) => {
+        this.status.set(status);
+        this.deviceId.set(status.deviceId);
+      }),
+    );
+  }
 }

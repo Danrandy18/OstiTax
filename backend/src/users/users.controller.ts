@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { DeviceUserGuard } from '../common/guards/device-user.guard';
@@ -24,5 +31,20 @@ export class UsersController {
   @UseGuards(DeviceUserGuard)
   getMe(@CurrentUser() user: User): UserStatusDto {
     return UserStatusDto.fromEntity(user, this.usersService.isPro(user));
+  }
+
+  /**
+   * Solo para QA manual mientras el producto está en pruebas.
+   * Deshabilitado fuera de development: nunca debe permitir resetear
+   * intentos gratis en producción (ver reglas de negocio en CLAUDE.md).
+   */
+  @Post('dev/reset-attempts')
+  @UseGuards(DeviceUserGuard)
+  async resetAttemptsForTesting(@CurrentUser() user: User): Promise<UserStatusDto> {
+    if (process.env.NODE_ENV === 'production') {
+      throw new ForbiddenException('Not available in production');
+    }
+    const updated = await this.usersService.resetFreeAttemptsForTesting(user.id);
+    return UserStatusDto.fromEntity(updated, this.usersService.isPro(updated));
   }
 }

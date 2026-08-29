@@ -86,6 +86,13 @@ export interface TranslationSchema {
   faqA2: string;
   faqQ3: string;
   faqA3: string;
+  iAmHint: string;
+  incomePeriodHint: string;
+  stateHint: string;
+  soleEarnerHint: string;
+  familyBonusHint: string;
+  benefitInKindHint: string;
+  taxFreeAllowanceHint: string;
   states: Record<string, string>;
 }
 
@@ -107,7 +114,7 @@ function states(de: Record<string, string>): Record<string, string> {
 
 export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
   de: {
-    appTitle: 'NettoKlar',
+    appTitle: 'ÖstiTax',
     appSubtitle: 'Gehalt netto berechnen · Österreich 2026',
     seoHero: 'Dein Nettogehalt — klar berechnet',
     seoLead:
@@ -192,13 +199,24 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     faqTitle: 'Häufige Fragen zum Nettogehalt in Österreich',
     faqQ1: 'Wie berechne ich mein Nettogehalt in Österreich?',
     faqA1:
-      'Mit NettoKlar gibst du dein Bruttogehalt ein, wählst Bundesland und Absetzbeträge. Der Rechner zeigt Lohnsteuer, Sozialversicherung und Netto — inklusive 13. und 14. Gehalt.',
-    faqQ2: 'Berücksichtigt NettoKlar den Familienbonus Plus und die Pendlerpauschale?',
+      'Mit ÖstiTax gibst du dein Bruttogehalt ein, wählst Bundesland und Absetzbeträge. Der Rechner zeigt Lohnsteuer, Sozialversicherung und Netto — inklusive 13. und 14. Gehalt.',
+    faqQ2: 'Berücksichtigt ÖstiTax den Familienbonus Plus und die Pendlerpauschale?',
     faqA2:
       'Ja. Du kannst Alleinverdienerabsetzbetrag, Familienbonus Plus und Pendlerpauschale angeben. Die Berechnung folgt den aktuellen Tabellen für Österreich.',
     faqQ3: 'Für welches Jahr gelten die Steuertabellen?',
     faqA3:
-      'NettoKlar verwendet die aktuellen Werte Stand Jänner 2026 (Steuerreform und Sozialversicherung).',
+      'ÖstiTax verwendet die aktuellen Werte Stand Jänner 2026 (Steuerreform und Sozialversicherung).',
+    iAmHint: 'Bestimmt die Sozialversicherungs- und Steuerregeln für deine Berechnung.',
+    incomePeriodHint:
+      '13. und 14. Gehalt werden automatisch berücksichtigt, unabhängig von deiner Auswahl.',
+    stateHint: 'Wien hat einen etwas höheren Sozialversicherungsbeitrag (Wohnbauförderung).',
+    soleEarnerHint:
+      'Für Alleinverdiener oder Alleinerzieher mit mindestens einem Kind (Familienbeihilfe).',
+    familyBonusHint:
+      'Steuerbonus pro Kind. "Voller Bonus", wenn nur du ihn beantragst, sonst "Geteilter Bonus".',
+    benefitInKindHint:
+      'Geldwerte Vorteile wie Diensthandy oder -wohnung, die zusätzlich versteuert werden.',
+    taxFreeAllowanceHint: 'Laut Freibetragsbescheid deines Finanzamts, falls vorhanden.',
     states: states({
       wien: 'Wien',
       niederoesterreich: 'Niederösterreich',
@@ -212,7 +230,7 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     }),
   },
   en: {
-    appTitle: 'NettoKlar',
+    appTitle: 'ÖstiTax',
     appSubtitle: 'Net salary calculator · Austria 2026',
     seoHero: 'Your net salary — clearly calculated',
     seoLead:
@@ -297,12 +315,20 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     faqTitle: 'FAQ — net salary in Austria',
     faqQ1: 'How do I calculate my net salary in Austria?',
     faqA1:
-      'With NettoKlar enter your gross salary, choose your federal state and deductions. You get income tax, social insurance and net — including 13th and 14th salary.',
-    faqQ2: 'Does NettoKlar include Familienbonus Plus and commute allowance?',
+      'With ÖstiTax enter your gross salary, choose your federal state and deductions. You get income tax, social insurance and net — including 13th and 14th salary.',
+    faqQ2: 'Does ÖstiTax include Familienbonus Plus and commute allowance?',
     faqA2:
       'Yes. You can set sole-earner deduction, Familienbonus Plus and Pendlerpauschale using current Austrian tables.',
     faqQ3: 'Which tax year do the tables use?',
-    faqA3: 'NettoKlar uses the current values as of January 2026.',
+    faqA3: 'ÖstiTax uses the current values as of January 2026.',
+    iAmHint: 'Determines the social insurance and tax rules used for your calculation.',
+    incomePeriodHint:
+      '13th and 14th salary are always included automatically, regardless of your choice here.',
+    stateHint: 'Vienna has a slightly higher social insurance rate (housing levy).',
+    soleEarnerHint: 'For sole earners or single parents with at least one child (family allowance).',
+    familyBonusHint: 'Tax credit per child. "Full bonus" if only you claim it, otherwise "Shared bonus".',
+    benefitInKindHint: 'Non-cash perks like a company phone or flat, taxed as extra income.',
+    taxFreeAllowanceHint: "From your tax office's Freibetragsbescheid, if you have one.",
     states: states({
       wien: 'Vienna',
       niederoesterreich: 'Lower Austria',
@@ -316,7 +342,7 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     }),
   },
   es: {
-    appTitle: 'NettoKlar',
+    appTitle: 'ÖstiTax',
     appSubtitle: 'Calcula tu neto · Austria 2026',
     seoHero: 'Tu salario neto — claro y preciso',
     seoLead:
@@ -401,12 +427,23 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     faqTitle: 'Preguntas frecuentes — salario neto en Austria',
     faqQ1: '¿Cómo calculo mi salario neto en Austria?',
     faqA1:
-      'Con NettoKlar introduces el bruto, eliges el estado federal y las deducciones. Verás impuesto, seguro social y neto — incluido el 13.º y 14.º.',
+      'Con ÖstiTax introduces el bruto, eliges el estado federal y las deducciones. Verás impuesto, seguro social y neto — incluido el 13.º y 14.º.',
     faqQ2: '¿Incluye Familienbonus Plus y la indemnización por desplazamiento?',
     faqA2:
       'Sí. Puedes indicar deducción de único sustento, Familienbonus Plus y Pendlerpauschale según tablas austriacas vigentes.',
     faqQ3: '¿De qué año son las tablas fiscales?',
-    faqA3: 'NettoKlar usa los valores vigentes a enero de 2026.',
+    faqA3: 'ÖstiTax usa los valores vigentes a enero de 2026.',
+    iAmHint: 'Determina las reglas de seguridad social e impuestos usadas en tu cálculo.',
+    incomePeriodHint:
+      'El 13.º y 14.º sueldo se calculan siempre automáticamente, sin importar tu elección aquí.',
+    stateHint: 'Viena tiene una cotización a la seguridad social algo más alta (fomento de vivienda).',
+    soleEarnerHint:
+      'Para quien es el único sostén del hogar o monoparental con al menos un hijo (con asignación familiar).',
+    familyBonusHint:
+      'Bono fiscal por hijo. "Bono completo" si solo tú lo solicitas, si no "Bono compartido".',
+    benefitInKindHint:
+      'Beneficios en especie como móvil o vivienda de empresa, gravados como ingreso extra.',
+    taxFreeAllowanceHint: 'Según la resolución de exención de tu oficina de impuestos, si la tienes.',
     states: states({
       wien: 'Viena',
       niederoesterreich: 'Baja Austria',
@@ -420,7 +457,7 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     }),
   },
   tr: {
-    appTitle: 'NettoKlar',
+    appTitle: 'ÖstiTax',
     appSubtitle: 'Net maaş hesapla · Avusturya 2026',
     seoHero: 'Net maaşın — net ve anlaşılır',
     seoLead:
@@ -505,12 +542,22 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     faqTitle: 'SSS — Avusturya net maaş',
     faqQ1: 'Avusturya’da net maaşımı nasıl hesaplarım?',
     faqA1:
-      'NettoKlar ile brüt maaşı gir, eyaleti ve indirimleri seç. Gelir vergisi, sosyal sigorta ve net — 13./14. maaş dahil — görünür.',
+      'ÖstiTax ile brüt maaşı gir, eyaleti ve indirimleri seç. Gelir vergisi, sosyal sigorta ve net — 13./14. maaş dahil — görünür.',
     faqQ2: 'Familienbonus Plus ve yol parası dahil mi?',
     faqA2:
       'Evet. Tek gelirli indirimi, Familienbonus Plus ve Pendlerpauschale girebilirsin.',
     faqQ3: 'Vergi tabloları hangi yıla ait?',
-    faqA3: 'NettoKlar Ocak 2026 değerlerini kullanır.',
+    faqA3: 'ÖstiTax Ocak 2026 değerlerini kullanır.',
+    iAmHint: 'Hesaplamanda kullanılan sosyal sigorta ve vergi kurallarını belirler.',
+    incomePeriodHint:
+      '13. ve 14. maaş, buradaki seçimden bağımsız olarak her zaman otomatik hesaplanır.',
+    stateHint: 'Viyana\'da sosyal sigorta oranı biraz daha yüksektir (konut katkısı).',
+    soleEarnerHint: 'En az bir çocuğu olan (aile yardımı alan) tek kazananlar veya tek ebeveynler için.',
+    familyBonusHint:
+      'Çocuk başına vergi indirimi. Sadece sen başvurursan "Tam bonus", değilse "Paylaşımlı bonus".',
+    benefitInKindHint:
+      'Şirket telefonu veya lojmanı gibi, ek gelir olarak vergilendirilen ayni menfaatler.',
+    taxFreeAllowanceHint: 'Vergi dairenin Freibetragsbescheid kararına göre, varsa.',
     states: states({
       wien: 'Viyana',
       niederoesterreich: 'Aşağı Avusturya',
@@ -524,7 +571,7 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     }),
   },
   bcs: {
-    appTitle: 'NettoKlar',
+    appTitle: 'ÖstiTax',
     appSubtitle: 'Izračunaj neto · Austrija 2026',
     seoHero: 'Tvoja neto plata — jasno izračunata',
     seoLead:
@@ -609,12 +656,23 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     faqTitle: 'Česta pitanja — neto plata u Austriji',
     faqQ1: 'Kako izračunati neto platu u Austriji?',
     faqA1:
-      'U NettoKlar unesi bruto, saveznu državu i odbitke. Dobijaš porez, socijalno i neto — uključujući 13. i 14. platu.',
+      'U ÖstiTax unesi bruto, saveznu državu i odbitke. Dobijaš porez, socijalno i neto — uključujući 13. i 14. platu.',
     faqQ2: 'Uključuje li Familienbonus Plus i putne troškove?',
     faqA2:
       'Da. Možeš unijeti odbitak za jednog zaradnja, Familienbonus Plus i Pendlerpauschale.',
     faqQ3: 'Za koju godinu važe poreske tabele?',
-    faqA3: 'NettoKlar koristi vrijednosti od januara 2026.',
+    faqA3: 'ÖstiTax koristi vrijednosti od januara 2026.',
+    iAmHint: 'Određuje pravila socijalnog osiguranja i poreza za tvoj izračun.',
+    incomePeriodHint:
+      '13. i 14. plata se uvijek automatski uračunavaju, bez obzira na tvoj izbor ovdje.',
+    stateHint: 'Beč ima nešto viši doprinos za socijalno osiguranje (stambeni doprinos).',
+    soleEarnerHint:
+      'Za jedine zarađivače ili samohrane roditelje sa najmanje jednim djetetom (dječiji dodatak).',
+    familyBonusHint:
+      'Poreski bonus po djetetu. "Puni bonus" ako ga tražiš samo ti, inače "Podijeljeni bonus".',
+    benefitInKindHint:
+      'Nenovčane pogodnosti poput službenog telefona ili stana, koje se dodatno oporezuju.',
+    taxFreeAllowanceHint: 'Prema rješenju tvoje poreske uprave (Freibetragsbescheid), ako postoji.',
     states: states({
       wien: 'Beč',
       niederoesterreich: 'Donja Austrija',
@@ -628,7 +686,7 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     }),
   },
   uk: {
-    appTitle: 'NettoKlar',
+    appTitle: 'ÖstiTax',
     appSubtitle: 'Розрахунок нетто · Австрія 2026',
     seoHero: 'Твоя нетто зарплата — зрозуміло порахована',
     seoLead:
@@ -713,12 +771,23 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     faqTitle: 'Поширені запитання — нетто в Австрії',
     faqQ1: 'Як порахувати нетто зарплату в Австрії?',
     faqA1:
-      'У NettoKlar введи брутто, землю та відрахування. Побачиш податок, соцстрахування і нетто — включно з 13-ю та 14-ю.',
+      'У ÖstiTax введи брутто, землю та відрахування. Побачиш податок, соцстрахування і нетто — включно з 13-ю та 14-ю.',
     faqQ2: 'Чи є Familienbonus Plus і компенсація за дорогу?',
     faqA2:
       'Так. Можна вказати відрахування одного заробітчика, Familienbonus Plus і Pendlerpauschale.',
     faqQ3: 'Якого року таблиці податків?',
-    faqA3: 'NettoKlar використовує значення станом на січень 2026.',
+    faqA3: 'ÖstiTax використовує значення станом на січень 2026.',
+    iAmHint: 'Визначає правила соцстрахування та податку для твого розрахунку.',
+    incomePeriodHint:
+      '13-та і 14-та зарплата завжди враховуються автоматично, незалежно від вибору тут.',
+    stateHint: 'У Відні трохи вищий внесок на соцстрахування (житловий збір).',
+    soleEarnerHint:
+      'Для єдиного заробітчика або одинокого батька чи матері щонайменше з однією дитиною (сімейна допомога).',
+    familyBonusHint:
+      '"Повний бонус", якщо оформлюєш лише ти, інакше "Поділений бонус".',
+    benefitInKindHint:
+      'Негрошові вигоди, як службовий телефон чи житло, що оподатковуються як додатковий дохід.',
+    taxFreeAllowanceHint: 'За рішенням про звільнення від податку (Freibetragsbescheid) твоєї податкової, якщо є.',
     states: states({
       wien: 'Відень',
       niederoesterreich: 'Нижня Австрія',
@@ -726,7 +795,7 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
       burgenland: 'Бургенланд',
       salzburg: 'Зальцбург',
       steiermark: 'Штирія',
-      kaernten: 'Кärnten',
+      kaernten: 'Карінтія',
       tirol: 'Тіроль',
       vorarlberg: 'Форарльберг',
     }),

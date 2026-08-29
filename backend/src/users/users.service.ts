@@ -162,6 +162,19 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
+  /** Solo para pruebas manuales en desarrollo (ver DeviceUserGuard + NODE_ENV en el controller). */
+  async resetFreeAttemptsForTesting(userId: string): Promise<User> {
+    const user = await this.usersRepository.findOneOrFail({
+      where: { id: userId },
+    });
+
+    user.freeAttemptsRemaining = this.configService.get<number>(
+      'billing.freeAttempts',
+      3,
+    );
+    return this.usersRepository.save(user);
+  }
+
   async downgradeToFree(userId: string): Promise<User> {
     const user = await this.usersRepository.findOneOrFail({
       where: { id: userId },

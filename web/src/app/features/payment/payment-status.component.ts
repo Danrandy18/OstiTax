@@ -8,7 +8,11 @@ import { TranslatePipe } from '../../shared/pipes/app.pipes';
   standalone: true,
   imports: [RouterLink, TranslatePipe],
   template: `
-    <section class="status-page card">
+    <section class="status-page card status-success">
+      <svg class="icon icon-lg status-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" />
+        <path d="m8 12.5 2.5 2.5L16 9.5" />
+      </svg>
       <h1>{{ 'paymentSuccessTitle' | translate }}</h1>
       <p>{{ 'paymentSuccessBody' | translate }}</p>
       @if (refreshing()) {
@@ -36,7 +40,11 @@ export class PaymentSuccessComponent implements OnInit {
   standalone: true,
   imports: [RouterLink, TranslatePipe],
   template: `
-    <section class="status-page card">
+    <section class="status-page card status-cancel">
+      <svg class="icon icon-lg status-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" />
+        <path d="m9 9 6 6M15 9l-6 6" />
+      </svg>
       <h1>{{ 'paymentCancelTitle' | translate }}</h1>
       <p>{{ 'paymentCancelBody' | translate }}</p>
       <a routerLink="/" class="btn-primary">{{ 'backToCalculator' | translate }}</a>

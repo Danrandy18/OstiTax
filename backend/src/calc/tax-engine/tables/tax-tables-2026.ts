@@ -122,7 +122,7 @@ export const PENSION_LOHNSTEUER_MONTHLY_ZONES = [
   {
     upToBmg: Number.POSITIVE_INFINITY,
     rate: 0.48,
-    allowance: eurosToCents(1181.82),
+    allowance: eurosToCents(1181.83),
   },
 ] as const;
 

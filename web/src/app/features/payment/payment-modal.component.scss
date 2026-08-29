@@ -6,14 +6,17 @@
   place-items: center;
   padding: 1rem;
   background: rgb(15 23 42 / 50%);
+  backdrop-filter: blur(2px);
+  animation: fadeIn var(--duration-fast) var(--ease-out) both;
 }
 
 .modal-shell {
   width: min(100%, 28rem);
   background: var(--color-surface-elevated);
   border-radius: var(--radius-lg);
-  box-shadow: 0 24px 48px rgb(15 23 42 / 18%);
+  box-shadow: var(--shadow-lg);
   padding: 1.5rem;
+  animation: scaleIn var(--duration-base) var(--ease-out) both;
 }
 
 .modal-header {

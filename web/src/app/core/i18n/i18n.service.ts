@@ -6,11 +6,11 @@ const STORAGE_KEY = 'app_lang';
 
 const DOCUMENT_TITLES: Record<Lang, string> = {
   de: BRAND.seoTitleDe,
-  en: 'NettoKlar — Net salary calculator Austria 2026 | Gross to net',
-  es: 'NettoKlar — Calcula tu salario neto Austria 2026 | Bruto a neto',
-  tr: 'NettoKlar — Avusturya net maaş hesaplayıcı 2026',
-  bcs: 'NettoKlar — Neto plata Austrija 2026 | Bruto u neto',
-  uk: 'NettoKlar — Нетто зарплата Австрія 2026 | Брутто в нетто',
+  en: 'ÖstiTax — Net salary calculator Austria 2026 | Gross to net',
+  es: 'ÖstiTax — Calcula tu salario neto Austria 2026 | Bruto a neto',
+  tr: 'ÖstiTax — Avusturya net maaş hesaplayıcı 2026',
+  bcs: 'ÖstiTax — Neto plata Austrija 2026 | Bruto u neto',
+  uk: 'ÖstiTax — Нетто зарплата Австрія 2026 | Брутто в нетто',
 };
 
 @Injectable({ providedIn: 'root' })

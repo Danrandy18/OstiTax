@@ -1,6 +1,6 @@
 import type { Cents } from './money.util';
 import { assertCents } from './money.util';
-import { calculateIncomeTax } from './income-tax.calculator';
+import { calculateIncomeTax, calculateSonstigeBezuegeIncomeTax } from './income-tax.calculator';
 import {
   hasCompanyCarBenefit,
   resolveBenefitInKindMonthly,
@@ -36,11 +36,11 @@ function recurringAssessmentGross(
   return assertCents(monthlyCashGross + resolveBenefitInKindMonthly(input));
 }
 
-function buildPaymentBreakdown(
+function computeAssessmentAndSocialInsurance(
   monthlyCashGross: Cents,
   input: CalculationInput,
   paymentType: 'recurring' | '13th' | '14th',
-): PaymentBreakdown {
+): { assessment: Cents; socialInsurance: Cents } {
   const isBonusMonth = paymentType === '13th' || paymentType === '14th';
   const assessment = isBonusMonth
     ? monthlyCashGross
@@ -58,6 +58,20 @@ function buildPaymentBreakdown(
     companyCarBenefitMonthly: companyCarBenefit,
     state: input.state,
   });
+
+  return { assessment, socialInsurance };
+}
+
+function buildPaymentBreakdown(
+  monthlyCashGross: Cents,
+  input: CalculationInput,
+  paymentType: 'recurring' | '13th' | '14th',
+): PaymentBreakdown {
+  const { assessment, socialInsurance } = computeAssessmentAndSocialInsurance(
+    monthlyCashGross,
+    input,
+    paymentType,
+  );
   const incomeTax = calculateIncomeTax(
     assessment,
     socialInsurance,
@@ -71,6 +85,19 @@ function buildPaymentBreakdown(
     socialInsurance,
     incomeTax,
     // Netto en efectivo: Brutto cash − SV − LS.
+    net: assertCents(monthlyCashGross - socialInsurance - incomeTax),
+  };
+}
+
+function buildBonusBreakdown(
+  monthlyCashGross: Cents,
+  socialInsurance: Cents,
+  incomeTax: Cents,
+): PaymentBreakdown {
+  return {
+    gross: monthlyCashGross,
+    socialInsurance,
+    incomeTax,
     net: assertCents(monthlyCashGross - socialInsurance - incomeTax),
   };
 }
@@ -91,8 +118,25 @@ export class AustrianTaxEngine {
   calculate(input: CalculationInput): CalculationResult {
     const monthlyGross = normalizeMonthlyGross(input);
     const recurring = buildPaymentBreakdown(monthlyGross, input, 'recurring');
-    const thirteenth = buildPaymentBreakdown(monthlyGross, input, '13th');
-    const fourteenth = buildPaymentBreakdown(monthlyGross, input, '14th');
+
+    const thirteenthParts = computeAssessmentAndSocialInsurance(monthlyGross, input, '13th');
+    const fourteenthParts = computeAssessmentAndSocialInsurance(monthlyGross, input, '14th');
+    const { thirteenthTax, fourteenthTax } = calculateSonstigeBezuegeIncomeTax(
+      { assessmentGross: thirteenthParts.assessment, socialInsurance: thirteenthParts.socialInsurance },
+      { assessmentGross: fourteenthParts.assessment, socialInsurance: fourteenthParts.socialInsurance },
+      monthlyGross,
+      input,
+    );
+    const thirteenth = buildBonusBreakdown(
+      monthlyGross,
+      thirteenthParts.socialInsurance,
+      thirteenthTax,
+    );
+    const fourteenth = buildBonusBreakdown(
+      monthlyGross,
+      fourteenthParts.socialInsurance,
+      fourteenthTax,
+    );
 
     return {
       tableYear: TAX_TABLE_YEAR,

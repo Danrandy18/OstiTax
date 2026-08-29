@@ -2,23 +2,23 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://nettoklar.at/</loc>
+    <loc>https://ostitax.at/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="de-AT" href="https://nettoklar.at/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://nettoklar.at/?lang=en" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://nettoklar.at/?lang=es" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://nettoklar.at/?lang=tr" />
-    <xhtml:link rel="alternate" hreflang="uk" href="https://nettoklar.at/?lang=uk" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://nettoklar.at/" />
+    <xhtml:link rel="alternate" hreflang="de-AT" href="https://ostitax.at/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ostitax.at/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://ostitax.at/?lang=es" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://ostitax.at/?lang=tr" />
+    <xhtml:link rel="alternate" hreflang="uk" href="https://ostitax.at/?lang=uk" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ostitax.at/" />
   </url>
   <url>
-    <loc>https://nettoklar.at/payment/success</loc>
+    <loc>https://ostitax.at/payment/success</loc>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
   <url>
-    <loc>https://nettoklar.at/payment/cancel</loc>
+    <loc>https://ostitax.at/payment/cancel</loc>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>

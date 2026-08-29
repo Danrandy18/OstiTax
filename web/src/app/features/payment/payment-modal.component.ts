@@ -1,5 +1,6 @@
 import {
   Component,
+  HostListener,
   inject,
   input,
   output,
@@ -25,6 +26,13 @@ export class PaymentModalComponent {
 
   readonly loading = signal<'stripe' | 'paypal' | null>(null);
   readonly error = signal<string | null>(null);
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.open()) {
+      this.close();
+    }
+  }
 
   close(): void {
     if (this.loading()) {

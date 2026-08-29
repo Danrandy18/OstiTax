@@ -25,12 +25,12 @@ async function submitCalculation(page: import('@playwright/test').Page) {
 
 test.describe.configure({ mode: 'serial' });
 
-test.describe('NettoKlar', () => {
+test.describe('ÖstiTax', () => {
   test('carga la aplicación con título y formulario', async ({ page }) => {
     await waitForAppReady(page);
 
-    await expect(page).toHaveTitle(/NettoKlar/i);
-    await expect(page.getByText('NettoKlar').first()).toBeVisible();
+    await expect(page).toHaveTitle(/ÖstiTax/i);
+    await expect(page.getByText('ÖstiTax').first()).toBeVisible();
     await expect(
       page.getByLabel(/Brutto monatlich|Monthly gross|Bruto mensual|Bruttobezug|Gross salary|Salario bruto/i),
     ).toBeVisible();

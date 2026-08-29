@@ -153,6 +153,18 @@ function isJahressechstelPreferentialWithheld(
   return true;
 }
 
+function bonusMonthPreferentialAndExcessBase(
+  assessmentGross: Cents,
+  socialInsurance: Cents,
+  jahressechstel: Cents,
+): { preferentialBase: Cents; excessBase: Cents } {
+  const taxableBase = assertCents(assessmentGross - socialInsurance);
+  return {
+    preferentialBase: Math.min(taxableBase, jahressechstel),
+    excessBase: assertCents(Math.max(0, taxableBase - jahressechstel)),
+  };
+}
+
 function calculateBonusMonthIncomeTax(
   assessmentGross: Cents,
   socialInsurance: Cents,
@@ -160,11 +172,12 @@ function calculateBonusMonthIncomeTax(
   monthlyCashGross: Cents,
   input: CalculationInput,
 ): Cents {
-  const taxableBase = assertCents(assessmentGross - socialInsurance);
   const jahressechstel = assertCents(monthlyCashGross * 2);
-
-  const preferentialBase = Math.min(taxableBase, jahressechstel);
-  const excessBase = assertCents(Math.max(0, taxableBase - jahressechstel));
+  const { preferentialBase, excessBase } = bonusMonthPreferentialAndExcessBase(
+    assessmentGross,
+    socialInsurance,
+    jahressechstel,
+  );
 
   let preferentialTax = 0;
   if (isJahressechstelPreferentialWithheld(monthlyCashGross)) {
@@ -188,6 +201,67 @@ function calculateBonusMonthIncomeTax(
       : 0;
 
   return assertCents(preferentialTax + excessTax);
+}
+
+/**
+ * 13.º y 14.º comparten un único Freibetrag (620 €) sobre el Jahressechstel.
+ * AK redondea el impuesto preferencial acumulado (13.º+14.º) una sola vez y
+ * el 14.º recibe el resto — calcularlos por separado desalinea el céntimo
+ * final del 14.º frente al Brutto-Netto-Rechner de la AK.
+ */
+export function calculateSonstigeBezuegeIncomeTax(
+  thirteenth: { assessmentGross: Cents; socialInsurance: Cents },
+  fourteenth: { assessmentGross: Cents; socialInsurance: Cents },
+  monthlyCashGross: Cents,
+  input: CalculationInput,
+): { thirteenthTax: Cents; fourteenthTax: Cents } {
+  const jahressechstel = assertCents(monthlyCashGross * 2);
+  const thirteenthParts = bonusMonthPreferentialAndExcessBase(
+    thirteenth.assessmentGross,
+    thirteenth.socialInsurance,
+    jahressechstel,
+  );
+  const fourteenthParts = bonusMonthPreferentialAndExcessBase(
+    fourteenth.assessmentGross,
+    fourteenth.socialInsurance,
+    jahressechstel,
+  );
+
+  let thirteenthPreferentialTax = 0;
+  let fourteenthPreferentialTax = 0;
+
+  if (isJahressechstelPreferentialWithheld(monthlyCashGross)) {
+    const reducedThirteenthBase = assertCents(
+      Math.max(0, thirteenthParts.preferentialBase - JAHRESSECHSTEL_FREIBETRAG_13TH),
+    );
+    thirteenthPreferentialTax = assertCents(
+      Math.max(0, Math.round(reducedThirteenthBase * JAHRESSECHSTEL_RATE)),
+    );
+
+    const combinedBase = assertCents(
+      reducedThirteenthBase + fourteenthParts.preferentialBase,
+    );
+    const combinedTax = assertCents(
+      Math.max(0, Math.round(combinedBase * JAHRESSECHSTEL_RATE)),
+    );
+    fourteenthPreferentialTax = assertCents(
+      Math.max(0, combinedTax - thirteenthPreferentialTax),
+    );
+  }
+
+  const thirteenthExcessTax =
+    thirteenthParts.excessBase > 0
+      ? calculateProgressiveTax(thirteenthParts.excessBase, thirteenthParts.excessBase, input, 0)
+      : 0;
+  const fourteenthExcessTax =
+    fourteenthParts.excessBase > 0
+      ? calculateProgressiveTax(fourteenthParts.excessBase, fourteenthParts.excessBase, input, 0)
+      : 0;
+
+  return {
+    thirteenthTax: assertCents(thirteenthPreferentialTax + thirteenthExcessTax),
+    fourteenthTax: assertCents(fourteenthPreferentialTax + fourteenthExcessTax),
+  };
 }
 
 export function calculateIncomeTax(

@@ -7,7 +7,11 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
   app.enableCors({
-    origin: [process.env.APP_URL ?? 'http://localhost:4200'],
+    origin: [
+      process.env.APP_URL ?? 'http://localhost:4200',
+      'http://localhost:5173',
+      'http://localhost:8080',
+    ],
     credentials: true,
     allowedHeaders: ['Content-Type', 'X-Device-Id', 'stripe-signature'],
   });

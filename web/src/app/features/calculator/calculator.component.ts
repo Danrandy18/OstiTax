@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, computed, effect, inject, isDevMode, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import type {
   AustrianState,
@@ -16,10 +16,21 @@ import {
   isPaymentRequiredError,
 } from '../../core/services/calculator-api.service';
 import { I18nService } from '../../core/i18n/i18n.service';
+import type { Lang } from '../../core/i18n/translations';
 import { SessionService } from '../../core/services/session.service';
 import { PaymentModalComponent } from '../payment/payment-modal.component';
-import { EurPipe, TranslatePipe } from '../../shared/pipes/app.pipes';
-import { exportOfficialCalculationPdf } from '../../core/pdf/text-pdf.util';
+import { TranslatePipe } from '../../shared/pipes/app.pipes';
+import { CountUpDirective } from '../../shared/animations/count-up.directive';
+import { exportOfficialCalculationPdf, PDF_SUPPORTED_LANGS } from '../../core/pdf/text-pdf.util';
+
+const PDF_LANG_LABELS: Record<Lang, string> = {
+  de: 'Deutsch',
+  en: 'English',
+  es: 'Español',
+  tr: 'Türkçe',
+  bcs: 'BCS',
+  uk: 'Українська',
+};
 
 type ResultTab = 'recurring' | 'thirteenth' | 'fourteenth' | 'annual';
 
@@ -28,7 +39,7 @@ const BMF_PENDLER_URL = 'https://www.bmf.gv.at/pendlerrechner';
 @Component({
   selector: 'app-calculator',
   standalone: true,
-  imports: [FormsModule, PaymentModalComponent, EurPipe, TranslatePipe],
+  imports: [FormsModule, PaymentModalComponent, TranslatePipe, CountUpDirective],
   templateUrl: './calculator.component.html',
   styleUrl: './calculator.component.scss',
 })
@@ -37,6 +48,33 @@ export class CalculatorComponent {
   readonly i18n = inject(I18nService);
   readonly session = inject(SessionService);
   readonly bmfPendlerUrl = BMF_PENDLER_URL;
+  /** Solo herramientas de QA visibles en `ng serve` / build no productivo. */
+  readonly devMode = isDevMode();
+  readonly resettingAttempts = signal(false);
+
+  /** PDF en otro idioma: función Pro. Limitado a de/en/es (ver text-pdf.util.ts). */
+  readonly pdfLangOptions = PDF_SUPPORTED_LANGS.map((code) => ({
+    code,
+    label: PDF_LANG_LABELS[code],
+  }));
+  readonly pdfLang = signal<Lang>(
+    PDF_SUPPORTED_LANGS.includes(this.i18n.currentLang()) ? this.i18n.currentLang() : 'de',
+  );
+
+  private readonly breakdownEl = viewChild<ElementRef<HTMLElement>>('breakdownEl');
+
+  constructor() {
+    effect(() => {
+      this.activeTab();
+      const el = this.breakdownEl()?.nativeElement;
+      if (!el) {
+        return;
+      }
+      el.classList.remove('tab-anim');
+      void el.offsetWidth;
+      el.classList.add('tab-anim');
+    });
+  }
 
   readonly form = signal<CalculateRequest>({
     employmentType: 'employee',
@@ -229,6 +267,10 @@ export class CalculatorComponent {
     this.paymentModalOpen.set(false);
   }
 
+  setPdfLang(lang: Lang): void {
+    this.pdfLang.set(lang);
+  }
+
   exportPdf(): void {
     const data = this.result();
     if (!data) {
@@ -238,6 +280,27 @@ export class CalculatorComponent {
       this.paymentModalOpen.set(true);
       return;
     }
-    exportOfficialCalculationPdf(this.buildCalculateRequest(), data);
+    exportOfficialCalculationPdf(this.buildCalculateRequest(), data, this.pdfLang());
+  }
+
+  /** Solo QA: descarga el PDF sin exigir Pro. No debe usarse en producción. */
+  exportPdfForTesting(): void {
+    const data = this.result();
+    if (!data) {
+      return;
+    }
+    exportOfficialCalculationPdf(this.buildCalculateRequest(), data, this.pdfLang());
+  }
+
+  /** Solo QA: el backend rechaza esto fuera de development. */
+  resetAttemptsForTesting(): void {
+    if (this.resettingAttempts()) {
+      return;
+    }
+    this.resettingAttempts.set(true);
+    this.session.resetAttemptsForTesting().subscribe({
+      next: () => this.resettingAttempts.set(false),
+      error: () => this.resettingAttempts.set(false),
+    });
   }
 }

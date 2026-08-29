@@ -1,11 +1,12 @@
 /** Terminología oficial alemana (Amtssprache) — PDF siempre DE, independiente del idioma UI. */
 export const PDF_OFFICIAL_DE = {
   documentTitle: 'Brutto-Netto-Berechnung',
-  productName: 'NettoKlar',
+  productName: 'ÖstiTax',
   standPrefix: 'Stand',
   createdPrefix: 'Erstellt am',
   sectionInputs: 'Eingaben',
   sectionResult: 'Ergebnis',
+  pageLabel: 'Seite 1/1',
   disclaimer:
     'Diese Berechnung dient als Orientierungshilfe. Das Ergebnis entspricht dem dargestellten Bezug bei 14 gleich hohen Monatsbezügen. Abweichungen durch Sonderzahlungen, Sachbezüge oder Freibeträge sind möglich.',
   employment: {
@@ -27,6 +28,15 @@ export const PDF_OFFICIAL_DE = {
     companyCar: 'Firmenauto (Sachbezug KFZ)',
     taxFreeAllowance: 'Monatlicher Freibetrag',
     commute: 'Pendlerpauschale',
+    childrenUnder18: 'Kinder unter 18',
+    childrenOver18: 'Kinder ueber 18 (Familienbeihilfe)',
+    companyCarAcquisitionCost: 'Anschaffungswert',
+    companyCarCo2: 'CO2 (g/km)',
+    companyCarRegistrationYear: 'Erstzulassung',
+    companyCarHalfBenefit: 'Halber Sachbezug',
+    commuteKm: 'Einfache Wegstrecke (km)',
+    publicTransportReasonable: 'Oeffentlicher Verkehr zumutbar',
+    commuteDaysLabel: 'Pendeltage pro Monat',
   },
   familyBonus: {
     none: 'Kein Bonus',

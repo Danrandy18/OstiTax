@@ -75,7 +75,7 @@ export class PaypalBillingService {
           plan_id: planId,
           custom_id: user.id,
           application_context: {
-            brand_name: 'NettoKlar',
+            brand_name: 'ÖstiTax',
             locale: 'de-AT',
             user_action: 'SUBSCRIBE_NOW',
             return_url: `${appUrl}/payment/success?provider=paypal`,

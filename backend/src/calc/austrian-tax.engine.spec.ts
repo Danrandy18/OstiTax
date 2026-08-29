@@ -53,7 +53,7 @@ function toInput(raw: AkCase['input']): CalculationInput {
 }
 
 function expectEuros(actual: number, expected: number): void {
-  expect(Math.abs(centsToEuros(actual) - expected)).toBeLessThanOrEqual(0.011);
+  expect(Math.abs(centsToEuros(actual) - expected)).toBeLessThanOrEqual(0.001);
 }
 
 function runAkSuite(cases: AkCase[], keys?: Array<keyof AkCase['expected']>): void {
