@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import type { User } from '../users/entities/user.entity';
+import type { PlanInterval } from './enums/plan-interval.enum';
 import { PaypalBillingService } from './paypal/paypal-billing.service';
 import { StripeBillingService } from './stripe/stripe-billing.service';
 
@@ -10,11 +11,11 @@ export class BillingService {
     private readonly paypalBillingService: PaypalBillingService,
   ) {}
 
-  createStripeCheckout(user: User) {
-    return this.stripeBillingService.createCheckoutSession(user);
+  createStripeCheckout(user: User, interval: PlanInterval) {
+    return this.stripeBillingService.createCheckoutSession(user, interval);
   }
 
-  createPaypalSubscription(user: User) {
-    return this.paypalBillingService.createSubscription(user);
+  createPaypalSubscription(user: User, interval: PlanInterval) {
+    return this.paypalBillingService.createSubscription(user, interval);
   }
 }

@@ -8,6 +8,7 @@ import Stripe from 'stripe';
 import type { User } from '../../users/entities/user.entity';
 import { SubscriptionProvider } from '../../users/enums/user-plan.enum';
 import { UsersService } from '../../users/users.service';
+import { PlanInterval } from '../enums/plan-interval.enum';
 
 @Injectable()
 export class StripeBillingService {
@@ -34,9 +35,13 @@ export class StripeBillingService {
 
   async createCheckoutSession(
     user: User,
+    interval: PlanInterval,
   ): Promise<{ url: string; sessionId: string }> {
-    const priceId = this.configService.get<string>('billing.stripe.priceId');
+    const priceIds = this.configService.get<Record<string, string>>(
+      'billing.stripe.priceIds',
+    );
     const appUrl = this.configService.get<string>('billing.appUrl');
+    const priceId = priceIds?.[interval];
 
     if (!priceId || !appUrl) {
       throw new ServiceUnavailableException(

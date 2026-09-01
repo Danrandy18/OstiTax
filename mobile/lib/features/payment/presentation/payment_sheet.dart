@@ -9,6 +9,62 @@ import '../../session/presentation/session_controller.dart';
 
 enum _PayMethod { stripe, paypal }
 
+enum _PlanInterval {
+  monthly('monthly'),
+  semiannual('semiannual'),
+  annual('annual');
+
+  const _PlanInterval(this.value);
+
+  final String value;
+}
+
+class _PlanInfo {
+  const _PlanInfo({
+    required this.interval,
+    required this.titleKey,
+    required this.priceKey,
+    required this.benefitKey,
+    this.perMonthKey,
+    this.badgeKey,
+    this.highlight = false,
+  });
+
+  final _PlanInterval interval;
+  final String titleKey;
+  final String priceKey;
+  final String benefitKey;
+  final String? perMonthKey;
+  final String? badgeKey;
+  final bool highlight;
+}
+
+const _plans = [
+  _PlanInfo(
+    interval: _PlanInterval.monthly,
+    titleKey: 'planMonthlyTitle',
+    priceKey: 'planMonthlyPrice',
+    benefitKey: 'planMonthlyBenefit',
+  ),
+  _PlanInfo(
+    interval: _PlanInterval.semiannual,
+    titleKey: 'planSemiannualTitle',
+    priceKey: 'planSemiannualPrice',
+    perMonthKey: 'planSemiannualPerMonth',
+    badgeKey: 'planSemiannualBadge',
+    benefitKey: 'planSemiannualBenefit',
+  ),
+  _PlanInfo(
+    interval: _PlanInterval.annual,
+    titleKey: 'planAnnualTitle',
+    priceKey: 'planAnnualPrice',
+    perMonthKey: 'planAnnualPerMonth',
+    badgeKey: 'planAnnualBadge',
+    benefitKey: 'planAnnualBenefit',
+    highlight: true,
+  ),
+];
+
 Future<void> showPaymentSheet(BuildContext context) {
   return showModalBottomSheet<void>(
     context: context,
@@ -29,8 +85,11 @@ class _PaymentSheetState extends ConsumerState<PaymentSheet> {
   _PayMethod? _loading;
   String? _error;
   bool _opened = false;
+  _PlanInterval _selectedInterval = _PlanInterval.monthly;
+  _PayMethod _selectedMethod = _PayMethod.stripe;
 
-  Future<void> _pay(_PayMethod method) async {
+  Future<void> _pay() async {
+    final method = _selectedMethod;
     final deviceId = ref.read(sessionControllerProvider).status?.deviceId;
     if (deviceId == null) return;
 
@@ -41,9 +100,13 @@ class _PaymentSheetState extends ConsumerState<PaymentSheet> {
 
     try {
       final billing = ref.read(billingRepositoryProvider);
+      final interval = _selectedInterval.value;
       final url = method == _PayMethod.stripe
-          ? (await billing.createStripeCheckout(deviceId)).url
-          : (await billing.createPaypalSubscription(deviceId)).approvalUrl;
+          ? (await billing.createStripeCheckout(deviceId, interval)).url
+          : (await billing.createPaypalSubscription(
+              deviceId,
+              interval,
+            )).approvalUrl;
 
       final uri = Uri.parse(url);
       final launched = await launchUrl(
@@ -81,118 +144,442 @@ class _PaymentSheetState extends ConsumerState<PaymentSheet> {
       child: Container(
         margin: const EdgeInsets.all(12),
         padding: const EdgeInsets.fromLTRB(22, 22, 22, 22),
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.88,
+        ),
         decoration: BoxDecoration(
           color: AppColors.surfaceElevated,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        ref.tr('paymentModalTitle'),
-                        style: const TextStyle(
-                          fontSize: 19,
-                          fontWeight: FontWeight.w800,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          ref.tr('paymentModalTitle'),
+                          style: const TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
+                        const SizedBox(height: 4),
+                        Text(
+                          ref.tr('paymentModalSubtitle'),
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 13.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              if (_opened) ...[
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppColors.successTint,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.check_circle_rounded,
+                        color: AppColors.success,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        ref.tr('paymentModalSubtitle'),
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 13.5,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              ref.tr('paymentOpenedTitle'),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.success,
+                              ),
+                            ),
+                            Text(
+                              ref.tr('paymentOpenedBody'),
+                              style: const TextStyle(
+                                fontSize: 12.5,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close_rounded),
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: _refreshStatus,
+                    icon: const Icon(Icons.refresh_rounded, size: 18),
+                    label: Text(ref.tr('refreshStatus')),
+                  ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 18),
-            if (_opened) ...[
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: AppColors.successTint,
-                  borderRadius: BorderRadius.circular(12),
+              ] else ...[
+                _SectionHeading(text: ref.tr('planSelectHeading')),
+                const SizedBox(height: 8),
+                for (final plan in _plans) ...[
+                  _PlanCard(
+                    title: ref.tr(plan.titleKey),
+                    price: ref.tr(plan.priceKey),
+                    benefit: ref.tr(plan.benefitKey),
+                    perMonth: plan.perMonthKey != null
+                        ? ref.tr(plan.perMonthKey!)
+                        : null,
+                    badge: plan.badgeKey != null
+                        ? ref.tr(plan.badgeKey!)
+                        : null,
+                    highlight: plan.highlight,
+                    selected: _selectedInterval == plan.interval,
+                    onTap: () =>
+                        setState(() => _selectedInterval = plan.interval),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+                const SizedBox(height: 10),
+                _SectionHeading(text: ref.tr('paymentMethodHeading')),
+                const SizedBox(height: 8),
+                _MethodCard(
+                  selected: _selectedMethod == _PayMethod.stripe,
+                  onTap: () =>
+                      setState(() => _selectedMethod = _PayMethod.stripe),
+                  leading: const _MiniCard(),
+                  title: ref.tr('payMethodCardTitle'),
+                  subtitle: ref.tr('payMethodCardDesc'),
                 ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.check_circle_rounded,
-                      color: AppColors.success,
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            ref.tr('paymentOpenedTitle'),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.success,
-                            ),
-                          ),
-                          Text(
-                            ref.tr('paymentOpenedBody'),
-                            style: const TextStyle(
-                              fontSize: 12.5,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
+                const SizedBox(height: 8),
+                _MethodCard(
+                  selected: _selectedMethod == _PayMethod.paypal,
+                  onTap: () =>
+                      setState(() => _selectedMethod = _PayMethod.paypal),
+                  leading: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFF003087), Color(0xFF009CDE)],
                       ),
                     ),
-                  ],
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'P',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                  title: ref.tr('payMethodPaypalTitle'),
+                  subtitle: ref.tr('payMethodPaypalDesc'),
                 ),
-              ),
-              const SizedBox(height: 14),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: _refreshStatus,
-                  icon: const Icon(Icons.refresh_rounded, size: 18),
-                  label: Text(ref.tr('refreshStatus')),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: _PayButton(
+                    label: _selectedMethod == _PayMethod.stripe
+                        ? ref.tr('payWithStripe')
+                        : ref.tr('payWithPaypal'),
+                    icon: _selectedMethod == _PayMethod.stripe
+                        ? Icons.credit_card_rounded
+                        : Icons.account_balance_wallet_rounded,
+                    loading: _loading != null,
+                    filled: true,
+                    onTap: _pay,
+                  ),
                 ),
-              ),
-            ] else ...[
-              _PayButton(
-                label: ref.tr('payWithStripe'),
-                icon: Icons.credit_card_rounded,
-                loading: _loading == _PayMethod.stripe,
-                filled: true,
-                onTap: () => _pay(_PayMethod.stripe),
-              ),
-              const SizedBox(height: 10),
-              _PayButton(
-                label: ref.tr('payWithPaypal'),
-                icon: Icons.account_balance_wallet_rounded,
-                loading: _loading == _PayMethod.paypal,
-                filled: false,
-                onTap: () => _pay(_PayMethod.paypal),
-              ),
+              ],
+              if (_error != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  _error!,
+                  style: const TextStyle(color: AppColors.error, fontSize: 13),
+                ),
+              ],
             ],
-            if (_error != null) ...[
-              const SizedBox(height: 12),
-              Text(
-                _error!,
-                style: const TextStyle(color: AppColors.error, fontSize: 13),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SectionHeading extends StatelessWidget {
+  const _SectionHeading({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text.toUpperCase(),
+      style: const TextStyle(
+        fontSize: 11.5,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.4,
+        color: AppColors.textSecondary,
+      ),
+    );
+  }
+}
+
+class _PlanCard extends StatelessWidget {
+  const _PlanCard({
+    required this.title,
+    required this.price,
+    required this.benefit,
+    required this.highlight,
+    required this.selected,
+    required this.onTap,
+    this.perMonth,
+    this.badge,
+  });
+
+  final String title;
+  final String price;
+  final String benefit;
+  final String? perMonth;
+  final String? badge;
+  final bool highlight;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final borderColor = selected
+        ? (highlight ? AppColors.success : AppColors.primary)
+        : AppColors.border;
+    final tint = selected
+        ? (highlight ? AppColors.success : AppColors.primary).withValues(
+            alpha: 0.06,
+          )
+        : AppColors.surface;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: tint,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: borderColor, width: 1.5),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              selected
+                  ? Icons.radio_button_checked_rounded
+                  : Icons.radio_button_off_rounded,
+              size: 20,
+              color: selected ? borderColor : AppColors.textSecondary,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      if (badge != null) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.success.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            badge!,
+                            style: const TextStyle(
+                              color: AppColors.success,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 10.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(price, style: const TextStyle(fontSize: 13.5)),
+                  if (perMonth != null)
+                    Text(
+                      perMonth!,
+                      style: const TextStyle(
+                        fontSize: 11.5,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  const SizedBox(height: 3),
+                  Text(
+                    benefit,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _MethodCard extends StatelessWidget {
+  const _MethodCard({
+    required this.selected,
+    required this.onTap,
+    required this.leading,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final bool selected;
+  final VoidCallback onTap;
+  final Widget leading;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: selected
+              ? AppColors.primary.withValues(alpha: 0.06)
+              : AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: selected ? AppColors.primary : AppColors.border,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            leading,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              selected
+                  ? Icons.radio_button_checked_rounded
+                  : Icons.radio_button_off_rounded,
+              color: selected ? AppColors.primary : AppColors.textSecondary,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Vista previa "futurista" de una tarjeta, solo decorativa: comunica que el
+/// pago con Visa/Mastercard se hace via Stripe sin pedir datos reales aqui.
+class _MiniCard extends StatelessWidget {
+  const _MiniCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 64,
+      height: 44,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF0F2027), Color(0xFF1D5C56), Color(0xFF0D5C56)],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 12,
+            height: 9,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(2),
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFFE9A8), Color(0xFFD4A94F)],
+              ),
+            ),
+          ),
+          const Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              'VISA',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 8,
+                fontWeight: FontWeight.w800,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

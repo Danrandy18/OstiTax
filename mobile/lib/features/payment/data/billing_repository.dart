@@ -8,11 +8,14 @@ class BillingRepository {
 
   final ApiClient _client;
 
-  Future<StripeCheckoutResponse> createStripeCheckout(String deviceId) async {
+  Future<StripeCheckoutResponse> createStripeCheckout(
+    String deviceId,
+    String interval,
+  ) async {
     try {
       final response = await _client.dio.post<Map<String, dynamic>>(
         '/billing/stripe/checkout',
-        data: {},
+        data: {'interval': interval},
         options: _client.withDevice(deviceId),
       );
       return StripeCheckoutResponse.fromJson(response.data!);
@@ -23,11 +26,12 @@ class BillingRepository {
 
   Future<PaypalSubscriptionResponse> createPaypalSubscription(
     String deviceId,
+    String interval,
   ) async {
     try {
       final response = await _client.dio.post<Map<String, dynamic>>(
         '/billing/paypal/subscription',
-        data: {},
+        data: {'interval': interval},
         options: _client.withDevice(deviceId),
       );
       return PaypalSubscriptionResponse.fromJson(response.data!);

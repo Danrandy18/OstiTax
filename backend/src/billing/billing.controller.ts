@@ -1,10 +1,12 @@
-import { Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { DeviceUserGuard } from '../common/guards/device-user.guard';
 import type { User } from '../users/entities/user.entity';
 import { UserStatusDto } from '../users/dto/user-status.dto';
 import { UsersService } from '../users/users.service';
 import { BillingService } from './billing.service';
+import { CreatePaypalSubscriptionDto } from './dto/create-paypal-subscription.dto';
+import { CreateStripeCheckoutDto } from './dto/create-stripe-checkout.dto';
 
 @Controller('billing')
 @UseGuards(DeviceUserGuard)
@@ -20,12 +22,18 @@ export class BillingController {
   }
 
   @Post('stripe/checkout')
-  createStripeCheckout(@CurrentUser() user: User) {
-    return this.billingService.createStripeCheckout(user);
+  createStripeCheckout(
+    @CurrentUser() user: User,
+    @Body() dto: CreateStripeCheckoutDto,
+  ) {
+    return this.billingService.createStripeCheckout(user, dto.interval);
   }
 
   @Post('paypal/subscription')
-  createPaypalSubscription(@CurrentUser() user: User) {
-    return this.billingService.createPaypalSubscription(user);
+  createPaypalSubscription(
+    @CurrentUser() user: User,
+    @Body() dto: CreatePaypalSubscriptionDto,
+  ) {
+    return this.billingService.createPaypalSubscription(user, dto.interval);
   }
 }

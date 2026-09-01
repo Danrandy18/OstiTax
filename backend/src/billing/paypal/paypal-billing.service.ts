@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import type { User } from '../../users/entities/user.entity';
 import { SubscriptionProvider } from '../../users/enums/user-plan.enum';
 import { UsersService } from '../../users/users.service';
+import { PlanInterval } from '../enums/plan-interval.enum';
 
 interface PayPalAccessTokenResponse {
   access_token: string;
@@ -57,9 +58,13 @@ export class PaypalBillingService {
 
   async createSubscription(
     user: User,
+    interval: PlanInterval,
   ): Promise<{ approvalUrl: string; subscriptionId: string }> {
-    const planId = this.configService.get<string>('billing.paypal.planId');
+    const planIds = this.configService.get<Record<string, string>>(
+      'billing.paypal.planIds',
+    );
     const appUrl = this.configService.get<string>('billing.appUrl');
+    const planId = planIds?.[interval];
 
     if (!planId || !appUrl) {
       throw new ServiceUnavailableException(

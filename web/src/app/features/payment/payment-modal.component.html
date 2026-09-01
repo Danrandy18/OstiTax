@@ -17,33 +17,106 @@
         </button>
       </header>
 
-      <div class="modal-actions">
-        <button
-          type="button"
-          class="btn-primary"
-          [disabled]="loading() !== null"
-          (click)="payWithStripe()"
-        >
-          @if (loading() === 'stripe') {
-            {{ 'loading' | translate }}
-          } @else {
-            {{ 'payWithStripe' | translate }}
-          }
-        </button>
+      <p class="section-heading">{{ 'planSelectHeading' | translate }}</p>
+      <fieldset class="plans" [disabled]="loading() !== null">
+        @for (plan of plans; track plan.value) {
+          <label
+            class="plan-card"
+            [class.selected]="selectedInterval() === plan.value"
+            [class.highlight]="plan.highlight"
+          >
+            <input
+              type="radio"
+              name="planInterval"
+              class="plan-card-radio"
+              [value]="plan.value"
+              [checked]="selectedInterval() === plan.value"
+              (change)="selectPlan(plan.value)"
+            />
+            <div class="plan-card-main">
+              <div class="plan-card-title-row">
+                <span class="plan-card-title">{{ plan.titleKey | translate }}</span>
+                @if (plan.badgeKey) {
+                  <span class="plan-card-badge">{{ plan.badgeKey | translate }}</span>
+                }
+              </div>
+              <span class="plan-card-price">{{ plan.priceKey | translate }}</span>
+              @if (plan.perMonthKey) {
+                <span class="plan-card-permonth">{{ plan.perMonthKey | translate }}</span>
+              }
+              <span class="plan-card-benefit">{{ plan.benefitKey | translate }}</span>
+            </div>
+          </label>
+        }
+      </fieldset>
 
-        <button
-          type="button"
-          class="btn-secondary"
-          [disabled]="loading() !== null"
-          (click)="payWithPaypal()"
+      <p class="section-heading">{{ 'paymentMethodHeading' | translate }}</p>
+      <fieldset class="methods" [disabled]="loading() !== null">
+        <label
+          class="method-card"
+          [class.selected]="selectedMethod() === 'card'"
         >
-          @if (loading() === 'paypal') {
-            {{ 'loading' | translate }}
-          } @else {
-            {{ 'payWithPaypal' | translate }}
-          }
-        </button>
-      </div>
+          <input
+            type="radio"
+            name="payMethod"
+            class="method-card-radio"
+            value="card"
+            [checked]="selectedMethod() === 'card'"
+            (change)="selectMethod('card')"
+          />
+          <div class="mini-card" aria-hidden="true">
+            <div class="mini-card-glow"></div>
+            <div class="mini-card-chip"></div>
+            <div class="mini-card-number">•••• •••• •••• 4242</div>
+            <div class="mini-card-brands">
+              <span class="brand-visa">VISA</span>
+              <span class="brand-mastercard" aria-hidden="true">
+                <span></span><span></span>
+              </span>
+            </div>
+          </div>
+          <div class="method-card-text">
+            <span class="method-card-title">{{ 'payMethodCardTitle' | translate }}</span>
+            <span class="method-card-desc">{{ 'payMethodCardDesc' | translate }}</span>
+          </div>
+        </label>
+
+        <label
+          class="method-card"
+          [class.selected]="selectedMethod() === 'paypal'"
+        >
+          <input
+            type="radio"
+            name="payMethod"
+            class="method-card-radio"
+            value="paypal"
+            [checked]="selectedMethod() === 'paypal'"
+            (change)="selectMethod('paypal')"
+          />
+          <div class="method-card-icon paypal-icon" aria-hidden="true">
+            <span>P</span>
+          </div>
+          <div class="method-card-text">
+            <span class="method-card-title">{{ 'payMethodPaypalTitle' | translate }}</span>
+            <span class="method-card-desc">{{ 'payMethodPaypalDesc' | translate }}</span>
+          </div>
+        </label>
+      </fieldset>
+
+      <button
+        type="button"
+        class="btn-primary btn-pay"
+        [disabled]="loading() !== null"
+        (click)="pay()"
+      >
+        @if (loading() !== null) {
+          {{ 'loading' | translate }}
+        } @else if (selectedMethod() === 'card') {
+          {{ 'payWithStripe' | translate }}
+        } @else {
+          {{ 'payWithPaypal' | translate }}
+        }
+      </button>
 
       @if (error()) {
         <p class="error-text" role="alert">{{ error() }}</p>

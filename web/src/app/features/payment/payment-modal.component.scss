@@ -11,7 +11,9 @@
 }
 
 .modal-shell {
-  width: min(100%, 28rem);
+  width: min(100%, 30rem);
+  max-height: 90vh;
+  overflow-y: auto;
   background: var(--color-surface-elevated);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
@@ -39,11 +41,6 @@
   }
 }
 
-.modal-actions {
-  display: grid;
-  gap: 0.75rem;
-}
-
 .modal-footer {
   margin-top: 1rem;
   display: flex;
@@ -54,6 +51,277 @@
   margin: 0.75rem 0 0;
   color: var(--color-error);
   font-size: 0.875rem;
+}
+
+.section-heading {
+  margin: 1.125rem 0 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+
+  &:first-of-type {
+    margin-top: 0.25rem;
+  }
+}
+
+.plans {
+  display: grid;
+  gap: 0.625rem;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.plan-card {
+  position: relative;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.75rem 0.875rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out);
+
+  &:hover {
+    border-color: var(--color-primary);
+  }
+
+  &.selected {
+    border-color: var(--color-primary);
+    background: rgb(var(--color-primary-rgb) / 6%);
+    box-shadow: 0 0 0 1px var(--color-primary);
+  }
+
+  &.highlight {
+    border-color: rgb(var(--color-success-rgb) / 55%);
+  }
+
+  &.highlight.selected {
+    border-color: var(--color-success);
+    box-shadow: 0 0 0 1px var(--color-success);
+    background: rgb(var(--color-success-rgb) / 6%);
+  }
+}
+
+.plan-card-radio {
+  margin-top: 0.2rem;
+  accent-color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.plan-card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.plan-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.plan-card-title {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: 0.9375rem;
+}
+
+.plan-card-badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-success);
+  background: rgb(var(--color-success-rgb) / 12%);
+  border-radius: var(--radius-pill);
+  padding: 0.125rem 0.5rem;
+  white-space: nowrap;
+}
+
+.plan-card-price {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.plan-card-permonth {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.plan-card-benefit {
+  margin-top: 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.methods {
+  display: grid;
+  gap: 0.625rem;
+  border: none;
+  padding: 0;
+  margin: 0 0 1.25rem;
+}
+
+.method-card {
+  position: relative;
+  display: flex;
+  gap: 0.875rem;
+  align-items: center;
+  padding: 0.75rem 0.875rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out);
+
+  &:hover {
+    border-color: var(--color-primary);
+  }
+
+  &.selected {
+    border-color: var(--color-primary);
+    background: rgb(var(--color-primary-rgb) / 6%);
+    box-shadow: 0 0 0 1px var(--color-primary);
+  }
+}
+
+.method-card-radio {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  accent-color: var(--color-primary);
+}
+
+.method-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.method-card-title {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: 0.9375rem;
+}
+
+.method-card-desc {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.method-card-icon {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-sm);
+  display: grid;
+  place-items: center;
+}
+
+.paypal-icon {
+  background: linear-gradient(135deg, #003087 0%, #009cde 100%);
+
+  span {
+    font-weight: 800;
+    font-style: italic;
+    font-size: 1.375rem;
+    color: #fff;
+  }
+}
+
+// "Futuristic" mini credit card preview shown on the card payment method option.
+.mini-card {
+  position: relative;
+  flex-shrink: 0;
+  width: 5.5rem;
+  height: 3.375rem;
+  border-radius: 10px;
+  padding: 0.5rem 0.625rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgb(255 255 255 / 18%), transparent 55%),
+    linear-gradient(135deg, #0f2027 0%, #1d5c56 45%, #0d5c56 100%);
+  box-shadow: 0 6px 16px rgb(13 92 86 / 30%);
+}
+
+.mini-card-glow {
+  position: absolute;
+  inset: -40% -40% auto auto;
+  width: 70%;
+  height: 70%;
+  background: radial-gradient(circle, rgb(0 255 220 / 35%), transparent 70%);
+  filter: blur(2px);
+}
+
+.mini-card-chip {
+  width: 0.875rem;
+  height: 0.625rem;
+  border-radius: 2px;
+  background: linear-gradient(135deg, #ffe9a8, #d4a94f);
+}
+
+.mini-card-number {
+  font-size: 0.5rem;
+  letter-spacing: 0.03em;
+  color: rgb(255 255 255 / 92%);
+  font-family: 'Courier New', monospace;
+}
+
+.mini-card-brands {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.3rem;
+}
+
+.brand-visa {
+  font-size: 0.5rem;
+  font-weight: 800;
+  font-style: italic;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+
+.brand-mastercard {
+  display: inline-flex;
+
+  span {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    display: inline-block;
+
+    &:first-child {
+      background: #eb001b;
+      margin-right: -0.2rem;
+    }
+
+    &:last-child {
+      background: #f79e1b;
+      mix-blend-mode: screen;
+    }
+  }
+}
+
+.btn-pay {
+  width: 100%;
+  margin-top: 0.25rem;
 }
 
 .icon-btn {
