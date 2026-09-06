@@ -4,16 +4,28 @@ import {
   HttpException,
   Injectable,
 } from '@nestjs/common';
+import { AccountsService } from '../../auth/accounts.service';
+import type { Account } from '../../auth/entities/account.entity';
 import type { User } from '../../users/entities/user.entity';
 import { UsersService } from '../../users/users.service';
 
 @Injectable()
 export class CalculationAccessGuard implements CanActivate {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly accountsService: AccountsService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<{ user: User }>();
+    const request = context
+      .switchToHttp()
+      .getRequest<{ user: User; account?: Account }>();
     const user = request.user;
+
+    if (request.account && this.accountsService.isPro(request.account)) {
+      // Cuenta Pro logueada: sin limite, sin tocar el contador de dispositivo.
+      return true;
+    }
 
     if (this.usersService.isPro(user)) {
       return true;

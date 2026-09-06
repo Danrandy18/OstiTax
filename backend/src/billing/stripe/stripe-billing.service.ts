@@ -5,9 +5,9 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
-import type { User } from '../../users/entities/user.entity';
+import { AccountsService } from '../../auth/accounts.service';
+import type { Account } from '../../auth/entities/account.entity';
 import { SubscriptionProvider } from '../../users/enums/user-plan.enum';
-import { UsersService } from '../../users/users.service';
 import { PlanInterval } from '../enums/plan-interval.enum';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class StripeBillingService {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly usersService: UsersService,
+    private readonly accountsService: AccountsService,
   ) {}
 
   private getStripe(): Stripe {
@@ -34,7 +34,7 @@ export class StripeBillingService {
   }
 
   async createCheckoutSession(
-    user: User,
+    account: Account,
     interval: PlanInterval,
   ): Promise<{ url: string; sessionId: string }> {
     const priceIds = this.configService.get<Record<string, string>>(
@@ -50,17 +50,17 @@ export class StripeBillingService {
     }
 
     const stripe = this.getStripe();
-    let customerId = user.stripeCustomerId;
+    let customerId = account.stripeCustomerId;
 
     if (!customerId) {
       const customer = await stripe.customers.create({
+        email: account.email,
         metadata: {
-          userId: user.id,
-          deviceId: user.deviceId,
+          accountId: account.id,
         },
       });
       customerId = customer.id;
-      await this.usersService.setStripeCustomerId(user.id, customerId);
+      await this.accountsService.setStripeCustomerId(account.id, customerId);
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -69,10 +69,10 @@ export class StripeBillingService {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${appUrl}/payment/success?provider=stripe&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/payment/cancel`,
-      client_reference_id: user.id,
-      metadata: { userId: user.id },
+      client_reference_id: account.id,
+      metadata: { accountId: account.id },
       subscription_data: {
-        metadata: { userId: user.id },
+        metadata: { accountId: account.id },
       },
     });
 
@@ -81,6 +81,14 @@ export class StripeBillingService {
     }
 
     return { url: session.url, sessionId: session.id };
+  }
+
+  async cancelSubscription(subscriptionId: string): Promise<void> {
+    try {
+      await this.getStripe().subscriptions.cancel(subscriptionId);
+    } catch {
+      // Ya cancelada o inexistente: no bloquear el borrado de la cuenta.
+    }
   }
 
   constructWebhookEvent(payload: Buffer, signature: string): Stripe.Event {
@@ -127,20 +135,20 @@ export class StripeBillingService {
   private async handleCheckoutCompleted(
     session: Stripe.Checkout.Session,
   ): Promise<void> {
-    const userId = session.metadata?.userId ?? session.client_reference_id;
+    const accountId = session.metadata?.accountId ?? session.client_reference_id;
     const subscriptionId =
       typeof session.subscription === 'string'
         ? session.subscription
         : session.subscription?.id;
 
-    if (!userId || !subscriptionId) {
+    if (!accountId || !subscriptionId) {
       return;
     }
 
     const stripe = this.getStripe();
     const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-    await this.usersService.activatePro(userId, {
+    await this.accountsService.activatePro(accountId, {
       provider: SubscriptionProvider.STRIPE,
       subscriptionId,
       status: subscription.status,
@@ -155,19 +163,21 @@ export class StripeBillingService {
   private async handleSubscriptionUpdated(
     subscription: Stripe.Subscription,
   ): Promise<void> {
-    const user =
-      (await this.usersService.findByStripeSubscriptionId(subscription.id)) ??
-      (subscription.metadata.userId
-        ? await this.usersService.findById(subscription.metadata.userId)
+    const account =
+      (await this.accountsService.findByStripeSubscriptionId(
+        subscription.id,
+      )) ??
+      (subscription.metadata.accountId
+        ? await this.accountsService.findById(subscription.metadata.accountId)
         : null);
 
-    if (!user) {
+    if (!account) {
       return;
     }
 
     const activeStatuses = new Set(['active', 'trialing', 'past_due']);
     if (activeStatuses.has(subscription.status)) {
-      await this.usersService.activatePro(user.id, {
+      await this.accountsService.activatePro(account.id, {
         provider: SubscriptionProvider.STRIPE,
         subscriptionId: subscription.id,
         status: subscription.status,
@@ -175,13 +185,13 @@ export class StripeBillingService {
         stripeCustomerId:
           typeof subscription.customer === 'string'
             ? subscription.customer
-            : subscription.customer?.id ?? user.stripeCustomerId,
+            : subscription.customer?.id ?? account.stripeCustomerId,
       });
       return;
     }
 
-    await this.usersService.updateSubscriptionStatus(
-      user.id,
+    await this.accountsService.updateSubscriptionStatus(
+      account.id,
       subscription.status,
       this.getSubscriptionPeriodEnd(subscription),
     );
@@ -190,14 +200,14 @@ export class StripeBillingService {
   private async handleSubscriptionDeleted(
     subscription: Stripe.Subscription,
   ): Promise<void> {
-    const user = await this.usersService.findByStripeSubscriptionId(
+    const account = await this.accountsService.findByStripeSubscriptionId(
       subscription.id,
     );
-    if (!user) {
+    if (!account) {
       return;
     }
 
-    await this.usersService.downgradeToFree(user.id);
+    await this.accountsService.downgradeToFree(account.id);
   }
 
   private toDate(unixSeconds: number | null | undefined): Date | null {

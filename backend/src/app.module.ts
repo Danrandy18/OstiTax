@@ -3,9 +3,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 import { BillingModule } from './billing/billing.module';
 import { CalcModule } from './calc/calc.module';
 import { CommonModule } from './common/common.module';
+import authConfig from './config/auth.config';
 import billingConfig from './config/billing.config';
 import databaseConfig from './config/database.config';
 import { UsersModule } from './users/users.module';
@@ -14,7 +16,7 @@ import { UsersModule } from './users/users.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig, billingConfig],
+      load: [databaseConfig, billingConfig, authConfig],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -31,6 +33,7 @@ import { UsersModule } from './users/users.module';
     }),
     CommonModule,
     UsersModule,
+    AuthModule,
     BillingModule,
     CalcModule,
   ],

@@ -1,39 +1,42 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { DeviceUserGuard } from '../common/guards/device-user.guard';
-import type { User } from '../users/entities/user.entity';
-import { UserStatusDto } from '../users/dto/user-status.dto';
-import { UsersService } from '../users/users.service';
+import { AccountsService } from '../auth/accounts.service';
+import { AccountStatusDto } from '../auth/dto/account-status.dto';
+import { CurrentAccount } from '../auth/decorators/current-account.decorator';
+import type { Account } from '../auth/entities/account.entity';
+import { AccountAuthGuard } from '../auth/guards/account-auth.guard';
 import { BillingService } from './billing.service';
 import { CreatePaypalSubscriptionDto } from './dto/create-paypal-subscription.dto';
 import { CreateStripeCheckoutDto } from './dto/create-stripe-checkout.dto';
 
 @Controller('billing')
-@UseGuards(DeviceUserGuard)
+@UseGuards(AccountAuthGuard)
 export class BillingController {
   constructor(
     private readonly billingService: BillingService,
-    private readonly usersService: UsersService,
+    private readonly accountsService: AccountsService,
   ) {}
 
   @Get('status')
-  getStatus(@CurrentUser() user: User): UserStatusDto {
-    return UserStatusDto.fromEntity(user, this.usersService.isPro(user));
+  getStatus(@CurrentAccount() account: Account): AccountStatusDto {
+    return AccountStatusDto.fromEntity(
+      account,
+      this.accountsService.isPro(account),
+    );
   }
 
   @Post('stripe/checkout')
   createStripeCheckout(
-    @CurrentUser() user: User,
+    @CurrentAccount() account: Account,
     @Body() dto: CreateStripeCheckoutDto,
   ) {
-    return this.billingService.createStripeCheckout(user, dto.interval);
+    return this.billingService.createStripeCheckout(account, dto.interval);
   }
 
   @Post('paypal/subscription')
   createPaypalSubscription(
-    @CurrentUser() user: User,
+    @CurrentAccount() account: Account,
     @Body() dto: CreatePaypalSubscriptionDto,
   ) {
-    return this.billingService.createPaypalSubscription(user, dto.interval);
+    return this.billingService.createPaypalSubscription(account, dto.interval);
   }
 }

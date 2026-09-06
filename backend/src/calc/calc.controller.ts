@@ -1,4 +1,5 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { OptionalAccountAuthGuard } from '../auth/guards/optional-account-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { CalculationAccessGuard } from '../common/guards/calculation-access.guard';
 import { DeviceUserGuard } from '../common/guards/device-user.guard';
@@ -16,7 +17,7 @@ export class CalcController {
   ) {}
 
   @Post()
-  @UseGuards(DeviceUserGuard, CalculationAccessGuard)
+  @UseGuards(DeviceUserGuard, OptionalAccountAuthGuard, CalculationAccessGuard)
   calculate(
     @Body() dto: CalculateRequestDto,
     @CurrentUser() user: User,

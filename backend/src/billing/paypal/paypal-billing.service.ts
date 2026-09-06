@@ -4,9 +4,9 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { User } from '../../users/entities/user.entity';
+import { AccountsService } from '../../auth/accounts.service';
+import type { Account } from '../../auth/entities/account.entity';
 import { SubscriptionProvider } from '../../users/enums/user-plan.enum';
-import { UsersService } from '../../users/users.service';
 import { PlanInterval } from '../enums/plan-interval.enum';
 
 interface PayPalAccessTokenResponse {
@@ -53,11 +53,11 @@ export class PaypalBillingService {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly usersService: UsersService,
+    private readonly accountsService: AccountsService,
   ) {}
 
   async createSubscription(
-    user: User,
+    account: Account,
     interval: PlanInterval,
   ): Promise<{ approvalUrl: string; subscriptionId: string }> {
     const planIds = this.configService.get<Record<string, string>>(
@@ -78,7 +78,7 @@ export class PaypalBillingService {
         method: 'POST',
         body: JSON.stringify({
           plan_id: planId,
-          custom_id: user.id,
+          custom_id: account.id,
           application_context: {
             brand_name: 'ÖstiTax',
             locale: 'de-AT',
@@ -99,6 +99,20 @@ export class PaypalBillingService {
     }
 
     return { approvalUrl, subscriptionId: subscription.id };
+  }
+
+  async cancelSubscription(subscriptionId: string): Promise<void> {
+    try {
+      await this.request<void>(
+        `/v1/billing/subscriptions/${subscriptionId}/cancel`,
+        {
+          method: 'POST',
+          body: JSON.stringify({ reason: 'Account deleted by user' }),
+        },
+      );
+    } catch {
+      // Ya cancelada o inexistente: no bloquear el borrado de la cuenta.
+    }
   }
 
   async verifyWebhook(
@@ -171,12 +185,12 @@ export class PaypalBillingService {
     }
 
     const subscription = await this.getSubscription(resource.id);
-    const userId = subscription.custom_id;
-    if (!userId) {
+    const accountId = subscription.custom_id;
+    if (!accountId) {
       return;
     }
 
-    await this.usersService.activatePro(userId, {
+    await this.accountsService.activatePro(accountId, {
       provider: SubscriptionProvider.PAYPAL,
       subscriptionId: subscription.id,
       status: subscription.status,
@@ -193,14 +207,14 @@ export class PaypalBillingService {
       return;
     }
 
-    const user = await this.usersService.findByPaypalSubscriptionId(
+    const account = await this.accountsService.findByPaypalSubscriptionId(
       resource.id,
     );
-    if (!user) {
+    if (!account) {
       return;
     }
 
-    await this.usersService.downgradeToFree(user.id);
+    await this.accountsService.downgradeToFree(account.id);
   }
 
   private async getSubscription(
@@ -237,6 +251,10 @@ export class PaypalBillingService {
       throw new BadRequestException(
         `PayPal API error (${response.status}): ${errorBody}`,
       );
+    }
+
+    if (response.status === 204) {
+      return undefined as T;
     }
 
     return (await response.json()) as T;
