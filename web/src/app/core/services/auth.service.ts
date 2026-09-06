@@ -76,6 +76,17 @@ export class AuthService {
     this.clearSession();
   }
 
+  forgotPassword(email: string) {
+    return this.http.post<{ ok: true }>('/api/auth/forgot-password', { email });
+  }
+
+  resetPassword(token: string, password: string) {
+    return this.http.post<{ ok: true }>('/api/auth/reset-password', {
+      token,
+      password,
+    });
+  }
+
   private persist(response: AuthResponse): void {
     localStorage.setItem(TOKEN_STORAGE_KEY, response.accessToken);
     this.token.set(response.accessToken);

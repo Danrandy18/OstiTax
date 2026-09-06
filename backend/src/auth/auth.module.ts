@@ -9,6 +9,7 @@ import { AuthService } from './auth.service';
 import { Account } from './entities/account.entity';
 import { AccountAuthGuard } from './guards/account-auth.guard';
 import { OptionalAccountAuthGuard } from './guards/optional-account-auth.guard';
+import { MailService } from './mail.service';
 
 @Module({
   imports: [
@@ -26,7 +27,13 @@ import { OptionalAccountAuthGuard } from './guards/optional-account-auth.guard';
     forwardRef(() => BillingModule),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AccountsService, AccountAuthGuard, OptionalAccountAuthGuard],
+  providers: [
+    AuthService,
+    AccountsService,
+    AccountAuthGuard,
+    OptionalAccountAuthGuard,
+    MailService,
+  ],
   exports: [AccountsService, AccountAuthGuard, OptionalAccountAuthGuard, JwtModule],
 })
 export class AuthModule {}

@@ -68,4 +68,26 @@ class AuthRepository {
       throw ApiException.fromDioError(error);
     }
   }
+
+  Future<void> forgotPassword(String email) async {
+    try {
+      await _client.dio.post<void>(
+        '/auth/forgot-password',
+        data: {'email': email},
+      );
+    } on DioException catch (error) {
+      throw ApiException.fromDioError(error);
+    }
+  }
+
+  Future<void> resetPassword(String token, String password) async {
+    try {
+      await _client.dio.post<void>(
+        '/auth/reset-password',
+        data: {'token': token, 'password': password},
+      );
+    } on DioException catch (error) {
+      throw ApiException.fromDioError(error);
+    }
+  }
 }

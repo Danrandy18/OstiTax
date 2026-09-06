@@ -13,9 +13,11 @@ import { AccountsService } from './accounts.service';
 import { AuthService } from './auth.service';
 import { CurrentAccount } from './decorators/current-account.decorator';
 import { AccountStatusDto } from './dto/account-status.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { GoogleLoginDto } from './dto/google-login.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import type { Account } from './entities/account.entity';
 import { AccountAuthGuard } from './guards/account-auth.guard';
 import { BillingService } from '../billing/billing.service';
@@ -54,6 +56,20 @@ export class AuthController {
       dto.idToken,
     );
     return this.toResponse(accessToken, account);
+  }
+
+  @Post('forgot-password')
+  @HttpCode(200)
+  async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<{ ok: true }> {
+    await this.authService.forgotPassword(dto.email);
+    return { ok: true };
+  }
+
+  @Post('reset-password')
+  @HttpCode(200)
+  async resetPassword(@Body() dto: ResetPasswordDto): Promise<{ ok: true }> {
+    await this.authService.resetPassword(dto.token, dto.password);
+    return { ok: true };
   }
 
   @Get('me')

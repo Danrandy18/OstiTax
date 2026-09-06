@@ -132,6 +132,16 @@ export interface TranslationSchema {
   authErrorGoogleFailed: string;
   authLogoutButton: string;
   authLoggedInAs: string;
+  authForgotPasswordLink: string;
+  authForgotPasswordTitle: string;
+  authForgotPasswordBody: string;
+  authForgotPasswordButton: string;
+  authForgotPasswordSuccess: string;
+  authResetPasswordTitle: string;
+  authNewPasswordLabel: string;
+  authResetPasswordButton: string;
+  authResetPasswordSuccess: string;
+  authResetPasswordInvalidToken: string;
   profileTitle: string;
   profileNavLink: string;
   profileEmailLabel: string;
@@ -308,6 +318,18 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
       'Google-Anmeldung fehlgeschlagen. Bitte versuche es erneut.',
     authLogoutButton: 'Abmelden',
     authLoggedInAs: 'Angemeldet als',
+    authForgotPasswordLink: 'Passwort vergessen?',
+    authForgotPasswordTitle: 'Passwort zurücksetzen',
+    authForgotPasswordBody:
+      'Gib deine E-Mail-Adresse ein und wir schicken dir einen Link zum Zurücksetzen deines Passworts.',
+    authForgotPasswordButton: 'Link senden',
+    authForgotPasswordSuccess:
+      'Falls ein Konto mit dieser E-Mail existiert, haben wir dir einen Link zum Zurücksetzen geschickt.',
+    authResetPasswordTitle: 'Neues Passwort wählen',
+    authNewPasswordLabel: 'Neues Passwort',
+    authResetPasswordButton: 'Passwort speichern',
+    authResetPasswordSuccess: 'Dein Passwort wurde geändert. Du wirst weitergeleitet...',
+    authResetPasswordInvalidToken: 'Dieser Link ist ungültig oder abgelaufen.',
     profileTitle: 'Mein Profil',
     profileNavLink: 'Mein Profil',
     profileEmailLabel: 'E-Mail',
@@ -473,6 +495,18 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     authErrorGoogleFailed: 'Google sign-in failed. Please try again.',
     authLogoutButton: 'Log out',
     authLoggedInAs: 'Signed in as',
+    authForgotPasswordLink: 'Forgot your password?',
+    authForgotPasswordTitle: 'Reset your password',
+    authForgotPasswordBody:
+      "Enter your email and we'll send you a link to reset your password.",
+    authForgotPasswordButton: 'Send link',
+    authForgotPasswordSuccess:
+      "If an account with that email exists, we've sent a reset link.",
+    authResetPasswordTitle: 'Choose a new password',
+    authNewPasswordLabel: 'New password',
+    authResetPasswordButton: 'Save password',
+    authResetPasswordSuccess: 'Your password has been changed. Redirecting...',
+    authResetPasswordInvalidToken: 'This link is invalid or has expired.',
     profileTitle: 'My Profile',
     profileNavLink: 'My Profile',
     profileEmailLabel: 'Email',
@@ -642,6 +676,18 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
       'Falló el inicio de sesión con Google. Inténtalo de nuevo.',
     authLogoutButton: 'Cerrar sesión',
     authLoggedInAs: 'Sesión iniciada como',
+    authForgotPasswordLink: '¿Olvidaste tu contraseña?',
+    authForgotPasswordTitle: 'Restablecer contraseña',
+    authForgotPasswordBody:
+      'Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña.',
+    authForgotPasswordButton: 'Enviar enlace',
+    authForgotPasswordSuccess:
+      'Si existe una cuenta con ese correo, te enviamos un enlace para restablecerla.',
+    authResetPasswordTitle: 'Elige una nueva contraseña',
+    authNewPasswordLabel: 'Nueva contraseña',
+    authResetPasswordButton: 'Guardar contraseña',
+    authResetPasswordSuccess: 'Tu contraseña fue cambiada. Redirigiendo...',
+    authResetPasswordInvalidToken: 'Este enlace es inválido o ha expirado.',
     profileTitle: 'Mi perfil',
     profileNavLink: 'Mi perfil',
     profileEmailLabel: 'Correo electrónico',
@@ -810,6 +856,18 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
       'Google ile giriş başarısız oldu. Lütfen tekrar dene.',
     authLogoutButton: 'Çıkış yap',
     authLoggedInAs: 'Şu hesapla giriş yapıldı',
+    authForgotPasswordLink: 'Şifreni mi unuttun?',
+    authForgotPasswordTitle: 'Şifreni sıfırla',
+    authForgotPasswordBody:
+      'E-postanı gir, şifreni sıfırlaman için bir bağlantı gönderelim.',
+    authForgotPasswordButton: 'Bağlantı gönder',
+    authForgotPasswordSuccess:
+      'Bu e-postayla bir hesap varsa, sıfırlama bağlantısı gönderdik.',
+    authResetPasswordTitle: 'Yeni bir şifre seç',
+    authNewPasswordLabel: 'Yeni şifre',
+    authResetPasswordButton: 'Şifreyi kaydet',
+    authResetPasswordSuccess: 'Şifren değiştirildi. Yönlendiriliyorsun...',
+    authResetPasswordInvalidToken: 'Bu bağlantı geçersiz veya süresi dolmuş.',
     profileTitle: 'Profilim',
     profileNavLink: 'Profilim',
     profileEmailLabel: 'E-posta',
@@ -979,6 +1037,18 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
       'Prijava putem Google-a nije uspjela. Pokušaj ponovo.',
     authLogoutButton: 'Odjava',
     authLoggedInAs: 'Prijavljen kao',
+    authForgotPasswordLink: 'Zaboravio si lozinku?',
+    authForgotPasswordTitle: 'Resetuj lozinku',
+    authForgotPasswordBody:
+      'Unesi svoj email i poslaćemo ti link za resetovanje lozinke.',
+    authForgotPasswordButton: 'Pošalji link',
+    authForgotPasswordSuccess:
+      'Ako nalog sa tim emailom postoji, poslali smo link za reset.',
+    authResetPasswordTitle: 'Izaberi novu lozinku',
+    authNewPasswordLabel: 'Nova lozinka',
+    authResetPasswordButton: 'Sačuvaj lozinku',
+    authResetPasswordSuccess: 'Tvoja lozinka je promijenjena. Preusmjeravamo te...',
+    authResetPasswordInvalidToken: 'Ovaj link je nevažeći ili je istekao.',
     profileTitle: 'Moj profil',
     profileNavLink: 'Moj profil',
     profileEmailLabel: 'Email',
@@ -1147,6 +1217,18 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     authErrorGoogleFailed: 'Вхід через Google не вдався. Спробуйте ще раз.',
     authLogoutButton: 'Вийти',
     authLoggedInAs: 'Увійшли як',
+    authForgotPasswordLink: 'Забули пароль?',
+    authForgotPasswordTitle: 'Скидання пароля',
+    authForgotPasswordBody:
+      'Введіть свою пошту, і ми надішлемо посилання для скидання пароля.',
+    authForgotPasswordButton: 'Надіслати посилання',
+    authForgotPasswordSuccess:
+      'Якщо акаунт з такою поштою існує, ми надіслали посилання для скидання.',
+    authResetPasswordTitle: 'Виберіть новий пароль',
+    authNewPasswordLabel: 'Новий пароль',
+    authResetPasswordButton: 'Зберегти пароль',
+    authResetPasswordSuccess: 'Ваш пароль змінено. Перенаправлення...',
+    authResetPasswordInvalidToken: 'Це посилання недійсне або застаріле.',
     profileTitle: 'Мій профіль',
     profileNavLink: 'Мій профіль',
     profileEmailLabel: 'Електронна пошта',

@@ -45,6 +45,12 @@ export class Account {
   @Column({ type: 'timestamptz', nullable: true })
   subscriptionCurrentPeriodEnd!: Date | null;
 
+  @Column({ type: 'varchar', nullable: true })
+  passwordResetTokenHash!: string | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  passwordResetExpiresAt!: Date | null;
+
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;
 

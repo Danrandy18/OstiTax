@@ -1,5 +1,6 @@
 import { Component, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { GOOGLE_CLIENT_ID } from '../../core/auth-config';
 import { I18nService } from '../../core/i18n/i18n.service';
@@ -35,6 +36,7 @@ declare global {
 })
 export class AuthPanelComponent {
   private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
   readonly i18n = inject(I18nService);
 
   private readonly googleButtonEl = viewChild<ElementRef<HTMLDivElement>>('googleButton');
@@ -53,6 +55,10 @@ export class AuthPanelComponent {
   switchMode(mode: AuthMode): void {
     this.mode.set(mode);
     this.error.set(null);
+  }
+
+  goToForgotPassword(): void {
+    void this.router.navigateByUrl('/forgot-password');
   }
 
   submit(): void {

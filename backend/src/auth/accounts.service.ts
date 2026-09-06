@@ -56,6 +56,14 @@ export class AccountsService {
     });
   }
 
+  async findByPasswordResetTokenHash(
+    tokenHash: string,
+  ): Promise<Account | null> {
+    return this.accountsRepository.findOne({
+      where: { passwordResetTokenHash: tokenHash },
+    });
+  }
+
   isPro(account: Account): boolean {
     return isSubscriptionActive(account);
   }
@@ -161,5 +169,27 @@ export class AccountsService {
 
   async delete(accountId: string): Promise<void> {
     await this.accountsRepository.delete({ id: accountId });
+  }
+
+  async setPasswordResetToken(
+    accountId: string,
+    tokenHash: string,
+    expiresAt: Date,
+  ): Promise<void> {
+    await this.accountsRepository.update(
+      { id: accountId },
+      { passwordResetTokenHash: tokenHash, passwordResetExpiresAt: expiresAt },
+    );
+  }
+
+  async resetPassword(accountId: string, passwordHash: string): Promise<void> {
+    await this.accountsRepository.update(
+      { id: accountId },
+      {
+        passwordHash,
+        passwordResetTokenHash: null,
+        passwordResetExpiresAt: null,
+      },
+    );
   }
 }

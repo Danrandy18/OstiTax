@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
@@ -6,9 +7,11 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { randomBytes, createHash } from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
 import { AccountsService } from './accounts.service';
 import type { Account } from './entities/account.entity';
+import { MailService } from './mail.service';
 
 const PASSWORD_SALT_ROUNDS = 12;
 
@@ -25,6 +28,7 @@ export class AuthService {
     private readonly accountsService: AccountsService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly mailService: MailService,
   ) {}
 
   async register(
@@ -98,6 +102,61 @@ export class AuthService {
     }
 
     return { accessToken: this.issueToken(account), account };
+  }
+
+  /**
+   * Siempre resuelve sin error, exista o no la cuenta, para no filtrar
+   * (por timing/respuesta) que emails estan registrados. Si la cuenta es
+   * Google-only (sin passwordHash), tampoco hay nada que restablecer y se
+   * ignora en silencio.
+   */
+  async forgotPassword(email: string): Promise<void> {
+    const account = await this.accountsService.findByEmail(email);
+    if (!account || !account.passwordHash) {
+      return;
+    }
+
+    const rawToken = randomBytes(32).toString('hex');
+    const tokenHash = this.hashToken(rawToken);
+    const expiresMinutes = this.configService.get<number>(
+      'auth.passwordResetExpiresInMinutes',
+      60,
+    );
+    const expiresAt = new Date(Date.now() + expiresMinutes * 60_000);
+
+    await this.accountsService.setPasswordResetToken(
+      account.id,
+      tokenHash,
+      expiresAt,
+    );
+
+    const appUrl = this.configService.get<string>('billing.appUrl');
+    const resetUrl = `${appUrl}/reset-password?token=${rawToken}`;
+    await this.mailService.sendPasswordResetEmail(account.email, resetUrl);
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const tokenHash = this.hashToken(token);
+    const account =
+      await this.accountsService.findByPasswordResetTokenHash(tokenHash);
+
+    if (
+      !account ||
+      !account.passwordResetExpiresAt ||
+      account.passwordResetExpiresAt.getTime() < Date.now()
+    ) {
+      throw new BadRequestException({
+        code: 'INVALID_RESET_TOKEN',
+        message: 'This reset link is invalid or has expired.',
+      });
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, PASSWORD_SALT_ROUNDS);
+    await this.accountsService.resetPassword(account.id, passwordHash);
+  }
+
+  private hashToken(token: string): string {
+    return createHash('sha256').update(token).digest('hex');
   }
 
   private issueToken(account: Account): string {

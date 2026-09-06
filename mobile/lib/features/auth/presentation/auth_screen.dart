@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/tr.dart';
 import '../../../core/theme/app_theme.dart';
@@ -120,6 +121,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   ref.tr(isLogin ? 'authSwitchToRegister' : 'authSwitchToLogin'),
                 ),
               ),
+              if (isLogin)
+                TextButton(
+                  onPressed: _loading
+                      ? null
+                      : () => context.push('/forgot-password'),
+                  child: Text(
+                    ref.tr('authForgotPasswordLink'),
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

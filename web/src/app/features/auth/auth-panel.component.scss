@@ -52,6 +52,22 @@
   margin-top: 0.125rem;
 }
 
+.auth-forgot-link {
+  align-self: center;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  margin-top: -0.125rem;
+
+  &:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+}
+
 .auth-switch {
   align-self: center;
   border: none;

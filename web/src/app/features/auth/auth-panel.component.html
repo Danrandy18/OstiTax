@@ -53,6 +53,12 @@
         {{ (mode() === 'login' ? 'authLoginButton' : 'authRegisterButton') | translate }}
       }
     </button>
+
+    @if (mode() === 'login') {
+      <button type="button" class="auth-forgot-link" (click)="goToForgotPassword()">
+        {{ 'authForgotPasswordLink' | translate }}
+      </button>
+    }
   </form>
 
   <button type="button" class="auth-switch" (click)="switchMode(mode() === 'login' ? 'register' : 'login')">
