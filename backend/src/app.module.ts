@@ -10,13 +10,15 @@ import { CommonModule } from './common/common.module';
 import authConfig from './config/auth.config';
 import billingConfig from './config/billing.config';
 import databaseConfig from './config/database.config';
+import finanzonlineConfig from './config/finanzonline.config';
+import { FinanzOnlineModule } from './finanzonline/finanzonline.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig, billingConfig, authConfig],
+      load: [databaseConfig, billingConfig, authConfig, finanzonlineConfig],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -36,6 +38,7 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     BillingModule,
     CalcModule,
+    FinanzOnlineModule,
   ],
   controllers: [AppController],
   providers: [AppService],

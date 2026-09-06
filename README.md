@@ -167,11 +167,31 @@ Los webhooks de Stripe y PayPal necesitan una URL alcanzable desde internet. Par
 - **Stripe** tiene su propia CLI oficial para esto: `stripe listen --forward-to localhost:3000/api/webhooks/stripe` (te da un `whsec_...` de prueba al vuelo).
 - **PayPal** no tiene un equivalente oficial; se puede usar un túnel genérico como `npx localtunnel --port 3000` y registrar esa URL temporal como webhook.
 
+## FinanzOnline (envío directo de declaraciones — pendiente de certificación)
+
+El módulo backend (`backend/src/finanzonline/`) ya está preparado, pero **no funciona todavía**: a diferencia de Stripe/PayPal, FinanzOnline no tiene un registro de autoservicio. Para poder enviar declaraciones directamente hay que:
+
+1. Solicitar ante el **BMF (Bundesministerium für Finanzen)** el alta como **transmisor de datos autorizado** para el webservice SOAP de FinanzOnline. Esto se gestiona en [finanzonline.bmf.gv.at](https://finanzonline.bmf.gv.at) y normalmente requiere justificar el caso de uso (software de terceros que actúa en nombre del contribuyente) — es un trámite administrativo, no algo que se resuelva en minutos.
+2. El BMF entrega una **Teilnehmer-ID**, **Benutzer-ID** y **PIN** una vez aprobada la solicitud.
+3. Pégalas en `backend/.env`:
+   ```
+   FINANZONLINE_TEILNEHMER_ID=...
+   FINANZONLINE_BENUTZER_ID=...
+   FINANZONLINE_PIN=...
+   FINANZONLINE_WEBSERVICE_URL=...   # URL del webservice que te indique el BMF
+   FINANZONLINE_ENABLED=true
+   ```
+4. Implementar el cliente SOAP real en `backend/src/finanzonline/finanzonline.service.ts` (hoy solo valida configuración y devuelve un error claro — hay un `// TODO` marcando dónde va el código).
+
+Mientras `FINANZONLINE_ENABLED=false` (por defecto), la app sigue funcionando normal — solo el endpoint `POST /api/finanzonline/submit` responde `503` indicando que hay que exportar el PDF y cargarlo manualmente.
+
 ## Próximos pasos sugeridos
 
 - Configurar credenciales reales de Stripe y PayPal (ver sección anterior)
 - Configurar SMTP para activar "olvidé mi contraseña" (ver `backend/.env.example`)
 - Configurar un OAuth Client ID de Google para activar "Sign in with Google"
+- Gestionar la certificación de FinanzOnline ante el BMF (ver sección anterior) para el envío directo de declaraciones
+- Evaluar un proveedor de Open Banking (GoCardless Bank Account Data, Salt Edge o Tink) para la sincronización bancaria automática
 - Introducir migraciones de base de datos para despliegues en producción (hoy usa `synchronize: true` en desarrollo)
 
 ## Integración Claude + Cursor (MCP de terceros)
