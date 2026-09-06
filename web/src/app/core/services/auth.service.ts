@@ -65,6 +65,13 @@ export class AuthService {
       .pipe(tap(() => this.clearSession()));
   }
 
+  /** Refresca el estado de la cuenta (ej. tras volver de un checkout de pago). */
+  refreshAccount() {
+    return this.http
+      .get<AccountStatus>('/api/auth/me')
+      .pipe(tap((account) => this.account.set(account)));
+  }
+
   logout(): void {
     this.clearSession();
   }

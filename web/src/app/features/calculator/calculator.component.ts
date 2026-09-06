@@ -17,6 +17,7 @@ import {
 } from '../../core/services/calculator-api.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import type { Lang } from '../../core/i18n/translations';
+import { AuthService } from '../../core/services/auth.service';
 import { SessionService } from '../../core/services/session.service';
 import { PaymentModalComponent } from '../payment/payment-modal.component';
 import { TranslatePipe } from '../../shared/pipes/app.pipes';
@@ -47,7 +48,13 @@ export class CalculatorComponent {
   private readonly calculatorApi = inject(CalculatorApiService);
   readonly i18n = inject(I18nService);
   readonly session = inject(SessionService);
+  readonly auth = inject(AuthService);
   readonly bmfPendlerUrl = BMF_PENDLER_URL;
+
+  /** El Pro pertenece a la cuenta; el flag por dispositivo queda como fallback histórico. */
+  readonly isPro = computed(
+    () => this.auth.account()?.isPro || this.session.status()?.isPro || false,
+  );
   /** Solo herramientas de QA visibles en `ng serve` / build no productivo. */
   readonly devMode = isDevMode();
   readonly resettingAttempts = signal(false);
@@ -140,7 +147,7 @@ export class CalculatorComponent {
 
   readonly showAttemptsBadge = computed(() => {
     const status = this.session.status();
-    return status && !status.isPro;
+    return !!status && !this.isPro();
   });
 
   updateForm<K extends keyof CalculateRequest>(
@@ -276,7 +283,7 @@ export class CalculatorComponent {
     if (!data) {
       return;
     }
-    if (!this.session.status()?.isPro) {
+    if (!this.isPro()) {
       this.paymentModalOpen.set(true);
       return;
     }

@@ -41,15 +41,6 @@ export class SessionService {
     }
   }
 
-  refreshStatus() {
-    return this.http.get<UserStatus>('/api/billing/status').pipe(
-      tap((status) => {
-        this.status.set(status);
-        this.deviceId.set(status.deviceId);
-      }),
-    );
-  }
-
   /** Solo QA: el backend rechaza esto fuera de development. */
   resetAttemptsForTesting() {
     return this.http.post<UserStatus>('/api/users/dev/reset-attempts', {}).pipe(

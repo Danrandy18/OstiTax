@@ -9,7 +9,7 @@
     </a>
 
     <div class="header-actions">
-      @if (session.status()?.isPro) {
+      @if (auth.account()?.isPro || session.status()?.isPro) {
         <span class="badge-pro">{{ 'proBadge' | translate }}</span>
       } @else if (session.status(); as status) {
         <span class="badge-attempts">{{ 'attemptsRemaining' | translate }}: {{ status.freeAttemptsRemaining }}</span>

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { SessionService } from '../../core/services/session.service';
+import { AuthService } from '../../core/services/auth.service';
 import { TranslatePipe } from '../../shared/pipes/app.pipes';
 
 @Component({
@@ -24,11 +24,11 @@ import { TranslatePipe } from '../../shared/pipes/app.pipes';
   styleUrl: './payment-status.component.scss',
 })
 export class PaymentSuccessComponent implements OnInit {
-  private readonly session = inject(SessionService);
+  private readonly auth = inject(AuthService);
   readonly refreshing = signal(true);
 
   ngOnInit(): void {
-    this.session.refreshStatus().subscribe({
+    this.auth.refreshAccount().subscribe({
       complete: () => this.refreshing.set(false),
       error: () => this.refreshing.set(false),
     });
