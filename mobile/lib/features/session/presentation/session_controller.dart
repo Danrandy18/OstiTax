@@ -40,17 +40,6 @@ class SessionController extends StateNotifier<SessionState> {
     }
   }
 
-  Future<void> refresh() async {
-    final deviceId = state.status?.deviceId;
-    if (deviceId == null) return;
-    try {
-      final status = await _repository.refreshStatus(deviceId);
-      state = state.copyWith(status: status);
-    } catch (_) {
-      // El estado actual se conserva; el usuario puede reintentar.
-    }
-  }
-
   void applyUsage({
     required String plan,
     required bool isPro,

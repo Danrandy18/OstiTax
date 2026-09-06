@@ -5,9 +5,11 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/l10n/tr.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../session/presentation/session_controller.dart';
+import '../../auth/presentation/auth_controller.dart';
 
 enum _PayMethod { stripe, paypal }
+
+enum _AuthFormMode { login, register }
 
 enum _PlanSegment {
   individual('individual', 'segmentIndividualLabel'),
@@ -88,10 +90,49 @@ class _PaymentSheetState extends ConsumerState<PaymentSheet> {
   _PlanPeriod _selectedPeriod = _PlanPeriod.monthly;
   _PayMethod _selectedMethod = _PayMethod.stripe;
 
+  _AuthFormMode _authMode = _AuthFormMode.login;
+  final _emailCtrl = TextEditingController();
+  final _passwordCtrl = TextEditingController();
+  final _nameCtrl = TextEditingController();
+  bool _authLoading = false;
+  String? _authError;
+
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    _passwordCtrl.dispose();
+    _nameCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submitAuth() async {
+    setState(() {
+      _authLoading = true;
+      _authError = null;
+    });
+
+    final notifier = ref.read(authControllerProvider.notifier);
+    final ok = _authMode == _AuthFormMode.login
+        ? await notifier.login(_emailCtrl.text.trim(), _passwordCtrl.text)
+        : await notifier.register(
+            _emailCtrl.text.trim(),
+            _passwordCtrl.text,
+            _nameCtrl.text.trim().isEmpty ? null : _nameCtrl.text.trim(),
+          );
+
+    if (!mounted) return;
+    setState(() {
+      _authLoading = false;
+      if (!ok) {
+        _authError = ref.read(authControllerProvider).error ?? ref.tr('authErrorGeneric');
+      }
+    });
+  }
+
   Future<void> _pay() async {
     final method = _selectedMethod;
-    final deviceId = ref.read(sessionControllerProvider).status?.deviceId;
-    if (deviceId == null) return;
+    final token = ref.read(authControllerProvider).token;
+    if (token == null) return;
 
     setState(() {
       _loading = method;
@@ -103,9 +144,9 @@ class _PaymentSheetState extends ConsumerState<PaymentSheet> {
       final interval =
           '${_selectedSegment.value}_${_selectedPeriod.name}';
       final url = method == _PayMethod.stripe
-          ? (await billing.createStripeCheckout(deviceId, interval)).url
+          ? (await billing.createStripeCheckout(token, interval)).url
           : (await billing.createPaypalSubscription(
-              deviceId,
+              token,
               interval,
             )).approvalUrl;
 
@@ -133,14 +174,15 @@ class _PaymentSheetState extends ConsumerState<PaymentSheet> {
   }
 
   Future<void> _refreshStatus() async {
-    await ref.read(sessionControllerProvider.notifier).refresh();
-    if (mounted && ref.read(sessionControllerProvider).status?.isPro == true) {
+    await ref.read(authControllerProvider.notifier).refreshAccount();
+    if (mounted && ref.read(authControllerProvider).account?.isPro == true) {
       Navigator.of(context).pop();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isAuthenticated = ref.watch(authControllerProvider).isAuthenticated;
     return SafeArea(
       child: Container(
         margin: const EdgeInsets.all(12),
@@ -233,6 +275,81 @@ class _PaymentSheetState extends ConsumerState<PaymentSheet> {
                     onPressed: _refreshStatus,
                     icon: const Icon(Icons.refresh_rounded, size: 18),
                     label: Text(ref.tr('refreshStatus')),
+                  ),
+                ),
+              ] else if (!isAuthenticated) ...[
+                Text(
+                  ref.tr(
+                    _authMode == _AuthFormMode.login
+                        ? 'authLoginTitle'
+                        : 'authRegisterTitle',
+                  ),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                if (_authMode == _AuthFormMode.register) ...[
+                  TextField(
+                    controller: _nameCtrl,
+                    decoration: InputDecoration(
+                      labelText: ref.tr('authNameOptional'),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                ],
+                TextField(
+                  controller: _emailCtrl,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(labelText: ref.tr('authEmailLabel')),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _passwordCtrl,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: ref.tr('authPasswordLabel'),
+                  ),
+                ),
+                if (_authError != null) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    _authError!,
+                    style: const TextStyle(color: AppColors.error, fontSize: 13),
+                  ),
+                ],
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  child: _PayButton(
+                    label: ref.tr(
+                      _authMode == _AuthFormMode.login
+                          ? 'authLoginButton'
+                          : 'authRegisterButton',
+                    ),
+                    icon: Icons.login_rounded,
+                    loading: _authLoading,
+                    filled: true,
+                    onTap: _submitAuth,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: _authLoading
+                      ? null
+                      : () => setState(() {
+                          _authMode = _authMode == _AuthFormMode.login
+                              ? _AuthFormMode.register
+                              : _AuthFormMode.login;
+                          _authError = null;
+                        }),
+                  child: Text(
+                    ref.tr(
+                      _authMode == _AuthFormMode.login
+                          ? 'authSwitchToRegister'
+                          : 'authSwitchToLogin',
+                    ),
                   ),
                 ),
               ] else ...[

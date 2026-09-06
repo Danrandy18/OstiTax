@@ -22,6 +22,24 @@ class ApiClient {
       headers: deviceId == null ? null : {'X-Device-Id': deviceId},
     );
   }
+
+  Options withAuth(String? token) {
+    return Options(
+      headers: token == null ? null : {'Authorization': 'Bearer $token'},
+    );
+  }
+
+  /// Combina ambos headers cuando un request necesita device + auth a la vez
+  /// (ej. /calculate autenticado). Mismo motivo que withDevice/withAuth para
+  /// no usar un interceptor global: evitar el ciclo con los providers de
+  /// sesion/auth.
+  Options merged(String? deviceId, String? token) {
+    final headers = <String, String>{
+      'X-Device-Id': ?deviceId,
+      'Authorization': ?token != null ? 'Bearer $token' : null,
+    };
+    return Options(headers: headers.isEmpty ? null : headers);
+  }
 }
 
 class ApiException implements Exception {

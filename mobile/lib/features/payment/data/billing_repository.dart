@@ -9,14 +9,14 @@ class BillingRepository {
   final ApiClient _client;
 
   Future<StripeCheckoutResponse> createStripeCheckout(
-    String deviceId,
+    String authToken,
     String interval,
   ) async {
     try {
       final response = await _client.dio.post<Map<String, dynamic>>(
         '/billing/stripe/checkout',
         data: {'interval': interval},
-        options: _client.withDevice(deviceId),
+        options: _client.withAuth(authToken),
       );
       return StripeCheckoutResponse.fromJson(response.data!);
     } on DioException catch (error) {
@@ -25,14 +25,14 @@ class BillingRepository {
   }
 
   Future<PaypalSubscriptionResponse> createPaypalSubscription(
-    String deviceId,
+    String authToken,
     String interval,
   ) async {
     try {
       final response = await _client.dio.post<Map<String, dynamic>>(
         '/billing/paypal/subscription',
         data: {'interval': interval},
-        options: _client.withDevice(deviceId),
+        options: _client.withAuth(authToken),
       );
       return PaypalSubscriptionResponse.fromJson(response.data!);
     } on DioException catch (error) {

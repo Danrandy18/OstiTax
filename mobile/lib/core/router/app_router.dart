@@ -1,5 +1,7 @@
 import 'package:go_router/go_router.dart';
 
+import '../../features/account/presentation/account_screen.dart';
+import '../../features/auth/presentation/auth_screen.dart';
 import '../../features/calculator/presentation/calculator_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/onboarding/presentation/splash_screen.dart';
@@ -15,6 +17,11 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/calculator',
       builder: (context, state) => const CalculatorScreen(),
+    ),
+    GoRoute(path: '/login', builder: (context, state) => const AuthScreen()),
+    GoRoute(
+      path: '/account',
+      builder: (context, state) => const AccountScreen(),
     ),
   ],
 );

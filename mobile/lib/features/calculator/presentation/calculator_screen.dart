@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/l10n/tr.dart';
@@ -7,6 +8,7 @@ import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/animated_logo.dart';
 import '../../../core/widgets/segmented_toggle.dart';
+import '../../auth/presentation/auth_controller.dart';
 import '../../payment/presentation/payment_sheet.dart';
 import '../../session/presentation/session_controller.dart';
 import '../domain/calculation_models.dart';
@@ -84,7 +86,9 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
   Widget build(BuildContext context) {
     final calcState = ref.watch(calculatorControllerProvider);
     final session = ref.watch(sessionControllerProvider);
+    final auth = ref.watch(authControllerProvider);
     final form = calcState.form;
+    final isPro = (auth.account?.isPro ?? false) || (session.status?.isPro ?? false);
 
     ref.listen<CalculatorState>(calculatorControllerProvider, (previous, next) {
       if (next.paymentRequired && !_paymentSheetQueued) {
@@ -117,7 +121,17 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
           ],
         ),
         actions: [
-          if (session.status != null) _StatusBadge(status: session.status!),
+          if (session.status != null)
+            _StatusBadge(
+              isPro: isPro,
+              freeAttemptsRemaining: session.status!.freeAttemptsRemaining,
+            ),
+          if (auth.account != null)
+            IconButton(
+              icon: const Icon(Icons.person_outline_rounded),
+              tooltip: auth.account!.email,
+              onPressed: () => context.push('/account'),
+            ),
           const SizedBox(width: 6),
           _LanguageMenu(),
           const SizedBox(width: 8),
@@ -432,7 +446,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
             const SizedBox(height: 20),
             const ResultCard(),
 
-            if (session.status != null && !session.status!.isPro) ...[
+            if (session.status != null && !isPro) ...[
               const SizedBox(height: 14),
               _AttemptsBanner(remaining: session.status!.freeAttemptsRemaining),
             ],
@@ -444,12 +458,13 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
 }
 
 class _StatusBadge extends ConsumerWidget {
-  const _StatusBadge({required this.status});
-  final dynamic status;
+  const _StatusBadge({required this.isPro, this.freeAttemptsRemaining});
+  final bool isPro;
+  final int? freeAttemptsRemaining;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (status.isPro as bool) {
+    if (isPro) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
@@ -474,7 +489,7 @@ class _StatusBadge extends ConsumerWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
-        '${ref.tr('attemptsRemaining')}: ${status.freeAttemptsRemaining}',
+        '${ref.tr('attemptsRemaining')}: ${freeAttemptsRemaining ?? 0}',
         style: const TextStyle(
           color: AppColors.textSecondary,
           fontWeight: FontWeight.w600,

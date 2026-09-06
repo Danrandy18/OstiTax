@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/legacy.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/providers.dart';
+import '../../auth/presentation/auth_controller.dart';
 import '../../session/presentation/session_controller.dart';
 import '../domain/calculation_models.dart';
 
@@ -92,11 +93,16 @@ class CalculatorController extends StateNotifier<CalculatorState> {
     if (state.loading) return;
     final deviceId = _ref.read(sessionControllerProvider).status?.deviceId;
     if (deviceId == null) return;
+    final authToken = _ref.read(authControllerProvider).token;
 
     state = state.copyWith(loading: true, error: null, paymentRequired: false);
     try {
       final repo = _ref.read(calculatorRepositoryProvider);
-      final response = await repo.calculate(state.form, deviceId: deviceId);
+      final response = await repo.calculate(
+        state.form,
+        deviceId: deviceId,
+        authToken: authToken,
+      );
       state = state.copyWith(
         result: response,
         activeTab: ResultTab.recurring,

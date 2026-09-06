@@ -11,12 +11,13 @@ class CalculatorRepository {
   Future<CalculateResponse> calculate(
     CalculateRequest request, {
     required String? deviceId,
+    String? authToken,
   }) async {
     try {
       final response = await _client.dio.post<Map<String, dynamic>>(
         '/calculate',
         data: request.toJson(),
-        options: _client.withDevice(deviceId),
+        options: _client.merged(deviceId, authToken),
       );
       return CalculateResponse.fromJson(response.data!);
     } on DioException catch (error) {
