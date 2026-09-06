@@ -2,11 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import {
+  isStatusStillActive,
+  isSubscriptionActive,
+} from '../common/utils/subscription-status.util';
 import { User } from './entities/user.entity';
 import { SubscriptionProvider, UserPlan } from './enums/user-plan.enum';
-
-const ACTIVE_STRIPE_STATUSES = new Set(['active', 'trialing', 'past_due']);
-const ACTIVE_PAYPAL_STATUSES = new Set(['ACTIVE', 'APPROVED']);
 
 export interface ActivateProParams {
   provider: SubscriptionProvider;
@@ -71,30 +72,7 @@ export class UsersService {
   }
 
   isPro(user: User): boolean {
-    if (user.plan !== UserPlan.PRO) {
-      return false;
-    }
-
-    if (
-      user.subscriptionCurrentPeriodEnd &&
-      user.subscriptionCurrentPeriodEnd.getTime() < Date.now()
-    ) {
-      return false;
-    }
-
-    if (!user.subscriptionStatus) {
-      return false;
-    }
-
-    if (user.subscriptionProvider === SubscriptionProvider.STRIPE) {
-      return ACTIVE_STRIPE_STATUSES.has(user.subscriptionStatus);
-    }
-
-    if (user.subscriptionProvider === SubscriptionProvider.PAYPAL) {
-      return ACTIVE_PAYPAL_STATUSES.has(user.subscriptionStatus);
-    }
-
-    return false;
+    return isSubscriptionActive(user);
   }
 
   async decrementFreeAttempt(userId: string): Promise<User> {
@@ -148,12 +126,7 @@ export class UsersService {
       user.subscriptionCurrentPeriodEnd = currentPeriodEnd;
     }
 
-    const stillPro =
-      user.subscriptionProvider === SubscriptionProvider.STRIPE
-        ? ACTIVE_STRIPE_STATUSES.has(status)
-        : user.subscriptionProvider === SubscriptionProvider.PAYPAL
-          ? ACTIVE_PAYPAL_STATUSES.has(status)
-          : false;
+    const stillPro = isStatusStillActive(user.subscriptionProvider, status);
 
     if (!stillPro) {
       user.plan = UserPlan.FREE;

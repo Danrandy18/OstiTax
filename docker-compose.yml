@@ -4,7 +4,7 @@ services:
     container_name: app_calculos_db
     restart: unless-stopped
     ports:
-      - '5432:5432'
+      - '${DB_HOST_PORT:-5432}:5432'
     environment:
       POSTGRES_USER: app_calculos
       POSTGRES_PASSWORD: app_calculos

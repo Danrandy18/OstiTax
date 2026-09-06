@@ -80,7 +80,13 @@ export interface StripeCheckoutResponse {
   sessionId: string;
 }
 
-export type PlanInterval = 'monthly' | 'semiannual' | 'annual';
+export type PlanInterval =
+  | 'individual_monthly'
+  | 'individual_annual'
+  | 'company_monthly'
+  | 'company_annual';
+
+export type PlanSegment = 'individual' | 'company';
 
 export interface PaypalSubscriptionResponse {
   approvalUrl: string;

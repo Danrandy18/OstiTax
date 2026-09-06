@@ -1,5 +1,6 @@
 export enum PlanInterval {
-  MONTHLY = 'monthly',
-  SEMIANNUAL = 'semiannual',
-  ANNUAL = 'annual',
+  INDIVIDUAL_MONTHLY = 'individual_monthly',
+  INDIVIDUAL_ANNUAL = 'individual_annual',
+  COMPANY_MONTHLY = 'company_monthly',
+  COMPANY_ANNUAL = 'company_annual',
 }

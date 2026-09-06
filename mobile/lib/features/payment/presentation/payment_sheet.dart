@@ -9,19 +9,21 @@ import '../../session/presentation/session_controller.dart';
 
 enum _PayMethod { stripe, paypal }
 
-enum _PlanInterval {
-  monthly('monthly'),
-  semiannual('semiannual'),
-  annual('annual');
+enum _PlanSegment {
+  individual('individual', 'segmentIndividualLabel'),
+  company('company', 'segmentCompanyLabel');
 
-  const _PlanInterval(this.value);
+  const _PlanSegment(this.value, this.labelKey);
 
   final String value;
+  final String labelKey;
 }
+
+enum _PlanPeriod { monthly, annual }
 
 class _PlanInfo {
   const _PlanInfo({
-    required this.interval,
+    required this.period,
     required this.titleKey,
     required this.priceKey,
     required this.benefitKey,
@@ -30,7 +32,7 @@ class _PlanInfo {
     this.highlight = false,
   });
 
-  final _PlanInterval interval;
+  final _PlanPeriod period;
   final String titleKey;
   final String priceKey;
   final String benefitKey;
@@ -39,31 +41,28 @@ class _PlanInfo {
   final bool highlight;
 }
 
-const _plans = [
-  _PlanInfo(
-    interval: _PlanInterval.monthly,
-    titleKey: 'planMonthlyTitle',
-    priceKey: 'planMonthlyPrice',
-    benefitKey: 'planMonthlyBenefit',
-  ),
-  _PlanInfo(
-    interval: _PlanInterval.semiannual,
-    titleKey: 'planSemiannualTitle',
-    priceKey: 'planSemiannualPrice',
-    perMonthKey: 'planSemiannualPerMonth',
-    badgeKey: 'planSemiannualBadge',
-    benefitKey: 'planSemiannualBenefit',
-  ),
-  _PlanInfo(
-    interval: _PlanInterval.annual,
-    titleKey: 'planAnnualTitle',
-    priceKey: 'planAnnualPrice',
-    perMonthKey: 'planAnnualPerMonth',
-    badgeKey: 'planAnnualBadge',
-    benefitKey: 'planAnnualBenefit',
-    highlight: true,
-  ),
-];
+List<_PlanInfo> _plansFor(_PlanSegment segment) {
+  final isCompany = segment == _PlanSegment.company;
+  return [
+    _PlanInfo(
+      period: _PlanPeriod.monthly,
+      titleKey: 'planMonthlyTitle',
+      priceKey: isCompany ? 'planMonthlyPriceCompany' : 'planMonthlyPrice',
+      benefitKey: 'planMonthlyBenefit',
+    ),
+    _PlanInfo(
+      period: _PlanPeriod.annual,
+      titleKey: 'planAnnualTitle',
+      priceKey: isCompany ? 'planAnnualPriceCompany' : 'planAnnualPrice',
+      perMonthKey: isCompany
+          ? 'planAnnualPerMonthCompany'
+          : 'planAnnualPerMonth',
+      badgeKey: 'planAnnualBadge',
+      benefitKey: 'planAnnualBenefit',
+      highlight: true,
+    ),
+  ];
+}
 
 Future<void> showPaymentSheet(BuildContext context) {
   return showModalBottomSheet<void>(
@@ -85,7 +84,8 @@ class _PaymentSheetState extends ConsumerState<PaymentSheet> {
   _PayMethod? _loading;
   String? _error;
   bool _opened = false;
-  _PlanInterval _selectedInterval = _PlanInterval.monthly;
+  _PlanSegment _selectedSegment = _PlanSegment.individual;
+  _PlanPeriod _selectedPeriod = _PlanPeriod.monthly;
   _PayMethod _selectedMethod = _PayMethod.stripe;
 
   Future<void> _pay() async {
@@ -100,7 +100,8 @@ class _PaymentSheetState extends ConsumerState<PaymentSheet> {
 
     try {
       final billing = ref.read(billingRepositoryProvider);
-      final interval = _selectedInterval.value;
+      final interval =
+          '${_selectedSegment.value}_${_selectedPeriod.name}';
       final url = method == _PayMethod.stripe
           ? (await billing.createStripeCheckout(deviceId, interval)).url
           : (await billing.createPaypalSubscription(
@@ -235,9 +236,28 @@ class _PaymentSheetState extends ConsumerState<PaymentSheet> {
                   ),
                 ),
               ] else ...[
+                _SectionHeading(text: ref.tr('segmentSelectHeading')),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    for (final seg in _PlanSegment.values) ...[
+                      Expanded(
+                        child: _SegmentChip(
+                          label: ref.tr(seg.labelKey),
+                          selected: _selectedSegment == seg,
+                          onTap: () =>
+                              setState(() => _selectedSegment = seg),
+                        ),
+                      ),
+                      if (seg != _PlanSegment.values.last)
+                        const SizedBox(width: 8),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 14),
                 _SectionHeading(text: ref.tr('planSelectHeading')),
                 const SizedBox(height: 8),
-                for (final plan in _plans) ...[
+                for (final plan in _plansFor(_selectedSegment)) ...[
                   _PlanCard(
                     title: ref.tr(plan.titleKey),
                     price: ref.tr(plan.priceKey),
@@ -249,9 +269,9 @@ class _PaymentSheetState extends ConsumerState<PaymentSheet> {
                         ? ref.tr(plan.badgeKey!)
                         : null,
                     highlight: plan.highlight,
-                    selected: _selectedInterval == plan.interval,
+                    selected: _selectedPeriod == plan.period,
                     onTap: () =>
-                        setState(() => _selectedInterval = plan.interval),
+                        setState(() => _selectedPeriod = plan.period),
                   ),
                   const SizedBox(height: 8),
                 ],
@@ -341,6 +361,49 @@ class _SectionHeading extends StatelessWidget {
         fontWeight: FontWeight.w700,
         letterSpacing: 0.4,
         color: AppColors.textSecondary,
+      ),
+    );
+  }
+}
+
+class _SegmentChip extends StatelessWidget {
+  const _SegmentChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selected
+              ? AppColors.primary.withValues(alpha: 0.06)
+              : AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected ? AppColors.primary : AppColors.border,
+            width: 1.5,
+          ),
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 13,
+            color: selected ? AppColors.primary : AppColors.textPrimary,
+          ),
+        ),
       ),
     );
   }

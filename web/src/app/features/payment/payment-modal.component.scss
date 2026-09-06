@@ -66,6 +66,53 @@
   }
 }
 
+.segments {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+  border: none;
+  padding: 0;
+  margin: 0 0 1.125rem;
+}
+
+.segment-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.625rem 0.75rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out);
+
+  &:hover {
+    border-color: var(--color-primary);
+  }
+
+  &.selected {
+    border-color: var(--color-primary);
+    background: rgb(var(--color-primary-rgb) / 6%);
+    box-shadow: 0 0 0 1px var(--color-primary);
+  }
+}
+
+.segment-card-radio {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+}
+
 .plans {
   display: grid;
   gap: 0.625rem;

@@ -17,12 +17,29 @@
         </button>
       </header>
 
+      <p class="section-heading">{{ 'segmentSelectHeading' | translate }}</p>
+      <fieldset class="segments" [disabled]="loading() !== null">
+        @for (seg of segments; track seg.value) {
+          <label class="segment-card" [class.selected]="segment() === seg.value">
+            <input
+              type="radio"
+              name="planSegment"
+              class="segment-card-radio"
+              [value]="seg.value"
+              [checked]="segment() === seg.value"
+              (change)="selectSegment(seg.value)"
+            />
+            <span>{{ seg.labelKey | translate }}</span>
+          </label>
+        }
+      </fieldset>
+
       <p class="section-heading">{{ 'planSelectHeading' | translate }}</p>
       <fieldset class="plans" [disabled]="loading() !== null">
-        @for (plan of plans; track plan.value) {
+        @for (plan of plans(); track plan.value) {
           <label
             class="plan-card"
-            [class.selected]="selectedInterval() === plan.value"
+            [class.selected]="selectedPeriod() === plan.value"
             [class.highlight]="plan.highlight"
           >
             <input
@@ -30,7 +47,7 @@
               name="planInterval"
               class="plan-card-radio"
               [value]="plan.value"
-              [checked]="selectedInterval() === plan.value"
+              [checked]="selectedPeriod() === plan.value"
               (change)="selectPlan(plan.value)"
             />
             <div class="plan-card-main">

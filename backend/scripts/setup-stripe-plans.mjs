@@ -36,21 +36,27 @@ const stripe = new Stripe(secretKey);
 
 const PLANS = [
   {
-    envKey: 'STRIPE_PRICE_ID_MONTHLY',
-    name: 'OestiTax Pro Mensual',
-    unitAmount: 300,
+    envKey: 'STRIPE_PRICE_ID_INDIVIDUAL_MONTHLY',
+    name: 'OestiTax Pro Individual Mensual',
+    unitAmount: 399,
     recurring: { interval: 'month', interval_count: 1 },
   },
   {
-    envKey: 'STRIPE_PRICE_ID_SEMIANNUAL',
-    name: 'OestiTax Pro Semestral',
-    unitAmount: 1500,
-    recurring: { interval: 'month', interval_count: 6 },
+    envKey: 'STRIPE_PRICE_ID_INDIVIDUAL_ANNUAL',
+    name: 'OestiTax Pro Individual Anual',
+    unitAmount: 3999,
+    recurring: { interval: 'year', interval_count: 1 },
   },
   {
-    envKey: 'STRIPE_PRICE_ID_ANNUAL',
-    name: 'OestiTax Pro Anual',
-    unitAmount: 2500,
+    envKey: 'STRIPE_PRICE_ID_COMPANY_MONTHLY',
+    name: 'OestiTax Pro Empresa Mensual',
+    unitAmount: 1299,
+    recurring: { interval: 'month', interval_count: 1 },
+  },
+  {
+    envKey: 'STRIPE_PRICE_ID_COMPANY_ANNUAL',
+    name: 'OestiTax Pro Empresa Anual',
+    unitAmount: 12999,
     recurring: { interval: 'year', interval_count: 1 },
   },
 ];
