@@ -7,6 +7,7 @@ import '../../../core/l10n/tr.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/animated_logo.dart';
+import '../../../core/widgets/legal_disclaimer_footer.dart';
 import '../../../core/widgets/segmented_toggle.dart';
 import '../../auth/presentation/auth_controller.dart';
 import '../../payment/presentation/payment_sheet.dart';
@@ -453,6 +454,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
           ],
         ),
       ),
+      bottomNavigationBar: const LegalDisclaimerFooter(),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/config/feature_flags.dart';
 import '../../../core/l10n/tr.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/legal_disclaimer_footer.dart';
 import 'auth_controller.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
@@ -139,6 +140,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: const LegalDisclaimerFooter(),
     );
   }
 }

@@ -6,6 +6,7 @@ import '../../../core/l10n/tr.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/providers.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/legal_disclaimer_footer.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
   const ResetPasswordScreen({super.key, required this.token});
@@ -105,6 +106,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 ),
         ),
       ),
+      bottomNavigationBar: const LegalDisclaimerFooter(),
     );
   }
 }

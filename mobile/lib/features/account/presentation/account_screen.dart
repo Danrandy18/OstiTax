@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/tr.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/legal_disclaimer_footer.dart';
 import '../../auth/presentation/auth_controller.dart';
 
 class AccountScreen extends ConsumerStatefulWidget {
@@ -59,6 +60,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
       return Scaffold(
         appBar: AppBar(title: Text(ref.tr('profileTitle'))),
         body: const SizedBox.shrink(),
+        bottomNavigationBar: const LegalDisclaimerFooter(),
       );
     }
 
@@ -132,6 +134,7 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
           ],
         ),
       ),
+      bottomNavigationBar: const LegalDisclaimerFooter(),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/tr.dart';
 import '../../../core/providers.dart';
+import '../../../core/widgets/legal_disclaimer_footer.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -76,6 +77,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 ),
         ),
       ),
+      bottomNavigationBar: const LegalDisclaimerFooter(),
     );
   }
 }
