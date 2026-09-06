@@ -8,8 +8,10 @@ import {
   signal,
 } from '@angular/core';
 import { BillingApiService } from '../../core/services/billing-api.service';
+import { AuthService } from '../../core/services/auth.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../shared/pipes/app.pipes';
+import { AuthPanelComponent } from '../auth/auth-panel.component';
 import type {
   PlanInterval,
   PlanSegment,
@@ -22,13 +24,16 @@ type PlanPeriod = 'monthly' | 'annual';
 @Component({
   selector: 'app-payment-modal',
   standalone: true,
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, AuthPanelComponent],
   templateUrl: './payment-modal.component.html',
   styleUrl: './payment-modal.component.scss',
 })
 export class PaymentModalComponent {
   private readonly billingApi = inject(BillingApiService);
+  private readonly auth = inject(AuthService);
   readonly i18n = inject(I18nService);
+
+  readonly isAuthenticated = computed(() => this.auth.account() !== null);
 
   readonly open = input(false);
   readonly closed = output<void>();

@@ -1,6 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { AuthService } from '../core/services/auth.service';
 import { I18nService } from '../core/i18n/i18n.service';
 import { SessionService } from '../core/services/session.service';
 import type { Lang } from '../core/i18n/translations';
@@ -16,12 +17,20 @@ import { TranslatePipe } from '../shared/pipes/app.pipes';
 export class AppShellComponent implements OnInit {
   readonly i18n = inject(I18nService);
   readonly session = inject(SessionService);
+  readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
   ngOnInit(): void {
     void this.session.ensureSession();
+    void this.auth.ensureAuth();
   }
 
   onLanguageChange(value: Lang): void {
     this.i18n.setLanguage(value);
+  }
+
+  logout(): void {
+    this.auth.logout();
+    void this.router.navigateByUrl('/');
   }
 }

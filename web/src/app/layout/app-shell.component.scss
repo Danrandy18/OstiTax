@@ -152,6 +152,25 @@
   white-space: nowrap;
 }
 
+.account-link {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 10rem;
+
+  &:hover {
+    color: var(--color-primary);
+  }
+}
+
+.btn-logout {
+  font-size: 0.8125rem;
+  padding: 0.25rem 0.5rem;
+}
+
 .lang-select {
   position: relative;
 

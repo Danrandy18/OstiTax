@@ -100,3 +100,19 @@ export interface PaymentRequiredError {
   freeAttemptsRemaining: number;
   plan: UserPlan;
 }
+
+export interface AccountStatus {
+  id: string;
+  email: string;
+  name: string | null;
+  plan: UserPlan;
+  isPro: boolean;
+  subscriptionProvider: string | null;
+  subscriptionStatus: string | null;
+  subscriptionCurrentPeriodEnd: string | null;
+}
+
+export interface AuthResponse {
+  accessToken: string;
+  account: AccountStatus;
+}

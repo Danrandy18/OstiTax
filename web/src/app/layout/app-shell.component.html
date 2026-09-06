@@ -15,6 +15,13 @@
         <span class="badge-attempts">{{ 'attemptsRemaining' | translate }}: {{ status.freeAttemptsRemaining }}</span>
       }
 
+      @if (auth.account(); as account) {
+        <a routerLink="/profile" class="account-link">{{ account.email }}</a>
+        <button type="button" class="btn-ghost btn-logout" (click)="logout()">
+          {{ 'authLogoutButton' | translate }}
+        </button>
+      }
+
       <label class="lang-select">
         <span class="sr-only">{{ 'language' | translate }}</span>
         <select

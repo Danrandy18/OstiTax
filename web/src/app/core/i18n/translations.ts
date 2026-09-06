@@ -114,6 +114,38 @@ export interface TranslationSchema {
   benefitInKindHint: string;
   taxFreeAllowanceHint: string;
   states: Record<string, string>;
+  authLoginTitle: string;
+  authRegisterTitle: string;
+  authEmailLabel: string;
+  authPasswordLabel: string;
+  authNameLabel: string;
+  authNameOptional: string;
+  authLoginButton: string;
+  authRegisterButton: string;
+  authSwitchToRegister: string;
+  authSwitchToLogin: string;
+  authGoogleButton: string;
+  authOrDivider: string;
+  authErrorInvalidCredentials: string;
+  authErrorEmailTaken: string;
+  authErrorGeneric: string;
+  authErrorGoogleFailed: string;
+  authLogoutButton: string;
+  authLoggedInAs: string;
+  profileTitle: string;
+  profileNavLink: string;
+  profileEmailLabel: string;
+  profileNameLabel: string;
+  profilePlanLabel: string;
+  profilePlanFree: string;
+  profilePlanPro: string;
+  profileRenewsOn: string;
+  profileDangerZoneTitle: string;
+  profileDeleteAccountButton: string;
+  profileDeleteConfirmTitle: string;
+  profileDeleteConfirmBody: string;
+  profileDeleteConfirmButton: string;
+  profileDeleteCancelButton: string;
 }
 
 const stateKeys = [
@@ -257,6 +289,40 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     benefitInKindHint:
       'Geldwerte Vorteile wie Diensthandy oder -wohnung, die zusätzlich versteuert werden.',
     taxFreeAllowanceHint: 'Laut Freibetragsbescheid deines Finanzamts, falls vorhanden.',
+    authLoginTitle: 'Anmelden',
+    authRegisterTitle: 'Konto erstellen',
+    authEmailLabel: 'E-Mail',
+    authPasswordLabel: 'Passwort',
+    authNameLabel: 'Name',
+    authNameOptional: 'Name (optional)',
+    authLoginButton: 'Anmelden',
+    authRegisterButton: 'Konto erstellen',
+    authSwitchToRegister: 'Noch kein Konto? Registrieren',
+    authSwitchToLogin: 'Schon ein Konto? Anmelden',
+    authGoogleButton: 'Mit Google fortfahren',
+    authOrDivider: 'oder',
+    authErrorInvalidCredentials: 'E-Mail oder Passwort ungültig.',
+    authErrorEmailTaken: 'Es existiert bereits ein Konto mit dieser E-Mail.',
+    authErrorGeneric: 'Etwas ist schiefgelaufen. Bitte versuche es erneut.',
+    authErrorGoogleFailed:
+      'Google-Anmeldung fehlgeschlagen. Bitte versuche es erneut.',
+    authLogoutButton: 'Abmelden',
+    authLoggedInAs: 'Angemeldet als',
+    profileTitle: 'Mein Profil',
+    profileNavLink: 'Mein Profil',
+    profileEmailLabel: 'E-Mail',
+    profileNameLabel: 'Name',
+    profilePlanLabel: 'Plan',
+    profilePlanFree: 'Kostenlos',
+    profilePlanPro: 'Pro',
+    profileRenewsOn: 'Verlängert sich am',
+    profileDangerZoneTitle: 'Gefahrenzone',
+    profileDeleteAccountButton: 'Konto löschen',
+    profileDeleteConfirmTitle: 'Konto wirklich löschen?',
+    profileDeleteConfirmBody:
+      'Eine aktive Abo-Zahlung wird gekündigt und alle deine Daten werden endgültig gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.',
+    profileDeleteConfirmButton: 'Ja, Konto löschen',
+    profileDeleteCancelButton: 'Abbrechen',
     states: states({
       wien: 'Wien',
       niederoesterreich: 'Niederösterreich',
@@ -389,6 +455,39 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     familyBonusHint: 'Tax credit per child. "Full bonus" if only you claim it, otherwise "Shared bonus".',
     benefitInKindHint: 'Non-cash perks like a company phone or flat, taxed as extra income.',
     taxFreeAllowanceHint: "From your tax office's Freibetragsbescheid, if you have one.",
+    authLoginTitle: 'Log in',
+    authRegisterTitle: 'Create account',
+    authEmailLabel: 'Email',
+    authPasswordLabel: 'Password',
+    authNameLabel: 'Name',
+    authNameOptional: 'Name (optional)',
+    authLoginButton: 'Log in',
+    authRegisterButton: 'Create account',
+    authSwitchToRegister: "Don't have an account? Sign up",
+    authSwitchToLogin: 'Already have an account? Log in',
+    authGoogleButton: 'Continue with Google',
+    authOrDivider: 'or',
+    authErrorInvalidCredentials: 'Invalid email or password.',
+    authErrorEmailTaken: 'An account with this email already exists.',
+    authErrorGeneric: 'Something went wrong. Please try again.',
+    authErrorGoogleFailed: 'Google sign-in failed. Please try again.',
+    authLogoutButton: 'Log out',
+    authLoggedInAs: 'Signed in as',
+    profileTitle: 'My Profile',
+    profileNavLink: 'My Profile',
+    profileEmailLabel: 'Email',
+    profileNameLabel: 'Name',
+    profilePlanLabel: 'Plan',
+    profilePlanFree: 'Free',
+    profilePlanPro: 'Pro',
+    profileRenewsOn: 'Renews on',
+    profileDangerZoneTitle: 'Danger zone',
+    profileDeleteAccountButton: 'Delete account',
+    profileDeleteConfirmTitle: 'Delete your account?',
+    profileDeleteConfirmBody:
+      'Any active subscription will be cancelled and all your data will be permanently deleted. This action cannot be undone.',
+    profileDeleteConfirmButton: 'Yes, delete my account',
+    profileDeleteCancelButton: 'Cancel',
     states: states({
       wien: 'Vienna',
       niederoesterreich: 'Lower Austria',
@@ -524,6 +623,40 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     benefitInKindHint:
       'Beneficios en especie como móvil o vivienda de empresa, gravados como ingreso extra.',
     taxFreeAllowanceHint: 'Según la resolución de exención de tu oficina de impuestos, si la tienes.',
+    authLoginTitle: 'Iniciar sesión',
+    authRegisterTitle: 'Crear cuenta',
+    authEmailLabel: 'Correo electrónico',
+    authPasswordLabel: 'Contraseña',
+    authNameLabel: 'Nombre',
+    authNameOptional: 'Nombre (opcional)',
+    authLoginButton: 'Iniciar sesión',
+    authRegisterButton: 'Crear cuenta',
+    authSwitchToRegister: '¿No tienes cuenta? Regístrate',
+    authSwitchToLogin: '¿Ya tienes cuenta? Inicia sesión',
+    authGoogleButton: 'Continuar con Google',
+    authOrDivider: 'o',
+    authErrorInvalidCredentials: 'Correo o contraseña inválidos.',
+    authErrorEmailTaken: 'Ya existe una cuenta con este correo.',
+    authErrorGeneric: 'Algo salió mal. Inténtalo de nuevo.',
+    authErrorGoogleFailed:
+      'Falló el inicio de sesión con Google. Inténtalo de nuevo.',
+    authLogoutButton: 'Cerrar sesión',
+    authLoggedInAs: 'Sesión iniciada como',
+    profileTitle: 'Mi perfil',
+    profileNavLink: 'Mi perfil',
+    profileEmailLabel: 'Correo electrónico',
+    profileNameLabel: 'Nombre',
+    profilePlanLabel: 'Plan',
+    profilePlanFree: 'Gratis',
+    profilePlanPro: 'Pro',
+    profileRenewsOn: 'Se renueva el',
+    profileDangerZoneTitle: 'Zona de peligro',
+    profileDeleteAccountButton: 'Eliminar cuenta',
+    profileDeleteConfirmTitle: '¿Eliminar tu cuenta?',
+    profileDeleteConfirmBody:
+      'Se cancelará cualquier suscripción activa y se borrarán todos tus datos de forma permanente. Esta acción no se puede deshacer.',
+    profileDeleteConfirmButton: 'Sí, eliminar mi cuenta',
+    profileDeleteCancelButton: 'Cancelar',
     states: states({
       wien: 'Viena',
       niederoesterreich: 'Baja Austria',
@@ -658,6 +791,40 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     benefitInKindHint:
       'Şirket telefonu veya lojmanı gibi, ek gelir olarak vergilendirilen ayni menfaatler.',
     taxFreeAllowanceHint: 'Vergi dairenin Freibetragsbescheid kararına göre, varsa.',
+    authLoginTitle: 'Giriş yap',
+    authRegisterTitle: 'Hesap oluştur',
+    authEmailLabel: 'E-posta',
+    authPasswordLabel: 'Şifre',
+    authNameLabel: 'Ad',
+    authNameOptional: 'Ad (isteğe bağlı)',
+    authLoginButton: 'Giriş yap',
+    authRegisterButton: 'Hesap oluştur',
+    authSwitchToRegister: 'Hesabın yok mu? Kaydol',
+    authSwitchToLogin: 'Zaten hesabın var mı? Giriş yap',
+    authGoogleButton: 'Google ile devam et',
+    authOrDivider: 'veya',
+    authErrorInvalidCredentials: 'E-posta veya şifre geçersiz.',
+    authErrorEmailTaken: 'Bu e-posta ile zaten bir hesap var.',
+    authErrorGeneric: 'Bir şeyler ters gitti. Lütfen tekrar dene.',
+    authErrorGoogleFailed:
+      'Google ile giriş başarısız oldu. Lütfen tekrar dene.',
+    authLogoutButton: 'Çıkış yap',
+    authLoggedInAs: 'Şu hesapla giriş yapıldı',
+    profileTitle: 'Profilim',
+    profileNavLink: 'Profilim',
+    profileEmailLabel: 'E-posta',
+    profileNameLabel: 'Ad',
+    profilePlanLabel: 'Plan',
+    profilePlanFree: 'Ücretsiz',
+    profilePlanPro: 'Pro',
+    profileRenewsOn: 'Yenilenme tarihi',
+    profileDangerZoneTitle: 'Tehlikeli bölge',
+    profileDeleteAccountButton: 'Hesabı sil',
+    profileDeleteConfirmTitle: 'Hesabın silinsin mi?',
+    profileDeleteConfirmBody:
+      'Aktif bir abonelik varsa iptal edilecek ve tüm verilerin kalıcı olarak silinecek. Bu işlem geri alınamaz.',
+    profileDeleteConfirmButton: 'Evet, hesabımı sil',
+    profileDeleteCancelButton: 'Vazgeç',
     states: states({
       wien: 'Viyana',
       niederoesterreich: 'Aşağı Avusturya',
@@ -793,6 +960,40 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     benefitInKindHint:
       'Nenovčane pogodnosti poput službenog telefona ili stana, koje se dodatno oporezuju.',
     taxFreeAllowanceHint: 'Prema rješenju tvoje poreske uprave (Freibetragsbescheid), ako postoji.',
+    authLoginTitle: 'Prijava',
+    authRegisterTitle: 'Napravi nalog',
+    authEmailLabel: 'Email',
+    authPasswordLabel: 'Lozinka',
+    authNameLabel: 'Ime',
+    authNameOptional: 'Ime (opciono)',
+    authLoginButton: 'Prijavi se',
+    authRegisterButton: 'Napravi nalog',
+    authSwitchToRegister: 'Nemaš nalog? Registruj se',
+    authSwitchToLogin: 'Već imaš nalog? Prijavi se',
+    authGoogleButton: 'Nastavi sa Google-om',
+    authOrDivider: 'ili',
+    authErrorInvalidCredentials: 'Neispravan email ili lozinka.',
+    authErrorEmailTaken: 'Nalog sa ovim emailom već postoji.',
+    authErrorGeneric: 'Nešto je pošlo po zlu. Pokušaj ponovo.',
+    authErrorGoogleFailed:
+      'Prijava putem Google-a nije uspjela. Pokušaj ponovo.',
+    authLogoutButton: 'Odjava',
+    authLoggedInAs: 'Prijavljen kao',
+    profileTitle: 'Moj profil',
+    profileNavLink: 'Moj profil',
+    profileEmailLabel: 'Email',
+    profileNameLabel: 'Ime',
+    profilePlanLabel: 'Plan',
+    profilePlanFree: 'Besplatno',
+    profilePlanPro: 'Pro',
+    profileRenewsOn: 'Obnavlja se',
+    profileDangerZoneTitle: 'Opasna zona',
+    profileDeleteAccountButton: 'Obriši nalog',
+    profileDeleteConfirmTitle: 'Obrisati tvoj nalog?',
+    profileDeleteConfirmBody:
+      'Svaka aktivna pretplata će biti otkazana, a svi tvoji podaci trajno obrisani. Ova radnja se ne može poništiti.',
+    profileDeleteConfirmButton: 'Da, obriši moj nalog',
+    profileDeleteCancelButton: 'Otkaži',
     states: states({
       wien: 'Beč',
       niederoesterreich: 'Donja Austrija',
@@ -928,6 +1129,39 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     benefitInKindHint:
       'Негрошові вигоди, як службовий телефон чи житло, що оподатковуються як додатковий дохід.',
     taxFreeAllowanceHint: 'За рішенням про звільнення від податку (Freibetragsbescheid) твоєї податкової, якщо є.',
+    authLoginTitle: 'Увійти',
+    authRegisterTitle: 'Створити акаунт',
+    authEmailLabel: 'Електронна пошта',
+    authPasswordLabel: 'Пароль',
+    authNameLabel: "Ім'я",
+    authNameOptional: "Ім'я (необов'язково)",
+    authLoginButton: 'Увійти',
+    authRegisterButton: 'Створити акаунт',
+    authSwitchToRegister: 'Немає акаунту? Зареєструватися',
+    authSwitchToLogin: 'Вже є акаунт? Увійти',
+    authGoogleButton: 'Продовжити з Google',
+    authOrDivider: 'або',
+    authErrorInvalidCredentials: 'Невірна пошта або пароль.',
+    authErrorEmailTaken: 'Акаунт з цією поштою вже існує.',
+    authErrorGeneric: 'Щось пішло не так. Спробуйте ще раз.',
+    authErrorGoogleFailed: 'Вхід через Google не вдався. Спробуйте ще раз.',
+    authLogoutButton: 'Вийти',
+    authLoggedInAs: 'Увійшли як',
+    profileTitle: 'Мій профіль',
+    profileNavLink: 'Мій профіль',
+    profileEmailLabel: 'Електронна пошта',
+    profileNameLabel: "Ім'я",
+    profilePlanLabel: 'План',
+    profilePlanFree: 'Безкоштовно',
+    profilePlanPro: 'Pro',
+    profileRenewsOn: 'Поновлюється',
+    profileDangerZoneTitle: 'Небезпечна зона',
+    profileDeleteAccountButton: 'Видалити акаунт',
+    profileDeleteConfirmTitle: 'Видалити ваш акаунт?',
+    profileDeleteConfirmBody:
+      'Будь-яка активна підписка буде скасована, а всі ваші дані остаточно видалені. Цю дію не можна скасувати.',
+    profileDeleteConfirmButton: 'Так, видалити мій акаунт',
+    profileDeleteCancelButton: 'Скасувати',
     states: states({
       wien: 'Відень',
       niederoesterreich: 'Нижня Австрія',

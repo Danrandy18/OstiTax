@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AccountPageComponent } from './features/account/account-page.component';
 import { CalculatorComponent } from './features/calculator/calculator.component';
 import { AppShellComponent } from './layout/app-shell.component';
 import {
@@ -12,6 +13,7 @@ export const routes: Routes = [
     component: AppShellComponent,
     children: [
       { path: '', component: CalculatorComponent },
+      { path: 'profile', component: AccountPageComponent },
       { path: 'payment/success', component: PaymentSuccessComponent },
       { path: 'payment/cancel', component: PaymentCancelComponent },
     ],

@@ -1,0 +1,67 @@
+<div class="auth-panel">
+  <h3 class="auth-title">
+    {{ (mode() === 'login' ? 'authLoginTitle' : 'authRegisterTitle') | translate }}
+  </h3>
+
+  <form class="auth-form" (ngSubmit)="submit()">
+    @if (mode() === 'register') {
+      <label class="auth-field">
+        <span>{{ 'authNameOptional' | translate }}</span>
+        <input
+          type="text"
+          name="name"
+          autocomplete="name"
+          [ngModel]="name()"
+          (ngModelChange)="name.set($event)"
+        />
+      </label>
+    }
+
+    <label class="auth-field">
+      <span>{{ 'authEmailLabel' | translate }}</span>
+      <input
+        type="email"
+        name="email"
+        required
+        autocomplete="email"
+        [ngModel]="email()"
+        (ngModelChange)="email.set($event)"
+      />
+    </label>
+
+    <label class="auth-field">
+      <span>{{ 'authPasswordLabel' | translate }}</span>
+      <input
+        type="password"
+        name="password"
+        required
+        minlength="8"
+        autocomplete="current-password"
+        [ngModel]="password()"
+        (ngModelChange)="password.set($event)"
+      />
+    </label>
+
+    @if (error()) {
+      <p class="auth-error" role="alert">{{ error() }}</p>
+    }
+
+    <button type="submit" class="btn-primary auth-submit" [disabled]="loading()">
+      @if (loading()) {
+        {{ 'loading' | translate }}
+      } @else {
+        {{ (mode() === 'login' ? 'authLoginButton' : 'authRegisterButton') | translate }}
+      }
+    </button>
+  </form>
+
+  <button type="button" class="auth-switch" (click)="switchMode(mode() === 'login' ? 'register' : 'login')">
+    {{ (mode() === 'login' ? 'authSwitchToRegister' : 'authSwitchToLogin') | translate }}
+  </button>
+
+  <div class="auth-divider">
+    <span>{{ 'authOrDivider' | translate }}</span>
+  </div>
+
+  <div class="auth-google" #googleButton></div>
+</div>
