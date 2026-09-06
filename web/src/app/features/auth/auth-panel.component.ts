@@ -2,7 +2,7 @@ import { Component, ElementRef, inject, signal, viewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { GOOGLE_CLIENT_ID } from '../../core/auth-config';
+import { GOOGLE_CLIENT_ID, PASSWORD_RESET_ENABLED } from '../../core/auth-config';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { TranslatePipe } from '../../shared/pipes/app.pipes';
 
@@ -47,6 +47,7 @@ export class AuthPanelComponent {
   readonly name = signal('');
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
+  readonly passwordResetEnabled = PASSWORD_RESET_ENABLED;
 
   constructor() {
     this.initGoogleButton();

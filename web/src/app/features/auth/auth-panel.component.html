@@ -54,7 +54,7 @@
       }
     </button>
 
-    @if (mode() === 'login') {
+    @if (mode() === 'login' && passwordResetEnabled) {
       <button type="button" class="auth-forgot-link" (click)="goToForgotPassword()">
         {{ 'authForgotPasswordLink' | translate }}
       </button>

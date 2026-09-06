@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../../../core/l10n/tr.dart';
 import '../../../core/theme/app_theme.dart';
 import 'auth_controller.dart';
@@ -121,7 +122,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   ref.tr(isLogin ? 'authSwitchToRegister' : 'authSwitchToLogin'),
                 ),
               ),
-              if (isLogin)
+              if (isLogin && passwordResetEnabled)
                 TextButton(
                   onPressed: _loading
                       ? null
