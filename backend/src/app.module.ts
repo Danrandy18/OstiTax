@@ -37,6 +37,9 @@ import { UsersModule } from './users/users.module';
         username: configService.get<string>('database.username'),
         password: configService.get<string>('database.password'),
         database: configService.get<string>('database.database'),
+        ssl: configService.get<boolean>('database.ssl')
+          ? { rejectUnauthorized: false }
+          : false,
         autoLoadEntities: true,
         synchronize: process.env.NODE_ENV !== 'production',
       }),
