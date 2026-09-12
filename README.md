@@ -204,6 +204,25 @@ npm run migration:run:prod   # node node_modules/typeorm/cli.js migration:run -d
 npm run start:prod
 ```
 
+## Despliegue en Render
+
+La app corre en producción en [Render](https://render.com), workspace **My Workspace**. Servicios (region Frankfurt):
+
+| Servicio | Tipo | URL | Root/build |
+|---|---|---|---|
+| `ostitax-backend` | Web Service (Node) | https://ostitax-backend.onrender.com | build: `cd backend && npm ci && npm run build`; start: `cd backend && npm run migration:run:prod && npm run start:prod` |
+| `ostitax-web` | Web Service (Node, SSR) | https://ostitax-web.onrender.com | build: `cd web && npm ci && npm run build`; start: `cd web && npm run serve:ssr:web` |
+| `ostitax-db` | PostgreSQL (plan free) | interno | expira 30 dias tras creacion (plan free) — pasar a un plan pago antes de esa fecha o se borra |
+
+El repo no tiene la GitHub App de Render instalada (el clone funciona igual por ser publico, pero el auto-deploy por push no esta garantizado) — si un push no dispara deploy solo, usar "Manual Deploy" en el dashboard de cada servicio.
+
+Variables de entorno relevantes que NO estan en `.env.example` porque son especificas de este deploy (configuradas directo en el dashboard de Render):
+
+- **Backend**: `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_DATABASE` (de `ostitax-db`, conexion interna), `DB_SSL=true`, `APP_URL=https://ostitax-web.onrender.com`.
+- **Web**: `API_ORIGIN=https://ostitax-backend.onrender.com` (a donde `server.ts` reenvia `/api`), `NG_ALLOWED_HOSTS=ostitax-web.onrender.com` y `NG_TRUST_PROXY_HEADERS=x-forwarded-for,x-forwarded-proto,x-forwarded-host,x-forwarded-port` — **imprescindibles**: sin ellas, Angular SSR cae silenciosamente a client-side rendering detras del proxy de Render (ver `web/src/server.ts` y la proteccion SSRF de `@angular/ssr`; `NG_ALLOWED_HOSTS` no lleva puerto, solo el hostname).
+
+Pendiente: Stripe/PayPal/SMTP/Google OAuth/FinanzOnline/GoCardless siguen sin configurar en produccion (ver secciones anteriores); dominio propio aun no conectado (usando subdominios `*.onrender.com`).
+
 ## Próximos pasos sugeridos
 
 - Configurar credenciales reales de Stripe y PayPal (ver sección anterior)
