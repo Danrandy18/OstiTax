@@ -185,6 +185,25 @@ El módulo backend (`backend/src/finanzonline/`) ya está preparado, pero **no f
 
 Mientras `FINANZONLINE_ENABLED=false` (por defecto), la app sigue funcionando normal — solo el endpoint `POST /api/finanzonline/submit` responde `503` indicando que hay que exportar el PDF y cargarlo manualmente.
 
+## Migraciones de base de datos (producción)
+
+En desarrollo (`NODE_ENV` distinto de `production`) el backend sigue usando `synchronize: true` (ver `backend/src/app.module.ts`): comodo para iterar, la tabla se ajusta sola. En producción `synchronize` está desactivado — el esquema se aplica con migraciones de TypeORM (`backend/src/migrations/`).
+
+```bash
+cd backend
+npm run migration:generate -- src/migrations/NombreDelCambio   # tras modificar una entidad
+npm run migration:run       # aplica migraciones pendientes (dev, contra backend/.env)
+npm run migration:revert    # revierte la última
+```
+
+En el servidor de producción (Render u otro), antes de arrancar la app hay que correr las migraciones ya compiladas:
+
+```bash
+npm run build
+npm run migration:run:prod   # node node_modules/typeorm/cli.js migration:run -d dist/data-source.js
+npm run start:prod
+```
+
 ## Próximos pasos sugeridos
 
 - Configurar credenciales reales de Stripe y PayPal (ver sección anterior)
@@ -192,7 +211,6 @@ Mientras `FINANZONLINE_ENABLED=false` (por defecto), la app sigue funcionando no
 - Configurar un OAuth Client ID de Google para activar "Sign in with Google"
 - Gestionar la certificación de FinanzOnline ante el BMF (ver sección anterior) para el envío directo de declaraciones
 - Evaluar un proveedor de Open Banking (GoCardless Bank Account Data, Salt Edge o Tink) para la sincronización bancaria automática
-- Introducir migraciones de base de datos para despliegues en producción (hoy usa `synchronize: true` en desarrollo)
 
 ## Integración Claude + Cursor (MCP de terceros)
 
