@@ -3,6 +3,8 @@ export type Lang = 'de' | 'en' | 'tr' | 'bcs' | 'es' | 'uk';
 export interface TranslationSchema {
   appTitle: string;
   appSubtitle: string;
+  disclaimerTitle: string;
+  disclaimerText: string;
   seoHero: string;
   seoLead: string;
   calculate: string;
@@ -200,6 +202,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
   de: {
     appTitle: 'ÖstiTax',
     appSubtitle: 'Gehalt netto berechnen · Österreich 2026',
+    disclaimerTitle: 'Haftungsausschluss',
+    disclaimerText: 'Keine Steuerberatung. Informativer Schätzwert.',
     seoHero: 'Dein Nettogehalt — klar berechnet',
     seoLead:
       'Brutto zu Netto in Sekunden: Lohnsteuer, Sozialversicherung, 13./14. Gehalt, Familienbonus und Pendlerpauschale.',
@@ -404,6 +408,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
   en: {
     appTitle: 'ÖstiTax',
     appSubtitle: 'Net salary calculator · Austria 2026',
+    disclaimerTitle: 'Disclaimer',
+    disclaimerText: 'Not tax advice. Informational estimate only.',
     seoHero: 'Your net salary — clearly calculated',
     seoLead:
       'Gross to net in seconds: income tax, social insurance, 13th/14th salary, family bonus and commute allowance.',
@@ -603,6 +609,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
   es: {
     appTitle: 'ÖstiTax',
     appSubtitle: 'Calcula tu neto · Austria 2026',
+    disclaimerTitle: 'Aviso legal',
+    disclaimerText: 'No es asesoría fiscal. Estimación informativa.',
     seoHero: 'Tu salario neto — claro y preciso',
     seoLead:
       'De bruto a neto en segundos: impuesto, seguro social, 13.º/14.º, bonus familiar y desplazamiento.',
@@ -806,6 +814,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
   tr: {
     appTitle: 'ÖstiTax',
     appSubtitle: 'Net maaş hesapla · Avusturya 2026',
+    disclaimerTitle: 'Sorumluluk reddi',
+    disclaimerText: 'Vergi danışmanlığı değildir. Bilgilendirme amaçlı tahmini değerdir.',
     seoHero: 'Net maaşın — net ve anlaşılır',
     seoLead:
       'Brütten nete saniyeler içinde: gelir vergisi, sosyal sigorta, 13./14. maaş ve indirimler.',
@@ -1008,6 +1018,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
   bcs: {
     appTitle: 'ÖstiTax',
     appSubtitle: 'Izračunaj neto · Austrija 2026',
+    disclaimerTitle: 'Odricanje od odgovornosti',
+    disclaimerText: 'Nije poresko savjetovanje. Informativna procjena.',
     seoHero: 'Tvoja neto plata — jasno izračunata',
     seoLead:
       'Od bruto do neto u sekundama: porez, socijalno, 13./14. plata i odbici.',
@@ -1211,6 +1223,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
   uk: {
     appTitle: 'ÖstiTax',
     appSubtitle: 'Розрахунок нетто · Австрія 2026',
+    disclaimerTitle: 'Застереження',
+    disclaimerText: 'Це не податкова консультація. Орієнтовна оцінка.',
     seoHero: 'Твоя нетто зарплата — зрозуміло порахована',
     seoLead:
       'Від брутто до нетто за секунди: податок, соцстрахування, 13-та/14-та та відрахування.',
