@@ -1,4 +1,5 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, tap } from 'rxjs';
 import type { AccountStatus, AuthResponse } from '../models/api.models';
@@ -8,6 +9,7 @@ const TOKEN_STORAGE_KEY = 'authToken';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
+  private readonly platformId = inject(PLATFORM_ID);
   private bootstrapPromise: Promise<void> | null = null;
 
   readonly account = signal<AccountStatus | null>(null);
@@ -22,6 +24,12 @@ export class AuthService {
   }
 
   private async bootstrap(): Promise<void> {
+    if (!isPlatformBrowser(this.platformId)) {
+      // El estado de sesion depende de localStorage: en el servidor no hay sesion que restaurar.
+      this.ready.set(true);
+      return;
+    }
+
     const stored = localStorage.getItem(TOKEN_STORAGE_KEY);
     if (!stored) {
       this.ready.set(true);

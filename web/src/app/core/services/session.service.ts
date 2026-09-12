@@ -1,4 +1,5 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, tap } from 'rxjs';
 import type { UserStatus } from '../models/api.models';
@@ -8,6 +9,7 @@ const DEVICE_STORAGE_KEY = 'deviceId';
 @Injectable({ providedIn: 'root' })
 export class SessionService {
   private readonly http = inject(HttpClient);
+  private readonly platformId = inject(PLATFORM_ID);
   private bootstrapPromise: Promise<void> | null = null;
 
   readonly deviceId = signal<string | null>(null);
@@ -23,6 +25,13 @@ export class SessionService {
   }
 
   private async bootstrap(): Promise<void> {
+    if (!isPlatformBrowser(this.platformId)) {
+      // El contador de intentos gratuitos vive en el dispositivo (localStorage): en el
+      // servidor no hay dispositivo que identificar, y no queremos golpear el backend en build time.
+      this.ready.set(true);
+      return;
+    }
+
     try {
       const stored = localStorage.getItem(DEVICE_STORAGE_KEY);
       const body = stored ? { deviceId: stored } : {};

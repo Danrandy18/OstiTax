@@ -1,4 +1,5 @@
-import { Directive, ElementRef, effect, inject, input } from '@angular/core';
+import { Directive, ElementRef, PLATFORM_ID, effect, inject, input } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 const FORMATTER = new Intl.NumberFormat('de-AT', {
   style: 'currency',
@@ -16,6 +17,7 @@ const COUNT_UP_DURATION_MS = 500;
 })
 export class CountUpDirective {
   private readonly el = inject(ElementRef<HTMLElement>);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   readonly countUp = input<number | null | undefined>(null);
 
   private current = 0;
@@ -33,7 +35,9 @@ export class CountUpDirective {
       this.frame = null;
     }
 
-    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    // Sin navegador (SSR/prerender) no hay requestAnimationFrame: fijamos el valor final.
+    const reduceMotion =
+      !this.isBrowser || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     if (reduceMotion) {
       this.current = target;
       this.el.nativeElement.textContent = FORMATTER.format(target);
