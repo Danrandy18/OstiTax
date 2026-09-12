@@ -8,6 +8,7 @@ import { AccountsService } from '../../auth/accounts.service';
 import type { Account } from '../../auth/entities/account.entity';
 import { SubscriptionProvider } from '../../users/enums/user-plan.enum';
 import { PlanInterval } from '../enums/plan-interval.enum';
+import { WebhookEventsService } from '../webhooks/webhook-events.service';
 
 interface PayPalAccessTokenResponse {
   access_token: string;
@@ -35,6 +36,7 @@ interface PayPalSubscriptionDetails {
 }
 
 interface PayPalWebhookEvent {
+  id: string;
   event_type: string;
   resource: {
     id?: string;
@@ -54,6 +56,7 @@ export class PaypalBillingService {
   constructor(
     private readonly configService: ConfigService,
     private readonly accountsService: AccountsService,
+    private readonly webhookEventsService: WebhookEventsService,
   ) {}
 
   async createSubscription(
@@ -72,6 +75,11 @@ export class PaypalBillingService {
       );
     }
 
+    // PayPal-Request-Id acotado al dia: si el cliente reintenta (doble click, conexion
+    // caida) PayPal devuelve la misma suscripcion en vez de crear una nueva.
+    const today = new Date().toISOString().slice(0, 10);
+    const idempotencyKey = `subscription:${account.id}:${interval}:${today}`;
+
     const subscription = await this.request<PayPalSubscriptionResponse>(
       '/v1/billing/subscriptions',
       {
@@ -87,6 +95,7 @@ export class PaypalBillingService {
             cancel_url: `${appUrl}/payment/cancel`,
           },
         }),
+        idempotencyKey,
       },
     );
 
@@ -162,6 +171,14 @@ export class PaypalBillingService {
   }
 
   async handleWebhookEvent(event: PayPalWebhookEvent): Promise<void> {
+    const isNewEvent = await this.webhookEventsService.markProcessedIfNew(
+      SubscriptionProvider.PAYPAL,
+      event.id,
+    );
+    if (!isNewEvent) {
+      return;
+    }
+
     switch (event.event_type) {
       case 'BILLING.SUBSCRIPTION.ACTIVATED':
       case 'BILLING.SUBSCRIPTION.RE-ACTIVATED':
@@ -228,7 +245,7 @@ export class PaypalBillingService {
 
   private async request<T>(
     path: string,
-    init: { method: string; body?: string },
+    init: { method: string; body?: string; idempotencyKey?: string },
   ): Promise<T> {
     const apiBase = this.configService.get<string>('billing.paypal.apiBase');
     if (!apiBase) {
@@ -242,6 +259,9 @@ export class PaypalBillingService {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
         Accept: 'application/json',
+        ...(init.idempotencyKey
+          ? { 'PayPal-Request-Id': init.idempotencyKey }
+          : {}),
       },
       body: init.body,
     });

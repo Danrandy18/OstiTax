@@ -9,6 +9,7 @@ import { AccountsService } from '../../auth/accounts.service';
 import type { Account } from '../../auth/entities/account.entity';
 import { SubscriptionProvider } from '../../users/enums/user-plan.enum';
 import { PlanInterval } from '../enums/plan-interval.enum';
+import { WebhookEventsService } from '../webhooks/webhook-events.service';
 
 @Injectable()
 export class StripeBillingService {
@@ -17,6 +18,7 @@ export class StripeBillingService {
   constructor(
     private readonly configService: ConfigService,
     private readonly accountsService: AccountsService,
+    private readonly webhookEventsService: WebhookEventsService,
   ) {}
 
   private getStripe(): Stripe {
@@ -63,18 +65,26 @@ export class StripeBillingService {
       await this.accountsService.setStripeCustomerId(account.id, customerId);
     }
 
-    const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
-      customer: customerId,
-      line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${appUrl}/payment/success?provider=stripe&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${appUrl}/payment/cancel`,
-      client_reference_id: account.id,
-      metadata: { accountId: account.id },
-      subscription_data: {
+    // Idempotency key acotada al dia: si el cliente reintenta (doble click, conexion
+    // caida) Stripe devuelve la misma session en vez de crear una nueva.
+    const today = new Date().toISOString().slice(0, 10);
+    const idempotencyKey = `checkout:${account.id}:${interval}:${today}`;
+
+    const session = await stripe.checkout.sessions.create(
+      {
+        mode: 'subscription',
+        customer: customerId,
+        line_items: [{ price: priceId, quantity: 1 }],
+        success_url: `${appUrl}/payment/success?provider=stripe&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${appUrl}/payment/cancel`,
+        client_reference_id: account.id,
         metadata: { accountId: account.id },
+        subscription_data: {
+          metadata: { accountId: account.id },
+        },
       },
-    });
+      { idempotencyKey },
+    );
 
     if (!session.url) {
       throw new BadRequestException('Stripe checkout session has no URL');
@@ -110,6 +120,14 @@ export class StripeBillingService {
   }
 
   async handleWebhookEvent(event: Stripe.Event): Promise<void> {
+    const isNewEvent = await this.webhookEventsService.markProcessedIfNew(
+      SubscriptionProvider.STRIPE,
+      event.id,
+    );
+    if (!isNewEvent) {
+      return;
+    }
+
     switch (event.type) {
       case 'checkout.session.completed':
         await this.handleCheckoutCompleted(event.data.object);
