@@ -20,6 +20,10 @@
         <button type="button" class="btn-ghost btn-logout" (click)="logout()">
           {{ 'authLogoutButton' | translate }}
         </button>
+      } @else {
+        <button type="button" class="btn-ghost btn-login" (click)="openLogin()">
+          {{ 'authLoginButton' | translate }}
+        </button>
       }
 
       <label class="lang-select">
@@ -51,6 +55,8 @@
     <router-outlet />
   }
 </main>
+
+<app-login-modal [open]="loginModalOpen()" (closed)="closeLogin()" />
 
 <footer class="app-disclaimer-footer">
   <div class="container disclaimer-inner">

@@ -1,0 +1,16 @@
+@if (open()) {
+  <div
+    class="modal-backdrop"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="'authLoginTitle' | translate"
+    (click)="onBackdropClick($event)"
+  >
+    <div class="modal-shell">
+      <button type="button" class="icon-btn close-btn" (click)="close()" [attr.aria-label]="'close' | translate">
+        ×
+      </button>
+      <app-auth-panel />
+    </div>
+  </div>
+}
