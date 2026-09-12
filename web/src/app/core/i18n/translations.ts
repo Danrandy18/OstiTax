@@ -156,6 +156,28 @@ export interface TranslationSchema {
   profileDeleteConfirmBody: string;
   profileDeleteConfirmButton: string;
   profileDeleteCancelButton: string;
+  profileConnectBankLink: string;
+  bankingPageTitle: string;
+  bankingPageSubtitle: string;
+  bankingLoginRequired: string;
+  bankingSelectInstitution: string;
+  bankingConnectButton: string;
+  bankingConnectionsHeading: string;
+  bankingNoConnections: string;
+  bankingNoInstitutions: string;
+  bankingStatusPending: string;
+  bankingStatusLinked: string;
+  bankingStatusExpired: string;
+  bankingStatusError: string;
+  bankingSyncButton: string;
+  bankingSyncing: string;
+  bankingSyncSuccess: string;
+  bankingTransactionsHeading: string;
+  bankingNoTransactions: string;
+  bankingCallbackLoading: string;
+  bankingCallbackSuccess: string;
+  bankingCallbackError: string;
+  bankingBackToBanking: string;
 }
 
 const stateKeys = [
@@ -345,6 +367,28 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
       'Eine aktive Abo-Zahlung wird gekündigt und alle deine Daten werden endgültig gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.',
     profileDeleteConfirmButton: 'Ja, Konto löschen',
     profileDeleteCancelButton: 'Abbrechen',
+    profileConnectBankLink: 'Bankkonto verbinden',
+    bankingPageTitle: 'Bankverbindung',
+    bankingPageSubtitle: 'Verbinde dein österreichisches Bankkonto, um Transaktionen zu sehen (nur Lesezugriff).',
+    bankingLoginRequired: 'Melde dich an, um dein Bankkonto zu verbinden.',
+    bankingSelectInstitution: 'Wähle deine Bank',
+    bankingConnectButton: 'Verbinden',
+    bankingConnectionsHeading: 'Deine Verbindungen',
+    bankingNoConnections: 'Noch keine Bank verbunden.',
+    bankingNoInstitutions: 'Keine Banken verfügbar.',
+    bankingStatusPending: 'Ausstehend',
+    bankingStatusLinked: 'Verbunden',
+    bankingStatusExpired: 'Abgelaufen',
+    bankingStatusError: 'Fehler',
+    bankingSyncButton: 'Synchronisieren',
+    bankingSyncing: 'Synchronisiere…',
+    bankingSyncSuccess: 'Transaktionen aktualisiert.',
+    bankingTransactionsHeading: 'Transaktionen',
+    bankingNoTransactions: 'Keine Transaktionen vorhanden.',
+    bankingCallbackLoading: 'Verbindung wird abgeschlossen…',
+    bankingCallbackSuccess: 'Bank erfolgreich verbunden.',
+    bankingCallbackError: 'Die Verbindung konnte nicht abgeschlossen werden.',
+    bankingBackToBanking: 'Zurück zur Bankverbindung',
     states: states({
       wien: 'Wien',
       niederoesterreich: 'Niederösterreich',
@@ -522,6 +566,28 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
       'Any active subscription will be cancelled and all your data will be permanently deleted. This action cannot be undone.',
     profileDeleteConfirmButton: 'Yes, delete my account',
     profileDeleteCancelButton: 'Cancel',
+    profileConnectBankLink: 'Connect your bank account',
+    bankingPageTitle: 'Bank connection',
+    bankingPageSubtitle: 'Connect your Austrian bank account to see your transactions (read-only).',
+    bankingLoginRequired: 'Log in to connect your bank account.',
+    bankingSelectInstitution: 'Choose your bank',
+    bankingConnectButton: 'Connect',
+    bankingConnectionsHeading: 'Your connections',
+    bankingNoConnections: 'No bank connected yet.',
+    bankingNoInstitutions: 'No banks available.',
+    bankingStatusPending: 'Pending',
+    bankingStatusLinked: 'Linked',
+    bankingStatusExpired: 'Expired',
+    bankingStatusError: 'Error',
+    bankingSyncButton: 'Sync',
+    bankingSyncing: 'Syncing…',
+    bankingSyncSuccess: 'Transactions updated.',
+    bankingTransactionsHeading: 'Transactions',
+    bankingNoTransactions: 'No transactions yet.',
+    bankingCallbackLoading: 'Completing connection…',
+    bankingCallbackSuccess: 'Bank connected successfully.',
+    bankingCallbackError: 'The connection could not be completed.',
+    bankingBackToBanking: 'Back to bank connection',
     states: states({
       wien: 'Vienna',
       niederoesterreich: 'Lower Austria',
@@ -703,6 +769,28 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
       'Se cancelará cualquier suscripción activa y se borrarán todos tus datos de forma permanente. Esta acción no se puede deshacer.',
     profileDeleteConfirmButton: 'Sí, eliminar mi cuenta',
     profileDeleteCancelButton: 'Cancelar',
+    profileConnectBankLink: 'Conectar tu banco',
+    bankingPageTitle: 'Conexión bancaria',
+    bankingPageSubtitle: 'Conecta tu cuenta bancaria austríaca para ver tus transacciones (solo lectura).',
+    bankingLoginRequired: 'Inicia sesión para conectar tu cuenta bancaria.',
+    bankingSelectInstitution: 'Elige tu banco',
+    bankingConnectButton: 'Conectar',
+    bankingConnectionsHeading: 'Tus conexiones',
+    bankingNoConnections: 'Todavía no conectaste ningún banco.',
+    bankingNoInstitutions: 'No hay bancos disponibles.',
+    bankingStatusPending: 'Pendiente',
+    bankingStatusLinked: 'Conectado',
+    bankingStatusExpired: 'Expirado',
+    bankingStatusError: 'Error',
+    bankingSyncButton: 'Sincronizar',
+    bankingSyncing: 'Sincronizando…',
+    bankingSyncSuccess: 'Transacciones actualizadas.',
+    bankingTransactionsHeading: 'Transacciones',
+    bankingNoTransactions: 'Todavía no hay transacciones.',
+    bankingCallbackLoading: 'Completando la conexión…',
+    bankingCallbackSuccess: 'Banco conectado con éxito.',
+    bankingCallbackError: 'No se pudo completar la conexión.',
+    bankingBackToBanking: 'Volver a la conexión bancaria',
     states: states({
       wien: 'Viena',
       niederoesterreich: 'Baja Austria',
@@ -883,6 +971,28 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
       'Aktif bir abonelik varsa iptal edilecek ve tüm verilerin kalıcı olarak silinecek. Bu işlem geri alınamaz.',
     profileDeleteConfirmButton: 'Evet, hesabımı sil',
     profileDeleteCancelButton: 'Vazgeç',
+    profileConnectBankLink: 'Bankanı bağla',
+    bankingPageTitle: 'Banka bağlantısı',
+    bankingPageSubtitle: 'İşlemlerini görmek için Avusturya banka hesabını bağla (yalnızca görüntüleme).',
+    bankingLoginRequired: 'Banka hesabını bağlamak için giriş yap.',
+    bankingSelectInstitution: 'Bankanı seç',
+    bankingConnectButton: 'Bağlan',
+    bankingConnectionsHeading: 'Bağlantıların',
+    bankingNoConnections: 'Henüz bağlı bir banka yok.',
+    bankingNoInstitutions: 'Kullanılabilir banka yok.',
+    bankingStatusPending: 'Beklemede',
+    bankingStatusLinked: 'Bağlandı',
+    bankingStatusExpired: 'Süresi doldu',
+    bankingStatusError: 'Hata',
+    bankingSyncButton: 'Senkronize et',
+    bankingSyncing: 'Senkronize ediliyor…',
+    bankingSyncSuccess: 'İşlemler güncellendi.',
+    bankingTransactionsHeading: 'İşlemler',
+    bankingNoTransactions: 'Henüz işlem yok.',
+    bankingCallbackLoading: 'Bağlantı tamamlanıyor…',
+    bankingCallbackSuccess: 'Banka başarıyla bağlandı.',
+    bankingCallbackError: 'Bağlantı tamamlanamadı.',
+    bankingBackToBanking: 'Banka bağlantısına dön',
     states: states({
       wien: 'Viyana',
       niederoesterreich: 'Aşağı Avusturya',
@@ -1064,6 +1174,28 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
       'Svaka aktivna pretplata će biti otkazana, a svi tvoji podaci trajno obrisani. Ova radnja se ne može poništiti.',
     profileDeleteConfirmButton: 'Da, obriši moj nalog',
     profileDeleteCancelButton: 'Otkaži',
+    profileConnectBankLink: 'Poveži svoju banku',
+    bankingPageTitle: 'Bankovna veza',
+    bankingPageSubtitle: 'Poveži svoj austrijski bankovni račun da vidiš svoje transakcije (samo za čitanje).',
+    bankingLoginRequired: 'Prijavi se da bi povezao svoj bankovni račun.',
+    bankingSelectInstitution: 'Izaberi svoju banku',
+    bankingConnectButton: 'Poveži',
+    bankingConnectionsHeading: 'Tvoje veze',
+    bankingNoConnections: 'Još uvek nema povezane banke.',
+    bankingNoInstitutions: 'Nema dostupnih banaka.',
+    bankingStatusPending: 'Na čekanju',
+    bankingStatusLinked: 'Povezano',
+    bankingStatusExpired: 'Isteklo',
+    bankingStatusError: 'Greška',
+    bankingSyncButton: 'Sinhronizuj',
+    bankingSyncing: 'Sinhronizacija u toku…',
+    bankingSyncSuccess: 'Transakcije su ažurirane.',
+    bankingTransactionsHeading: 'Transakcije',
+    bankingNoTransactions: 'Još uvek nema transakcija.',
+    bankingCallbackLoading: 'Završavanje veze…',
+    bankingCallbackSuccess: 'Banka je uspešno povezana.',
+    bankingCallbackError: 'Veza nije mogla da se završi.',
+    bankingBackToBanking: 'Nazad na bankovnu vezu',
     states: states({
       wien: 'Beč',
       niederoesterreich: 'Donja Austrija',
@@ -1244,6 +1376,28 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
       'Будь-яка активна підписка буде скасована, а всі ваші дані остаточно видалені. Цю дію не можна скасувати.',
     profileDeleteConfirmButton: 'Так, видалити мій акаунт',
     profileDeleteCancelButton: 'Скасувати',
+    profileConnectBankLink: "Підключити свій банк",
+    bankingPageTitle: "Підключення банку",
+    bankingPageSubtitle: 'Підключіть свій австрійський банківський рахунок, щоб бачити транзакції (лише перегляд).',
+    bankingLoginRequired: 'Увійдіть, щоб підключити свій банківський рахунок.',
+    bankingSelectInstitution: 'Оберіть свій банк',
+    bankingConnectButton: "Підключити",
+    bankingConnectionsHeading: "Ваші підключення",
+    bankingNoConnections: 'Ще немає підключеного банку.',
+    bankingNoInstitutions: 'Немає доступних банків.',
+    bankingStatusPending: 'Очікується',
+    bankingStatusLinked: "Підключено",
+    bankingStatusExpired: 'Термін дії закінчився',
+    bankingStatusError: 'Помилка',
+    bankingSyncButton: 'Синхронізувати',
+    bankingSyncing: 'Синхронізація…',
+    bankingSyncSuccess: 'Транзакції оновлено.',
+    bankingTransactionsHeading: 'Транзакції',
+    bankingNoTransactions: 'Поки що немає транзакцій.',
+    bankingCallbackLoading: "Завершення підключення…",
+    bankingCallbackSuccess: "Банк успішно підключено.",
+    bankingCallbackError: "Не вдалося завершити підключення.",
+    bankingBackToBanking: "Повернутися до підключення банку",
     states: states({
       wien: 'Відень',
       niederoesterreich: 'Нижня Австрія',

@@ -116,3 +116,31 @@ export interface AuthResponse {
   accessToken: string;
   account: AccountStatus;
 }
+
+export type BankConnectionStatus = 'pending' | 'linked' | 'expired' | 'error';
+
+export interface BankInstitution {
+  id: string;
+  name: string;
+  bic?: string;
+  logo?: string;
+}
+
+export interface BankConnection {
+  id: string;
+  institutionId: string;
+  institutionName: string | null;
+  status: BankConnectionStatus;
+  errorMessage: string | null;
+  createdAt: string;
+}
+
+export interface BankTransaction {
+  id: string;
+  bankAccountId: string;
+  bookingDate: string | null;
+  amount: string;
+  currency: string;
+  remittanceInfo: string | null;
+  counterpartyName: string | null;
+}

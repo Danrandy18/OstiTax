@@ -7,6 +7,7 @@ import '../../features/auth/presentation/reset_password_screen.dart';
 import '../../features/calculator/presentation/calculator_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/onboarding/presentation/splash_screen.dart';
+import '../../features/open_banking/presentation/banking_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/splash',
@@ -24,6 +25,14 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/account',
       builder: (context, state) => const AccountScreen(),
+    ),
+    GoRoute(
+      path: '/banking',
+      builder: (context, state) => const BankingScreen(),
+    ),
+    GoRoute(
+      path: '/banking/callback',
+      builder: (context, state) => const BankingScreen(),
     ),
     GoRoute(
       path: '/forgot-password',

@@ -132,6 +132,12 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
               icon: const Icon(Icons.person_outline_rounded),
               tooltip: auth.account!.email,
               onPressed: () => context.push('/account'),
+            )
+          else
+            IconButton(
+              icon: const Icon(Icons.login_rounded),
+              tooltip: ref.tr('authLoginButton'),
+              onPressed: () => context.push('/login'),
             ),
           const SizedBox(width: 6),
           _LanguageMenu(),

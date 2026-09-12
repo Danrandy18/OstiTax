@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'network/api_client.dart';
 import '../features/auth/data/auth_repository.dart';
 import '../features/calculator/data/calculator_repository.dart';
+import '../features/open_banking/data/open_banking_repository.dart';
 import '../features/payment/data/billing_repository.dart';
 import '../features/session/data/session_repository.dart';
 
@@ -28,6 +29,10 @@ final calculatorRepositoryProvider = Provider<CalculatorRepository>(
 
 final billingRepositoryProvider = Provider<BillingRepository>(
   (ref) => BillingRepository(ref.watch(apiClientProvider)),
+);
+
+final openBankingRepositoryProvider = Provider<OpenBankingRepository>(
+  (ref) => OpenBankingRepository(ref.watch(apiClientProvider)),
 );
 
 final flutterSecureStorageProvider = Provider<FlutterSecureStorage>(

@@ -1,0 +1,99 @@
+<div class="banking-page">
+  <h1>{{ 'bankingPageTitle' | translate }}</h1>
+  <p class="subtitle">{{ 'bankingPageSubtitle' | translate }}</p>
+
+  @if (!auth.account()) {
+    <p class="muted">{{ 'bankingLoginRequired' | translate }}</p>
+    <a routerLink="/" class="back-link">{{ 'backToCalculator' | translate }}</a>
+  } @else {
+  <section class="banking-section">
+    <h2>{{ 'bankingConnectionsHeading' | translate }}</h2>
+
+    @if (connections().length === 0) {
+      <p class="muted">{{ 'bankingNoConnections' | translate }}</p>
+    } @else {
+      <div class="connections-list">
+        @for (connection of connections(); track connection.id) {
+          <div class="connection-row">
+            <div class="connection-info">
+              <span class="connection-name">{{ connection.institutionName || connection.institutionId }}</span>
+              <span class="status-badge" [class]="'status-' + connection.status">
+                @switch (connection.status) {
+                  @case ('pending') { {{ 'bankingStatusPending' | translate }} }
+                  @case ('linked') { {{ 'bankingStatusLinked' | translate }} }
+                  @case ('expired') { {{ 'bankingStatusExpired' | translate }} }
+                  @default { {{ 'bankingStatusError' | translate }} }
+                }
+              </span>
+            </div>
+            @if (connection.status === 'linked') {
+              <button
+                type="button"
+                class="btn-ghost"
+                [disabled]="syncingId() === connection.id"
+                (click)="sync(connection.id)"
+              >
+                {{ (syncingId() === connection.id ? 'bankingSyncing' : 'bankingSyncButton') | translate }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="banking-section">
+    <h2>{{ 'bankingSelectInstitution' | translate }}</h2>
+
+    @if (institutions() === null) {
+      <button type="button" class="btn-primary" (click)="loadInstitutions()">
+        {{ 'bankingSelectInstitution' | translate }}
+      </button>
+    } @else if (loadingInstitutions()) {
+      <p class="muted">{{ 'loading' | translate }}</p>
+    } @else {
+      <div class="institutions-list">
+        @for (institution of institutions(); track institution.id) {
+          <div class="institution-row">
+            <span class="institution-name">{{ institution.name }}</span>
+            <button
+              type="button"
+              class="btn-primary"
+              [disabled]="connectingId() === institution.id"
+              (click)="connect(institution.id)"
+            >
+              {{ 'bankingConnectButton' | translate }}
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="banking-section">
+    <h2>{{ 'bankingTransactionsHeading' | translate }}</h2>
+
+    @if (transactions().length === 0) {
+      <p class="muted">{{ 'bankingNoTransactions' | translate }}</p>
+    } @else {
+      <div class="transactions-table">
+        @for (txn of transactions(); track txn.id) {
+          <div class="transaction-row">
+            <span class="txn-date">{{ txn.bookingDate ? (txn.bookingDate | date: 'shortDate') : '—' }}</span>
+            <span class="txn-counterparty">{{ txn.counterpartyName || txn.remittanceInfo || '—' }}</span>
+            <span class="txn-amount" [class.negative]="+txn.amount < 0">
+              {{ txn.amount }} {{ txn.currency }}
+            </span>
+          </div>
+        }
+      </div>
+    }
+  </section>
+
+  @if (error()) {
+    <p class="error-text" role="alert">{{ error() }}</p>
+  }
+
+  <a routerLink="/" class="back-link">{{ 'backToCalculator' | translate }}</a>
+  }
+</div>

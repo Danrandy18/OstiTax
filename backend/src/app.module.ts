@@ -11,14 +11,22 @@ import authConfig from './config/auth.config';
 import billingConfig from './config/billing.config';
 import databaseConfig from './config/database.config';
 import finanzonlineConfig from './config/finanzonline.config';
+import openBankingConfig from './config/open-banking.config';
 import { FinanzOnlineModule } from './finanzonline/finanzonline.module';
+import { OpenBankingModule } from './open-banking/open-banking.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig, billingConfig, authConfig, finanzonlineConfig],
+      load: [
+        databaseConfig,
+        billingConfig,
+        authConfig,
+        finanzonlineConfig,
+        openBankingConfig,
+      ],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -39,6 +47,7 @@ import { UsersModule } from './users/users.module';
     BillingModule,
     CalcModule,
     FinanzOnlineModule,
+    OpenBankingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,0 +1,150 @@
+.banking-page {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2rem 0 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  .subtitle {
+    margin: -1rem 0 0;
+    color: var(--color-text-secondary);
+    font-size: 0.9375rem;
+  }
+}
+
+.banking-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-elevated);
+
+  h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+}
+
+.muted {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.connections-list,
+.institutions-list,
+.transactions-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.connection-row,
+.institution-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.connection-info {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.connection-name,
+.institution-name {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+}
+
+.status-badge {
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.status-pending {
+  background: rgb(var(--color-warning-rgb) / 12%);
+  color: var(--color-warning);
+}
+
+.status-linked {
+  background: rgb(var(--color-success-rgb) / 12%);
+  color: var(--color-success);
+}
+
+.status-expired,
+.status-error {
+  background: color-mix(in srgb, var(--color-error) 12%, transparent);
+  color: var(--color-error);
+}
+
+.transaction-row {
+  display: grid;
+  grid-template-columns: 5rem 1fr auto;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.8125rem;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.txn-date {
+  color: var(--color-text-secondary);
+}
+
+.txn-counterparty {
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.txn-amount {
+  font-weight: 700;
+  color: var(--color-success);
+  white-space: nowrap;
+
+  &.negative {
+    color: var(--color-error);
+  }
+}
+
+.error-text {
+  margin: 0;
+  color: var(--color-error);
+  font-size: 0.875rem;
+}
+
+.back-link {
+  align-self: flex-start;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: 0.875rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

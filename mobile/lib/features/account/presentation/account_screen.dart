@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/tr.dart';
 import '../../../core/theme/app_theme.dart';
@@ -89,6 +90,19 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                   _Row(
                     label: ref.tr('profilePlanLabel'),
                     value: ref.tr(account.isPro ? 'profilePlanPro' : 'profilePlanFree'),
+                  ),
+                  const SizedBox(height: 14),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton(
+                      onPressed: () => context.push('/banking'),
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: Text(ref.tr('profileConnectBankLink')),
+                    ),
                   ),
                 ],
               ),
