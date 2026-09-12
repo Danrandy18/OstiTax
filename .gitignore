@@ -43,3 +43,8 @@ web/playwright-report/
 web/test-results/
 web/blob-report/
 web/.playwright/
+
+# Local agent/tooling config (not part of the app)
+.claude/
+.mcp.json
+.playwright-mcp/
