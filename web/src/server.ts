@@ -11,6 +11,14 @@ import { join } from 'node:path';
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
+/**
+ * Render (como la mayoria de PaaS) sirve la app detras de un proxy inverso:
+ * el Host real llega en X-Forwarded-Host, no en el header Host de la
+ * conexion TCP interna. Sin esto, la proteccion SSRF de Angular SSR rechaza
+ * el request y cae a client-side rendering (ver angular.dev/best-practices/
+ * security#configuring-trusted-proxy-headers).
+ */
+app.set('trust proxy', true);
 const angularApp = new AngularNodeAppEngine();
 
 /**
