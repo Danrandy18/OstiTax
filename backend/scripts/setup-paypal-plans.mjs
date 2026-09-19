@@ -112,7 +112,7 @@ async function getOrCreateProductId(token) {
     }
   }
 
-  const product = await request(token, '/v1/catalog/products', {
+  const product = await request(token, '/v1/catalogs/products', {
     name: 'OestiTax Pro',
     description: 'Suscripcion Pro de la calculadora fiscal OestiTax',
     type: 'SERVICE',
