@@ -38,6 +38,7 @@ export class CalculationAccessGuard implements CanActivate {
           code: 'PAYMENT_REQUIRED',
           message: 'Free attempts exhausted. Upgrade to Pro to continue.',
           freeAttemptsRemaining: 0,
+          freeAttemptsResetAt: this.usersService.freeAttemptsResetAt(user),
           plan: user.plan,
         },
         402,

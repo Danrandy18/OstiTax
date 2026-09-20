@@ -26,21 +26,18 @@ export class UsersService {
   ) {}
 
   async findOrCreateByDeviceId(deviceId: string): Promise<User> {
-    const existing = await this.usersRepository.findOne({ where: { deviceId } });
+    const existing = await this.usersRepository.findOne({
+      where: { deviceId },
+    });
     if (existing) {
-      return this.refreshExpiredPro(existing);
+      return this.refreshFreeAttempts(await this.refreshExpiredPro(existing));
     }
-
-    const freeAttempts = this.configService.get<number>(
-      'billing.freeAttempts',
-      3,
-    );
 
     return this.usersRepository.save(
       this.usersRepository.create({
         deviceId,
         plan: UserPlan.FREE,
-        freeAttemptsRemaining: freeAttempts,
+        freeAttemptsRemaining: this.freeAttemptsLimit(),
       }),
     );
   }
@@ -85,7 +82,22 @@ export class UsersService {
     }
 
     user.freeAttemptsRemaining -= 1;
+    // El primer intento gastado abre la ventana de reinicio.
+    user.freeAttemptsWindowStartedAt ??= new Date();
     return this.usersRepository.save(user);
+  }
+
+  /** Cuando se restauraran los intentos gratis, o null si no se ha gastado ninguno. */
+  freeAttemptsResetAt(user: User): string | null {
+    if (
+      !user.freeAttemptsWindowStartedAt ||
+      user.freeAttemptsRemaining >= this.freeAttemptsLimit()
+    ) {
+      return null;
+    }
+    return new Date(
+      user.freeAttemptsWindowStartedAt.getTime() + this.freeAttemptsResetMs(),
+    ).toISOString();
   }
 
   async activatePro(userId: string, params: ActivateProParams): Promise<User> {
@@ -141,10 +153,8 @@ export class UsersService {
       where: { id: userId },
     });
 
-    user.freeAttemptsRemaining = this.configService.get<number>(
-      'billing.freeAttempts',
-      3,
-    );
+    user.freeAttemptsRemaining = this.freeAttemptsLimit();
+    user.freeAttemptsWindowStartedAt = null;
     return this.usersRepository.save(user);
   }
 
@@ -172,6 +182,50 @@ export class UsersService {
     });
     user.stripeCustomerId = stripeCustomerId;
     return this.usersRepository.save(user);
+  }
+
+  private freeAttemptsLimit(): number {
+    return this.configService.get<number>('billing.freeAttempts', 3);
+  }
+
+  private freeAttemptsResetMs(): number {
+    const hours = this.configService.get<number>(
+      'billing.freeAttemptsResetHours',
+      24,
+    );
+    return hours * 60 * 60 * 1000;
+  }
+
+  /**
+   * Los intentos gratis se restauran solos al pasar el plazo desde el primer intento gastado.
+   * Se aplica al cargar al usuario (todos los endpoints pasan por aqui), sin tareas programadas.
+   */
+  private async refreshFreeAttempts(user: User): Promise<User> {
+    if (
+      this.isPro(user) ||
+      user.freeAttemptsRemaining >= this.freeAttemptsLimit()
+    ) {
+      return user;
+    }
+
+    const now = Date.now();
+    if (!user.freeAttemptsWindowStartedAt) {
+      // Gasto intentos antes de existir la ventana: el plazo cuenta desde ahora, asi que no queda
+      // bloqueado para siempre.
+      user.freeAttemptsWindowStartedAt = new Date(now);
+      return this.usersRepository.save(user);
+    }
+
+    if (
+      now - user.freeAttemptsWindowStartedAt.getTime() >=
+      this.freeAttemptsResetMs()
+    ) {
+      user.freeAttemptsRemaining = this.freeAttemptsLimit();
+      user.freeAttemptsWindowStartedAt = null;
+      return this.usersRepository.save(user);
+    }
+
+    return user;
   }
 
   private async refreshExpiredPro(user: User): Promise<User> {

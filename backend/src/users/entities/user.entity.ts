@@ -21,6 +21,10 @@ export class User {
   @Column({ type: 'int', default: 3 })
   freeAttemptsRemaining!: number;
 
+  /** Cuando se gasto el primer intento de la ventana actual; pasado el plazo, se restauran. */
+  @Column({ type: 'timestamptz', nullable: true })
+  freeAttemptsWindowStartedAt!: Date | null;
+
   @Column({ type: 'varchar', nullable: true })
   stripeCustomerId!: string | null;
 

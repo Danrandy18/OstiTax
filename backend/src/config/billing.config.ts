@@ -2,6 +2,11 @@ import { registerAs } from '@nestjs/config';
 
 export default registerAs('billing', () => ({
   freeAttempts: parseInt(process.env.FREE_ATTEMPTS ?? '3', 10),
+  // Horas tras el primer intento gastado en las que se restauran los intentos gratis.
+  freeAttemptsResetHours: parseInt(
+    process.env.FREE_ATTEMPTS_RESET_HOURS ?? '24',
+    10,
+  ),
   appUrl: process.env.APP_URL ?? 'http://localhost:4200',
   stripe: {
     secretKey: process.env.STRIPE_SECRET_KEY ?? '',

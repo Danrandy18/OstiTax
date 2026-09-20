@@ -19,18 +19,16 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('session')
-  async createSession(
-    @Body() dto: CreateSessionDto,
-  ): Promise<UserStatusDto> {
+  async createSession(@Body() dto: CreateSessionDto): Promise<UserStatusDto> {
     const deviceId = dto.deviceId ?? randomUUID();
     const user = await this.usersService.findOrCreateByDeviceId(deviceId);
-    return UserStatusDto.fromEntity(user, this.usersService.isPro(user));
+    return this.toStatus(user);
   }
 
   @Get('me')
   @UseGuards(DeviceUserGuard)
   getMe(@CurrentUser() user: User): UserStatusDto {
-    return UserStatusDto.fromEntity(user, this.usersService.isPro(user));
+    return this.toStatus(user);
   }
 
   /**
@@ -40,11 +38,23 @@ export class UsersController {
    */
   @Post('dev/reset-attempts')
   @UseGuards(DeviceUserGuard)
-  async resetAttemptsForTesting(@CurrentUser() user: User): Promise<UserStatusDto> {
+  async resetAttemptsForTesting(
+    @CurrentUser() user: User,
+  ): Promise<UserStatusDto> {
     if (process.env.NODE_ENV === 'production') {
       throw new ForbiddenException('Not available in production');
     }
-    const updated = await this.usersService.resetFreeAttemptsForTesting(user.id);
-    return UserStatusDto.fromEntity(updated, this.usersService.isPro(updated));
+    const updated = await this.usersService.resetFreeAttemptsForTesting(
+      user.id,
+    );
+    return this.toStatus(updated);
+  }
+
+  private toStatus(user: User): UserStatusDto {
+    return UserStatusDto.fromEntity(
+      user,
+      this.usersService.isPro(user),
+      this.usersService.freeAttemptsResetAt(user),
+    );
   }
 }

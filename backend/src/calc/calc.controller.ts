@@ -29,6 +29,7 @@ export class CalcController {
         plan: user.plan,
         isPro: this.usersService.isPro(user),
         freeAttemptsRemaining: user.freeAttemptsRemaining,
+        freeAttemptsResetAt: this.usersService.freeAttemptsResetAt(user),
       },
     };
   }

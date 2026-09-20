@@ -21,6 +21,7 @@ export class UsageDto {
   plan!: string;
   isPro!: boolean;
   freeAttemptsRemaining!: number;
+  freeAttemptsResetAt!: string | null;
 }
 
 export class CalculateResponseDto {
