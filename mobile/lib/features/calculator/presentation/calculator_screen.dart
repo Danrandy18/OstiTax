@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../../../core/l10n/app_strings.dart';
 import '../../../core/l10n/tr.dart';
 import '../../../core/providers.dart';
@@ -14,6 +15,7 @@ import '../../payment/presentation/payment_sheet.dart';
 import '../../payment/presentation/upgrade_sheet.dart';
 import '../../session/presentation/session_controller.dart';
 import '../domain/calculation_models.dart';
+import 'attempts_exhausted_dialog.dart';
 import 'calculator_controller.dart';
 import 'result_card.dart';
 
@@ -100,7 +102,11 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
           ref
               .read(calculatorControllerProvider.notifier)
               .dismissPaymentRequired();
-          await showPaymentSheet(context);
+          if (purchasesEnabled) {
+            await showPaymentSheet(context);
+          } else {
+            await showAttemptsExhaustedDialog(context);
+          }
           _paymentSheetQueued = false;
         });
       }
@@ -127,7 +133,7 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
           // El contador de intentos va junto al subtitulo, en el cuerpo: junto al boton Pro, la
           // cuenta y el idioma no cabe en 360 px.
           if (session.status != null && isPro) const _StatusBadge(isPro: true),
-          if (!isPro)
+          if (purchasesEnabled && !isPro)
             _UpgradeButton(
               // Con sesión iniciada además hay icono de cuenta: en pantallas estrechas el botón
               // pasa a ser solo el icono para que el encabezado no se desborde.
@@ -142,6 +148,13 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
               tooltip: auth.account!.email,
               visualDensity: VisualDensity.compact,
               onPressed: () => context.push('/account'),
+            )
+          else if (!purchasesEnabled)
+            // Sin boton "Pro", el acceso a la cuenta vuelve a ser el icono de login.
+            IconButton(
+              icon: const Icon(Icons.login_rounded),
+              tooltip: ref.tr('authLoginButton'),
+              onPressed: () => context.push('/login'),
             ),
           const SizedBox(width: 6),
           _LanguageMenu(),
@@ -618,7 +631,7 @@ class _AttemptsBanner extends ConsumerWidget {
             '${ref.tr('attemptsRemaining')}: $remaining',
             style: const TextStyle(fontSize: 13.5),
           ),
-          if (warning)
+          if (warning && purchasesEnabled)
             TextButton(
               onPressed: () => showPaymentSheet(context),
               child: Text(ref.tr('upgradeToPro')),

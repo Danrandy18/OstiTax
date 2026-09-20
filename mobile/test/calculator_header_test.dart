@@ -1,3 +1,4 @@
+import 'package:app_calculos/core/config/feature_flags.dart';
 import 'package:app_calculos/core/providers.dart';
 import 'package:app_calculos/features/auth/data/auth_repository.dart';
 import 'package:app_calculos/features/auth/domain/account_status.dart';
@@ -90,13 +91,20 @@ Future<void> _pumpHeader(
 }
 
 void main() {
-  testWidgets('sin sesión: aparece Mejorar a Pro y no hay icono de login', (
+  testWidgets('sin sesión: botón Pro o icono de login según el interruptor', (
     tester,
   ) async {
     await _pumpHeader(tester, loggedIn: false, isPro: false);
 
-    expect(find.byTooltip('Auf Pro upgraden'), findsOneWidget);
-    expect(find.byIcon(Icons.login_rounded), findsNothing);
+    // Con compras activas el botón Pro sustituye al login; sin ellas (Play Store) se ve el login.
+    expect(
+      find.byTooltip('Auf Pro upgraden'),
+      purchasesEnabled ? findsOneWidget : findsNothing,
+    );
+    expect(
+      find.byIcon(Icons.login_rounded),
+      purchasesEnabled ? findsNothing : findsOneWidget,
+    );
     // El contador de intentos sigue a la vista (ahora junto al subtitulo).
     expect(find.textContaining(': 3'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -107,7 +115,10 @@ void main() {
   ) async {
     await _pumpHeader(tester, loggedIn: true, isPro: false);
 
-    expect(find.byTooltip('Auf Pro upgraden'), findsOneWidget);
+    expect(
+      find.byTooltip('Auf Pro upgraden'),
+      purchasesEnabled ? findsOneWidget : findsNothing,
+    );
     expect(find.byIcon(Icons.person_outline_rounded), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
