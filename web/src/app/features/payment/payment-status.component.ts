@@ -1,7 +1,13 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, DestroyRef, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import { catchError, exhaustMap, of, take, takeWhile, timer } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { TranslatePipe } from '../../shared/pipes/app.pipes';
+
+const POLL_INTERVAL_MS = 2500;
+const POLL_MAX_ATTEMPTS = 16;
 
 @Component({
   selector: 'app-payment-success',
@@ -25,13 +31,26 @@ import { TranslatePipe } from '../../shared/pipes/app.pipes';
 })
 export class PaymentSuccessComponent implements OnInit {
   private readonly auth = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly platformId = inject(PLATFORM_ID);
   readonly refreshing = signal(true);
 
   ngOnInit(): void {
-    this.auth.refreshAccount().subscribe({
-      complete: () => this.refreshing.set(false),
-      error: () => this.refreshing.set(false),
-    });
+    if (!isPlatformBrowser(this.platformId) || !this.auth.token()) {
+      this.refreshing.set(false);
+      return;
+    }
+
+    // El proveedor redirige antes de que su webhook llegue al backend: pro se activa unos segundos
+    // despues. Se consulta hasta ver isPro (o agotar el tiempo) en vez de una sola vez.
+    timer(0, POLL_INTERVAL_MS)
+      .pipe(
+        take(POLL_MAX_ATTEMPTS),
+        exhaustMap(() => this.auth.refreshAccount().pipe(catchError(() => of(null)))),
+        takeWhile((account) => !account?.isPro, true),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({ complete: () => this.refreshing.set(false) });
   }
 }
 
