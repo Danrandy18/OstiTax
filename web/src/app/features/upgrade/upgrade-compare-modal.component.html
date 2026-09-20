@@ -1,0 +1,78 @@
+@if (open()) {
+  <div
+    class="modal-backdrop"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="'compareTitle' | translate"
+    (click)="onBackdropClick($event)"
+  >
+    <div class="modal-shell">
+      <button
+        type="button"
+        class="close-btn"
+        (click)="closed.emit()"
+        [attr.aria-label]="'close' | translate"
+      >
+        ×
+      </button>
+
+      <h2 class="compare-title">{{ 'compareTitle' | translate }}</h2>
+      <p class="compare-subtitle">{{ 'compareSubtitle' | translate }}</p>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th scope="col">{{ 'compareFeatureCol' | translate }}</th>
+            <th scope="col">{{ 'compareFreeCol' | translate }}</th>
+            <th scope="col" class="col-pro">{{ 'compareProCol' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows; track row.labelKey) {
+            <tr>
+              <th scope="row">{{ row.labelKey | translate }}</th>
+              <td>
+                <ng-container
+                  *ngTemplateOutlet="cell; context: { $implicit: row.free }"
+                />
+              </td>
+              <td class="col-pro">
+                <ng-container
+                  *ngTemplateOutlet="cell; context: { $implicit: row.pro }"
+                />
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <p class="compare-price">{{ 'comparePriceLine' | translate }}</p>
+
+      <button type="button" class="btn-primary compare-cta" (click)="choosePlan.emit()">
+        {{ 'compareChoosePlan' | translate }}
+      </button>
+      <button type="button" class="btn-ghost compare-login" (click)="login.emit()">
+        {{ 'compareHaveAccount' | translate }}
+      </button>
+    </div>
+  </div>
+}
+
+<ng-template #cell let-cell>
+  @switch (cell.kind) {
+    @case ('text') {
+      <span class="cell-text">{{ cell.key | translate }}</span>
+    }
+    @case ('yes') {
+      <svg class="icon cell-yes" viewBox="0 0 24 24" role="img" [attr.aria-label]="'compareProCol' | translate">
+        <path d="m5 12.5 4.5 4.5L19 7.5" />
+      </svg>
+    }
+    @case ('no') {
+      <span class="cell-no" aria-hidden="true">—</span>
+    }
+    @case ('soon') {
+      <span class="cell-soon">{{ 'compareComingSoon' | translate }}</span>
+    }
+  }
+</ng-template>

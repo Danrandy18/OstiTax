@@ -11,18 +11,19 @@
     <div class="header-actions">
       @if (auth.account()?.isPro || session.status()?.isPro) {
         <span class="badge-pro">{{ 'proBadge' | translate }}</span>
-      } @else if (session.status(); as status) {
-        <span class="badge-attempts">{{ 'attemptsRemaining' | translate }}: {{ status.freeAttemptsRemaining }}</span>
+      } @else {
+        @if (session.status(); as status) {
+          <span class="badge-attempts">{{ 'attemptsRemaining' | translate }}: {{ status.freeAttemptsRemaining }}</span>
+        }
+        <button type="button" class="btn-primary btn-upgrade" (click)="upgrade.openCompare()">
+          {{ 'upgradeCta' | translate }}
+        </button>
       }
 
       @if (auth.account(); as account) {
         <a routerLink="/profile" class="account-link">{{ account.email }}</a>
         <button type="button" class="btn-ghost btn-logout" (click)="logout()">
           {{ 'authLogoutButton' | translate }}
-        </button>
-      } @else {
-        <button type="button" class="btn-secondary btn-login" (click)="openLogin()">
-          {{ 'authLoginButton' | translate }}
         </button>
       }
 
@@ -57,6 +58,14 @@
 </main>
 
 <app-login-modal [open]="loginModalOpen()" (closed)="closeLogin()" />
+
+<app-upgrade-compare-modal
+  [open]="upgrade.compareOpen()"
+  (closed)="upgrade.closeCompare()"
+  (choosePlan)="upgrade.choosePlan()"
+  (login)="loginFromCompare()"
+/>
+<app-payment-modal [open]="upgrade.paymentOpen()" (closed)="upgrade.closePayment()" />
 
 @if (langToast(); as language) {
   <div class="lang-toast" role="status" aria-live="polite">

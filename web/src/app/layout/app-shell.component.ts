@@ -6,9 +6,12 @@ import { BRAND } from '../core/brand';
 import { AuthService } from '../core/services/auth.service';
 import { I18nService } from '../core/i18n/i18n.service';
 import { SessionService } from '../core/services/session.service';
+import { UpgradeService } from '../core/services/upgrade.service';
 import type { Lang } from '../core/i18n/translations';
 import { TranslatePipe } from '../shared/pipes/app.pipes';
 import { LoginModalComponent } from '../features/auth/login-modal.component';
+import { PaymentModalComponent } from '../features/payment/payment-modal.component';
+import { UpgradeCompareModalComponent } from '../features/upgrade/upgrade-compare-modal.component';
 
 /** Unicas rutas publicas e indexables: la calculadora y sus versiones por idioma. */
 const INDEXABLE_PATHS = new Set(['/', '/en', '/es', '/tr', '/uk', '/bcs']);
@@ -25,7 +28,15 @@ const LANG_TOAST_MS = 1900;
     '[class.lang-out]': 'langPhase() === "out"',
     '[class.lang-in]': 'langPhase() === "in"',
   },
-  imports: [RouterOutlet, RouterLink, TranslatePipe, FormsModule, LoginModalComponent],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    TranslatePipe,
+    FormsModule,
+    LoginModalComponent,
+    PaymentModalComponent,
+    UpgradeCompareModalComponent,
+  ],
   templateUrl: './app-shell.component.html',
   styleUrl: './app-shell.component.scss',
 })
@@ -35,6 +46,7 @@ export class AppShellComponent implements OnInit {
   readonly i18n = inject(I18nService);
   readonly session = inject(SessionService);
   readonly auth = inject(AuthService);
+  readonly upgrade = inject(UpgradeService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -97,6 +109,12 @@ export class AppShellComponent implements OnInit {
 
   openLogin(): void {
     this.loginModalOpen.set(true);
+  }
+
+  /** Desde la comparativa: quien ya tiene cuenta Pro entra por aqui. */
+  loginFromCompare(): void {
+    this.upgrade.closeCompare();
+    this.openLogin();
   }
 
   closeLogin(): void {

@@ -19,7 +19,7 @@ import { I18nService } from '../../core/i18n/i18n.service';
 import type { Lang } from '../../core/i18n/translations';
 import { AuthService } from '../../core/services/auth.service';
 import { SessionService } from '../../core/services/session.service';
-import { PaymentModalComponent } from '../payment/payment-modal.component';
+import { UpgradeService } from '../../core/services/upgrade.service';
 import { TranslatePipe } from '../../shared/pipes/app.pipes';
 import { CountUpDirective } from '../../shared/animations/count-up.directive';
 import { exportOfficialCalculationPdf, PDF_SUPPORTED_LANGS } from '../../core/pdf/text-pdf.util';
@@ -40,7 +40,7 @@ const BMF_PENDLER_URL = 'https://www.bmf.gv.at/pendlerrechner';
 @Component({
   selector: 'app-calculator',
   standalone: true,
-  imports: [FormsModule, PaymentModalComponent, TranslatePipe, CountUpDirective],
+  imports: [FormsModule, TranslatePipe, CountUpDirective],
   templateUrl: './calculator.component.html',
   styleUrl: './calculator.component.scss',
 })
@@ -49,6 +49,7 @@ export class CalculatorComponent {
   readonly i18n = inject(I18nService);
   readonly session = inject(SessionService);
   readonly auth = inject(AuthService);
+  private readonly upgrade = inject(UpgradeService);
   readonly bmfPendlerUrl = BMF_PENDLER_URL;
 
   /** El Pro pertenece a la cuenta; el flag por dispositivo queda como fallback histórico. */
@@ -104,7 +105,6 @@ export class CalculatorComponent {
   readonly activeTab = signal<ResultTab>('recurring');
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
-  readonly paymentModalOpen = signal(false);
 
   readonly stateOptions = computed(() =>
     Object.entries(this.i18n.t().states).map(([value, label]) => ({
@@ -258,7 +258,7 @@ export class CalculatorComponent {
       error: (err) => {
         this.loading.set(false);
         if (isPaymentRequiredError(err)) {
-          this.paymentModalOpen.set(true);
+          this.upgrade.openPayment();
           return;
         }
         this.error.set(this.i18n.t().errorGeneric);
@@ -267,11 +267,7 @@ export class CalculatorComponent {
   }
 
   openPaymentModal(): void {
-    this.paymentModalOpen.set(true);
-  }
-
-  closePaymentModal(): void {
-    this.paymentModalOpen.set(false);
+    this.upgrade.openPayment();
   }
 
   setPdfLang(lang: Lang): void {
@@ -284,7 +280,7 @@ export class CalculatorComponent {
       return;
     }
     if (!this.isPro()) {
-      this.paymentModalOpen.set(true);
+      this.upgrade.openPayment();
       return;
     }
     exportOfficialCalculationPdf(this.buildCalculateRequest(), data, this.pdfLang());

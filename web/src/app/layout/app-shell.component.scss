@@ -298,6 +298,7 @@
     .badge-attempts,
     .btn-login,
     .btn-logout,
+    .btn-upgrade,
     .app-main,
     .app-disclaimer-footer
   ) {
@@ -311,6 +312,7 @@
     .badge-attempts,
     .btn-login,
     .btn-logout,
+    .btn-upgrade,
     .app-main,
     .app-disclaimer-footer
   ) {
@@ -360,4 +362,11 @@
     stroke-linecap: round;
     stroke-linejoin: round;
   }
+}
+
+.btn-upgrade {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  padding: 0.375rem 0.875rem;
+  white-space: nowrap;
 }
