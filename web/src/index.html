@@ -17,17 +17,17 @@
   <meta name="geo.region" content="AT">
   <meta name="geo.placename" content="Austria">
   <meta name="language" content="de-AT">
-  <link rel="canonical" href="https://ostitax.at/">
+  <link rel="canonical" href="https://xn--stitax-vxa.at/">
 
   <!-- Hreflang: mercado AT + idiomas UI (rutas reales, prerenderizadas por idioma) -->
-  <link rel="alternate" hreflang="de-AT" href="https://ostitax.at/">
-  <link rel="alternate" hreflang="de" href="https://ostitax.at/">
-  <link rel="alternate" hreflang="en" href="https://ostitax.at/en">
-  <link rel="alternate" hreflang="tr" href="https://ostitax.at/tr">
-  <link rel="alternate" hreflang="es" href="https://ostitax.at/es">
-  <link rel="alternate" hreflang="uk" href="https://ostitax.at/uk">
-  <link rel="alternate" hreflang="hr" href="https://ostitax.at/bcs">
-  <link rel="alternate" hreflang="x-default" href="https://ostitax.at/">
+  <link rel="alternate" hreflang="de-AT" href="https://xn--stitax-vxa.at/">
+  <link rel="alternate" hreflang="de" href="https://xn--stitax-vxa.at/">
+  <link rel="alternate" hreflang="en" href="https://xn--stitax-vxa.at/en">
+  <link rel="alternate" hreflang="tr" href="https://xn--stitax-vxa.at/tr">
+  <link rel="alternate" hreflang="es" href="https://xn--stitax-vxa.at/es">
+  <link rel="alternate" hreflang="uk" href="https://xn--stitax-vxa.at/uk">
+  <link rel="alternate" hreflang="hr" href="https://xn--stitax-vxa.at/bcs">
+  <link rel="alternate" hreflang="x-default" href="https://xn--stitax-vxa.at/">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
@@ -37,114 +37,37 @@
   <meta property="og:site_name" content="ÖstiTax">
   <meta property="og:title" content="ÖstiTax — Gehalt netto berechnen Österreich">
   <meta property="og:description" content="Brutto zu Netto in Sekunden. Lohnsteuer, SV, 13./14. Gehalt und Absetzbeträge — klar berechnet für Österreich 2026.">
-  <meta property="og:url" content="https://ostitax.at/">
-  <meta property="og:image" content="https://ostitax.at/og-cover.png">
+  <meta property="og:url" content="https://xn--stitax-vxa.at/">
+  <meta property="og:image" content="https://xn--stitax-vxa.at/og-cover.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/png">
   <meta property="og:image:alt" content="ÖstiTax — Gehalt netto berechnen für Österreich">
 
   <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="ÖstiTax — Gehalt netto berechnen Österreich">
   <meta name="twitter:description" content="Dein Nettogehalt klar berechnet: Lohnsteuer, Sozialversicherung und Absetzbeträge. Österreich 2026.">
-  <meta name="twitter:image" content="https://ostitax.at/og-cover.png">
+  <meta name="twitter:image" content="https://xn--stitax-vxa.at/og-cover.png">
+  <meta name="twitter:image:alt" content="ÖstiTax — Gehalt netto berechnen für Österreich">
 
   <!-- Theme -->
-  <meta name="theme-color" content="#1E40AF">
+  <meta name="theme-color" content="#0D5C56">
   <meta name="application-name" content="ÖstiTax">
   <meta name="apple-mobile-web-app-title" content="ÖstiTax">
 
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+
+  <!-- Fuente: <link> en vez de @import en styles.scss (el @import bloquea el render en cadena) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
 
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-  <!-- Structured data (JSON-LD) para rich results -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Organization",
-        "@id": "https://ostitax.at/#organization",
-        "name": "ÖstiTax",
-        "url": "https://ostitax.at/",
-        "logo": "https://ostitax.at/favicon.ico",
-        "description": "Online-Rechner für Nettogehalt in Österreich."
-      },
-      {
-        "@type": "WebSite",
-        "@id": "https://ostitax.at/#website",
-        "url": "https://ostitax.at/",
-        "name": "ÖstiTax",
-        "description": "Gehalt netto berechnen Österreich — Brutto zu Netto mit Lohnsteuer und Sozialversicherung.",
-        "publisher": { "@id": "https://ostitax.at/#organization" },
-        "inLanguage": ["de-AT", "en", "tr", "es", "uk"],
-        "potentialAction": {
-          "@type": "SearchAction",
-          "target": "https://ostitax.at/?q={search_term_string}",
-          "query-input": "required name=search_term_string"
-        }
-      },
-      {
-        "@type": "WebApplication",
-        "@id": "https://ostitax.at/#app",
-        "name": "ÖstiTax",
-        "url": "https://ostitax.at/",
-        "applicationCategory": "FinanceApplication",
-        "operatingSystem": "Web",
-        "browserRequirements": "Requires JavaScript",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "EUR",
-          "description": "3 kostenlose Berechnungen, danach Pro-Abo"
-        },
-        "featureList": [
-          "Brutto zu Netto berechnen",
-          "Lohnsteuer Österreich",
-          "Sozialversicherung",
-          "13. und 14. Gehalt",
-          "Familienbonus Plus",
-          "Pendlerpauschale",
-          "6 Sprachen"
-        ],
-        "inLanguage": "de-AT",
-        "areaServed": {
-          "@type": "Country",
-          "name": "Austria"
-        }
-      },
-      {
-        "@type": "FAQPage",
-        "@id": "https://ostitax.at/#faq",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "Wie berechne ich mein Nettogehalt in Österreich?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Mit ÖstiTax gibst du dein Bruttogehalt ein, wählst Bundesland und Absetzbeträge. Der Rechner zeigt Lohnsteuer, Sozialversicherung und Netto — inklusive 13. und 14. Gehalt."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Berücksichtigt ÖstiTax den Familienbonus Plus und die Pendlerpauschale?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Ja. Du kannst Alleinverdienerabsetzbetrag, Familienbonus Plus und Pendlerpauschale angeben. Die Berechnung folgt den aktuellen Tabellen für Österreich."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Für welches Jahr gelten die Steuertabellen?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "ÖstiTax verwendet die aktuellen Werte Stand Jänner 2026 (Steuerreform und Sozialversicherung)."
-            }
-          }
-        ]
-      }
-    ]
-  }
-  </script>
 </head>
 <body>
   <app-root></app-root>

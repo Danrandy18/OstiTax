@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /api/
 
-Sitemap: https://ostitax.at/sitemap.xml
+Sitemap: https://xn--stitax-vxa.at/sitemap.xml

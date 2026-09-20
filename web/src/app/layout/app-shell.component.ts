@@ -10,6 +10,9 @@ import type { Lang } from '../core/i18n/translations';
 import { TranslatePipe } from '../shared/pipes/app.pipes';
 import { LoginModalComponent } from '../features/auth/login-modal.component';
 
+/** Unicas rutas publicas e indexables: la calculadora y sus versiones por idioma. */
+const INDEXABLE_PATHS = new Set(['/', '/en', '/es', '/tr', '/uk', '/bcs']);
+
 @Component({
   selector: 'app-shell',
   standalone: true,
@@ -30,13 +33,15 @@ export class AppShellComponent implements OnInit {
 
   constructor() {
     // Rutas /en, /es, etc. fuerzan ese idioma (para SEO por idioma); ver app.routes.ts.
-    this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe(() => this.applyRouteLang());
+    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
+      this.applyRouteLang();
+      this.applyIndexing();
+    });
   }
 
   ngOnInit(): void {
     this.applyRouteLang();
+    this.applyIndexing();
     void this.session.ensureSession();
     void this.auth.ensureAuth();
   }
@@ -56,6 +61,11 @@ export class AppShellComponent implements OnInit {
   logout(): void {
     this.auth.logout();
     void this.router.navigateByUrl('/');
+  }
+
+  private applyIndexing(): void {
+    const path = this.router.url.split(/[?#]/)[0];
+    this.i18n.setIndexable(INDEXABLE_PATHS.has(path));
   }
 
   private applyRouteLang(): void {

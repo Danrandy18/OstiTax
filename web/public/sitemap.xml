@@ -2,85 +2,69 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://ostitax.at/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="de-AT" href="https://ostitax.at/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://ostitax.at/en" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://ostitax.at/es" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://ostitax.at/tr" />
-    <xhtml:link rel="alternate" hreflang="uk" href="https://ostitax.at/uk" />
-    <xhtml:link rel="alternate" hreflang="hr" href="https://ostitax.at/bcs" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://ostitax.at/" />
+    <loc>https://xn--stitax-vxa.at/</loc>
+    <lastmod>2026-09-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="de-AT" href="https://xn--stitax-vxa.at/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://xn--stitax-vxa.at/en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://xn--stitax-vxa.at/es" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://xn--stitax-vxa.at/tr" />
+    <xhtml:link rel="alternate" hreflang="uk" href="https://xn--stitax-vxa.at/uk" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://xn--stitax-vxa.at/bcs" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xn--stitax-vxa.at/" />
   </url>
   <url>
-    <loc>https://ostitax.at/en</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="de-AT" href="https://ostitax.at/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://ostitax.at/en" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://ostitax.at/es" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://ostitax.at/tr" />
-    <xhtml:link rel="alternate" hreflang="uk" href="https://ostitax.at/uk" />
-    <xhtml:link rel="alternate" hreflang="hr" href="https://ostitax.at/bcs" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://ostitax.at/" />
+    <loc>https://xn--stitax-vxa.at/en</loc>
+    <lastmod>2026-09-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="de-AT" href="https://xn--stitax-vxa.at/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://xn--stitax-vxa.at/en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://xn--stitax-vxa.at/es" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://xn--stitax-vxa.at/tr" />
+    <xhtml:link rel="alternate" hreflang="uk" href="https://xn--stitax-vxa.at/uk" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://xn--stitax-vxa.at/bcs" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xn--stitax-vxa.at/" />
   </url>
   <url>
-    <loc>https://ostitax.at/es</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="de-AT" href="https://ostitax.at/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://ostitax.at/en" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://ostitax.at/es" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://ostitax.at/tr" />
-    <xhtml:link rel="alternate" hreflang="uk" href="https://ostitax.at/uk" />
-    <xhtml:link rel="alternate" hreflang="hr" href="https://ostitax.at/bcs" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://ostitax.at/" />
+    <loc>https://xn--stitax-vxa.at/es</loc>
+    <lastmod>2026-09-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="de-AT" href="https://xn--stitax-vxa.at/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://xn--stitax-vxa.at/en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://xn--stitax-vxa.at/es" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://xn--stitax-vxa.at/tr" />
+    <xhtml:link rel="alternate" hreflang="uk" href="https://xn--stitax-vxa.at/uk" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://xn--stitax-vxa.at/bcs" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xn--stitax-vxa.at/" />
   </url>
   <url>
-    <loc>https://ostitax.at/tr</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="de-AT" href="https://ostitax.at/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://ostitax.at/en" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://ostitax.at/es" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://ostitax.at/tr" />
-    <xhtml:link rel="alternate" hreflang="uk" href="https://ostitax.at/uk" />
-    <xhtml:link rel="alternate" hreflang="hr" href="https://ostitax.at/bcs" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://ostitax.at/" />
+    <loc>https://xn--stitax-vxa.at/tr</loc>
+    <lastmod>2026-09-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="de-AT" href="https://xn--stitax-vxa.at/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://xn--stitax-vxa.at/en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://xn--stitax-vxa.at/es" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://xn--stitax-vxa.at/tr" />
+    <xhtml:link rel="alternate" hreflang="uk" href="https://xn--stitax-vxa.at/uk" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://xn--stitax-vxa.at/bcs" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xn--stitax-vxa.at/" />
   </url>
   <url>
-    <loc>https://ostitax.at/uk</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="de-AT" href="https://ostitax.at/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://ostitax.at/en" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://ostitax.at/es" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://ostitax.at/tr" />
-    <xhtml:link rel="alternate" hreflang="uk" href="https://ostitax.at/uk" />
-    <xhtml:link rel="alternate" hreflang="hr" href="https://ostitax.at/bcs" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://ostitax.at/" />
+    <loc>https://xn--stitax-vxa.at/uk</loc>
+    <lastmod>2026-09-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="de-AT" href="https://xn--stitax-vxa.at/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://xn--stitax-vxa.at/en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://xn--stitax-vxa.at/es" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://xn--stitax-vxa.at/tr" />
+    <xhtml:link rel="alternate" hreflang="uk" href="https://xn--stitax-vxa.at/uk" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://xn--stitax-vxa.at/bcs" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xn--stitax-vxa.at/" />
   </url>
   <url>
-    <loc>https://ostitax.at/bcs</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="de-AT" href="https://ostitax.at/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://ostitax.at/en" />
-    <xhtml:link rel="alternate" hreflang="es" href="https://ostitax.at/es" />
-    <xhtml:link rel="alternate" hreflang="tr" href="https://ostitax.at/tr" />
-    <xhtml:link rel="alternate" hreflang="uk" href="https://ostitax.at/uk" />
-    <xhtml:link rel="alternate" hreflang="hr" href="https://ostitax.at/bcs" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://ostitax.at/" />
-  </url>
-  <url>
-    <loc>https://ostitax.at/payment/success</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  <url>
-    <loc>https://ostitax.at/payment/cancel</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.2</priority>
+    <loc>https://xn--stitax-vxa.at/bcs</loc>
+    <lastmod>2026-09-20</lastmod>
+    <xhtml:link rel="alternate" hreflang="de-AT" href="https://xn--stitax-vxa.at/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://xn--stitax-vxa.at/en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://xn--stitax-vxa.at/es" />
+    <xhtml:link rel="alternate" hreflang="tr" href="https://xn--stitax-vxa.at/tr" />
+    <xhtml:link rel="alternate" hreflang="uk" href="https://xn--stitax-vxa.at/uk" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://xn--stitax-vxa.at/bcs" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://xn--stitax-vxa.at/" />
   </url>
 </urlset>
