@@ -1,4 +1,4 @@
-package com.appcalculos.app_calculos
+package at.ostitax.app
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 
+import '../config/feature_flags.dart';
 import '../../features/account/presentation/account_screen.dart';
 import '../../features/auth/presentation/auth_screen.dart';
 import '../../features/auth/presentation/forgot_password_screen.dart';
@@ -11,6 +12,12 @@ import '../../features/open_banking/presentation/banking_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/splash',
+  redirect: (context, state) {
+    if (!bankingEnabled && state.matchedLocation.startsWith('/banking')) {
+      return '/account';
+    }
+    return null;
+  },
   routes: [
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     GoRoute(

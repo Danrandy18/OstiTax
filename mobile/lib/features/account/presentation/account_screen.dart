@@ -1,7 +1,9 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/config/feature_flags.dart';
 import '../../../core/l10n/tr.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/legal_disclaimer_footer.dart';
@@ -47,9 +49,8 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
       Navigator.of(context).pop();
     } else {
       setState(() => _deleting = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(ref.tr('authErrorGeneric'))),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(ref.tr('authErrorGeneric'))));
     }
   }
 
@@ -81,29 +82,39 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _Row(label: ref.tr('profileEmailLabel'), value: account.email),
+                  _Row(
+                    label: ref.tr('profileEmailLabel'),
+                    value: account.email,
+                  ),
                   if (account.name != null) ...[
                     const SizedBox(height: 10),
-                    _Row(label: ref.tr('profileNameLabel'), value: account.name!),
+                    _Row(
+                      label: ref.tr('profileNameLabel'),
+                      value: account.name!,
+                    ),
                   ],
                   const SizedBox(height: 10),
                   _Row(
                     label: ref.tr('profilePlanLabel'),
-                    value: ref.tr(account.isPro ? 'profilePlanPro' : 'profilePlanFree'),
-                  ),
-                  const SizedBox(height: 14),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: TextButton(
-                      onPressed: () => context.push('/banking'),
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: Text(ref.tr('profileConnectBankLink')),
+                    value: ref.tr(
+                      account.isPro ? 'profilePlanPro' : 'profilePlanFree',
                     ),
                   ),
+                  if (bankingEnabled) ...[
+                    const SizedBox(height: 14),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton(
+                        onPressed: () => context.push('/banking'),
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(ref.tr('profileConnectBankLink')),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -111,7 +122,9 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+                border: Border.all(
+                  color: AppColors.error.withValues(alpha: 0.3),
+                ),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Column(
