@@ -1,10 +1,22 @@
 import { Injectable, inject, signal, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom, tap } from 'rxjs';
+import {
+  catchError,
+  exhaustMap,
+  firstValueFrom,
+  of,
+  take,
+  takeWhile,
+  tap,
+  timer,
+  type Subscription,
+} from 'rxjs';
 import type { AccountStatus, AuthResponse } from '../models/api.models';
 
 const TOKEN_STORAGE_KEY = 'authToken';
+const PRO_POLL_INTERVAL_MS = 2500;
+const PRO_POLL_MAX_ATTEMPTS = 24;
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -12,9 +24,12 @@ export class AuthService {
   private readonly platformId = inject(PLATFORM_ID);
   private bootstrapPromise: Promise<void> | null = null;
 
+  private proPolling: Subscription | null = null;
+
   readonly account = signal<AccountStatus | null>(null);
   readonly token = signal<string | null>(null);
   readonly ready = signal(false);
+  readonly activatingPro = signal(false);
 
   ensureAuth(): Promise<void> {
     if (!this.bootstrapPromise) {
@@ -80,6 +95,27 @@ export class AuthService {
       .pipe(tap((account) => this.account.set(account)));
   }
 
+  /**
+   * Stripe y PayPal redirigen antes de que su webhook llegue al backend: pro se activa unos
+   * segundos despues. Vive aqui y no en la pagina de exito para que siga aunque el usuario
+   * navegue a otra pantalla; toda la UI lee account(), asi que se actualiza sola.
+   */
+  pollUntilPro(): void {
+    if (!isPlatformBrowser(this.platformId) || !this.token()) {
+      return;
+    }
+
+    this.proPolling?.unsubscribe();
+    this.activatingPro.set(true);
+    this.proPolling = timer(0, PRO_POLL_INTERVAL_MS)
+      .pipe(
+        take(PRO_POLL_MAX_ATTEMPTS),
+        exhaustMap(() => this.refreshAccount().pipe(catchError(() => of(null)))),
+        takeWhile((account) => !account?.isPro, true),
+      )
+      .subscribe({ complete: () => this.activatingPro.set(false) });
+  }
+
   logout(): void {
     this.clearSession();
   }
@@ -102,6 +138,8 @@ export class AuthService {
   }
 
   private clearSession(): void {
+    this.proPolling?.unsubscribe();
+    this.activatingPro.set(false);
     localStorage.removeItem(TOKEN_STORAGE_KEY);
     this.token.set(null);
     this.account.set(null);
