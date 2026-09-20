@@ -48,3 +48,8 @@ web/.playwright/
 .claude/
 .mcp.json
 .playwright-mcp/
+
+# Claves de firma de Android: nunca al repo (es publico). Ver mobile/README.md.
+*.jks
+*.keystore
+key.properties
