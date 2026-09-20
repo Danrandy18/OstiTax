@@ -274,3 +274,90 @@
   clip: rect(0, 0, 0, 0);
   border: 0;
 }
+
+/* Cambio de idioma: los textos se desvanecen, se intercambian y reaparecen con un leve
+   desplazamiento. Se usan animaciones (no transiciones) para no pisar los hover de los botones. */
+@keyframes langOut {
+  to {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes langIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+:host(.lang-out)
+  :is(
+    .brand-subtitle,
+    .badge-pro,
+    .badge-attempts,
+    .btn-login,
+    .btn-logout,
+    .app-main,
+    .app-disclaimer-footer
+  ) {
+  animation: langOut var(--duration-fast) var(--ease-out) forwards;
+}
+
+:host(.lang-in)
+  :is(
+    .brand-subtitle,
+    .badge-pro,
+    .badge-attempts,
+    .btn-login,
+    .btn-logout,
+    .app-main,
+    .app-disclaimer-footer
+  ) {
+  animation: langIn var(--duration-slow) var(--ease-out) backwards;
+}
+
+@keyframes langToast {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+  12%,
+  82% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+.lang-toast {
+  position: fixed;
+  top: 4.75rem;
+  right: 1rem;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgb(var(--color-primary-rgb) / 30%);
+  pointer-events: none;
+  animation: langToast 1900ms var(--ease-out) both;
+
+  .icon {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
