@@ -11,6 +11,7 @@ import '../../../core/widgets/legal_disclaimer_footer.dart';
 import '../../../core/widgets/segmented_toggle.dart';
 import '../../auth/presentation/auth_controller.dart';
 import '../../payment/presentation/payment_sheet.dart';
+import '../../payment/presentation/upgrade_sheet.dart';
 import '../../session/presentation/session_controller.dart';
 import '../domain/calculation_models.dart';
 import 'calculator_controller.dart';
@@ -89,7 +90,8 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
     final session = ref.watch(sessionControllerProvider);
     final auth = ref.watch(authControllerProvider);
     final form = calcState.form;
-    final isPro = (auth.account?.isPro ?? false) || (session.status?.isPro ?? false);
+    final isPro =
+        (auth.account?.isPro ?? false) || (session.status?.isPro ?? false);
 
     ref.listen<CalculatorState>(calculatorControllerProvider, (previous, next) {
       if (next.paymentRequired && !_paymentSheetQueued) {
@@ -122,22 +124,24 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
           ],
         ),
         actions: [
-          if (session.status != null)
-            _StatusBadge(
-              isPro: isPro,
-              freeAttemptsRemaining: session.status!.freeAttemptsRemaining,
+          // El contador de intentos va junto al subtitulo, en el cuerpo: junto al boton Pro, la
+          // cuenta y el idioma no cabe en 360 px.
+          if (session.status != null && isPro) const _StatusBadge(isPro: true),
+          if (!isPro)
+            _UpgradeButton(
+              // Con sesión iniciada además hay icono de cuenta: en pantallas estrechas el botón
+              // pasa a ser solo el icono para que el encabezado no se desborde.
+              compact:
+                  auth.account != null &&
+                  MediaQuery.sizeOf(context).width < 420,
+              onPressed: () => showUpgradeSheet(context),
             ),
           if (auth.account != null)
             IconButton(
               icon: const Icon(Icons.person_outline_rounded),
               tooltip: auth.account!.email,
+              visualDensity: VisualDensity.compact,
               onPressed: () => context.push('/account'),
-            )
-          else
-            IconButton(
-              icon: const Icon(Icons.login_rounded),
-              tooltip: ref.tr('authLoginButton'),
-              onPressed: () => context.push('/login'),
             ),
           const SizedBox(width: 6),
           _LanguageMenu(),
@@ -148,12 +152,26 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
           children: [
-            Text(
-              ref.tr('appSubtitle'),
-              style: const TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 13,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    ref.tr('appSubtitle'),
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+                if (session.status != null && !isPro) ...[
+                  const SizedBox(width: 8),
+                  _StatusBadge(
+                    isPro: false,
+                    freeAttemptsRemaining:
+                        session.status!.freeAttemptsRemaining,
+                  ),
+                ],
+              ],
             ),
             const SizedBox(height: 16),
 
@@ -461,6 +479,44 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
         ),
       ),
       bottomNavigationBar: const LegalDisclaimerFooter(),
+    );
+  }
+}
+
+/// Botón compacto (icono + "Pro") para no desbordar el encabezado en móviles estrechos;
+/// el texto completo "Mejorar a Pro" va como tooltip y dentro de la comparativa.
+/// Quien ya tiene cuenta entra desde la propia comparativa.
+class _UpgradeButton extends ConsumerWidget {
+  const _UpgradeButton({required this.onPressed, this.compact = false});
+  final VoidCallback onPressed;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (compact) {
+      return IconButton.filled(
+        onPressed: onPressed,
+        tooltip: ref.tr('upgradeCta'),
+        icon: const Icon(Icons.workspace_premium_rounded, size: 18),
+        visualDensity: VisualDensity.compact,
+      );
+    }
+    return Tooltip(
+      message: ref.tr('upgradeCta'),
+      child: FilledButton.icon(
+        onPressed: onPressed,
+        icon: const Icon(Icons.workspace_premium_rounded, size: 16),
+        label: Text(
+          ref.tr('proBadge'),
+          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5),
+        ),
+        style: FilledButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          minimumSize: const Size(0, 32),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.compact,
+        ),
+      ),
     );
   }
 }

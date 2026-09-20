@@ -28,5 +28,41 @@ void main() {
         }
       }
     });
+
+    test('the Free vs Pro comparison is translated in every language', () {
+      const compareKeys = [
+        'upgradeCta',
+        'compareTitle',
+        'compareSubtitle',
+        'compareFeatureCol',
+        'compareFreeCol',
+        'compareProCol',
+        'compareRowCalcs',
+        'compareCalcsFree',
+        'compareCalcsPro',
+        'compareRowPdf',
+        'compareRowAccount',
+        'compareRowOcr',
+        'compareComingSoon',
+        'comparePriceLine',
+        'compareChoosePlan',
+        'compareHaveAccount',
+      ];
+      // 'Pro' y el nombre de la columna gratis pueden coincidir con el alemán; el resto no.
+      const mayMatchGerman = {'compareProCol', 'compareFreeCol'};
+      for (final locale in AppStrings.supportedLocales) {
+        for (final key in compareKeys) {
+          final value = AppStrings.t(locale, key);
+          expect(value, isNot(key), reason: 'Missing "$key" for "$locale"');
+          if (locale != 'de' && !mayMatchGerman.contains(key)) {
+            expect(
+              value,
+              isNot(AppStrings.t('de', key)),
+              reason: '"$key" for "$locale" is just the German fallback',
+            );
+          }
+        }
+      }
+    });
   });
 }
