@@ -1,6 +1,8 @@
 /** Marca del producto — distinta de Arbeiterkammer / Brutto-Netto-Rechner. */
 export const BRAND = {
   name: 'ÖstiTax',
+  /** Iniciales del logo del encabezado. */
+  mark: 'ÖT',
   domain: 'ostitax.at',
   /** Dominio canónico (actualizar al desplegar). */
   siteUrl: 'https://ostitax.at',

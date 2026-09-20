@@ -1,9 +1,9 @@
 <header class="app-header">
   <div class="container header-inner">
-    <a routerLink="/" class="brand" aria-label="ÖstiTax">
-      <span class="brand-mark" aria-hidden="true">ÖT</span>
+    <a routerLink="/" class="brand" [attr.aria-label]="brand.name">
+      <span class="brand-mark" aria-hidden="true">{{ brand.mark }}</span>
       <span class="brand-text">
-        <span class="brand-title">{{ 'appTitle' | translate }}</span>
+        <span class="brand-title">{{ brand.name }}</span>
         <span class="brand-subtitle">{{ 'appSubtitle' | translate }}</span>
       </span>
     </a>

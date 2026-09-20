@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
+import { BRAND } from '../core/brand';
 import { AuthService } from '../core/services/auth.service';
 import { I18nService } from '../core/i18n/i18n.service';
 import { SessionService } from '../core/services/session.service';
@@ -17,6 +18,8 @@ import { LoginModalComponent } from '../features/auth/login-modal.component';
   styleUrl: './app-shell.component.scss',
 })
 export class AppShellComponent implements OnInit {
+  /** Marca fija en alemán: no depende del idioma de la UI. */
+  readonly brand = BRAND;
   readonly i18n = inject(I18nService);
   readonly session = inject(SessionService);
   readonly auth = inject(AuthService);
