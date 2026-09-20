@@ -144,6 +144,9 @@ export interface TranslationSchema {
   authResetPasswordButton: string;
   authResetPasswordSuccess: string;
   authResetPasswordInvalidToken: string;
+  authResetCodeBody: string;
+  authResetCodeLabel: string;
+  authResetCodeInvalid: string;
   profileTitle: string;
   profileNavLink: string;
   profileEmailLabel: string;
@@ -356,6 +359,9 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     authResetPasswordButton: 'Passwort speichern',
     authResetPasswordSuccess: 'Dein Passwort wurde geändert. Du wirst weitergeleitet...',
     authResetPasswordInvalidToken: 'Dieser Link ist ungültig oder abgelaufen.',
+    authResetCodeBody: 'Wir versenden noch keine E-Mails. Gib den Testcode ein, den du vom Administrator erhalten hast, und wähle ein neues Passwort.',
+    authResetCodeLabel: 'Testcode',
+    authResetCodeInvalid: 'Der Code ist ungültig oder es gab zu viele Versuche. Bitte später erneut versuchen.',
     profileTitle: 'Mein Profil',
     profileNavLink: 'Mein Profil',
     profileEmailLabel: 'E-Mail',
@@ -557,6 +563,9 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     authResetPasswordButton: 'Save password',
     authResetPasswordSuccess: 'Your password has been changed. Redirecting...',
     authResetPasswordInvalidToken: 'This link is invalid or has expired.',
+    authResetCodeBody: 'We are not sending emails yet. Enter the test code you received from the administrator and choose a new password.',
+    authResetCodeLabel: 'Test code',
+    authResetCodeInvalid: 'The code is invalid or there were too many attempts. Please try again later.',
     profileTitle: 'My Profile',
     profileNavLink: 'My Profile',
     profileEmailLabel: 'Email',
@@ -762,6 +771,9 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     authResetPasswordButton: 'Guardar contraseña',
     authResetPasswordSuccess: 'Tu contraseña fue cambiada. Redirigiendo...',
     authResetPasswordInvalidToken: 'Este enlace es inválido o ha expirado.',
+    authResetCodeBody: 'Todavía no enviamos correos. Introduce el código de prueba que te dio el administrador y elige una contraseña nueva.',
+    authResetCodeLabel: 'Código de prueba',
+    authResetCodeInvalid: 'El código no es válido o hubo demasiados intentos. Inténtalo más tarde.',
     profileTitle: 'Mi perfil',
     profileNavLink: 'Mi perfil',
     profileEmailLabel: 'Correo electrónico',
@@ -966,6 +978,9 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     authResetPasswordButton: 'Şifreyi kaydet',
     authResetPasswordSuccess: 'Şifren değiştirildi. Yönlendiriliyorsun...',
     authResetPasswordInvalidToken: 'Bu bağlantı geçersiz veya süresi dolmuş.',
+    authResetCodeBody: 'Henüz e-posta göndermiyoruz. Yöneticiden aldığın test kodunu gir ve yeni bir şifre seç.',
+    authResetCodeLabel: 'Test kodu',
+    authResetCodeInvalid: 'Kod geçersiz veya çok fazla deneme yapıldı. Lütfen daha sonra tekrar dene.',
     profileTitle: 'Profilim',
     profileNavLink: 'Profilim',
     profileEmailLabel: 'E-posta',
@@ -1171,6 +1186,9 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     authResetPasswordButton: 'Sačuvaj lozinku',
     authResetPasswordSuccess: 'Tvoja lozinka je promijenjena. Preusmjeravamo te...',
     authResetPasswordInvalidToken: 'Ovaj link je nevažeći ili je istekao.',
+    authResetCodeBody: 'Još ne šaljemo e-poštu. Unesi probni kod koji si dobio od administratora i odaberi novu lozinku.',
+    authResetCodeLabel: 'Probni kod',
+    authResetCodeInvalid: 'Kod nije važeći ili je bilo previše pokušaja. Pokušaj ponovo kasnije.',
     profileTitle: 'Moj profil',
     profileNavLink: 'Moj profil',
     profileEmailLabel: 'Email',
@@ -1375,6 +1393,9 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     authResetPasswordButton: 'Зберегти пароль',
     authResetPasswordSuccess: 'Ваш пароль змінено. Перенаправлення...',
     authResetPasswordInvalidToken: 'Це посилання недійсне або застаріле.',
+    authResetCodeBody: 'Ми ще не надсилаємо листи. Введи тестовий код, який ти отримав від адміністратора, і вибери новий пароль.',
+    authResetCodeLabel: 'Тестовий код',
+    authResetCodeInvalid: 'Код недійсний або було забагато спроб. Спробуй пізніше.',
     profileTitle: 'Мій профіль',
     profileNavLink: 'Мій профіль',
     profileEmailLabel: 'Електронна пошта',

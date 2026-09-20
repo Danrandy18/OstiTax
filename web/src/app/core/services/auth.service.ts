@@ -121,7 +121,18 @@ export class AuthService {
   }
 
   forgotPassword(email: string) {
-    return this.http.post<{ ok: true }>('/api/auth/forgot-password', { email });
+    // mode 'code': sin SMTP, se pide el codigo de prueba en vez de esperar un correo.
+    return this.http.post<{ ok: true; mode?: 'email' | 'code' }>('/api/auth/forgot-password', {
+      email,
+    });
+  }
+
+  resetPasswordWithCode(email: string, code: string, password: string) {
+    return this.http.post<{ ok: true }>('/api/auth/reset-password/code', {
+      email,
+      code,
+      password,
+    });
   }
 
   resetPassword(token: string, password: string) {
