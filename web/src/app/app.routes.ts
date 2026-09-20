@@ -5,6 +5,7 @@ import { BankingPageComponent } from './features/banking/banking-page.component'
 import { CalculatorComponent } from './features/calculator/calculator.component';
 import { ForgotPasswordComponent } from './features/auth/forgot-password.component';
 import { ResetPasswordComponent } from './features/auth/reset-password.component';
+import { LegalPageComponent } from './features/legal/legal-page.component';
 import { AppShellComponent } from './layout/app-shell.component';
 import {
   PaymentCancelComponent,
@@ -24,6 +25,10 @@ export const routes: Routes = [
       { path: 'tr', component: CalculatorComponent, data: { lang: 'tr' } },
       { path: 'uk', component: CalculatorComponent, data: { lang: 'uk' } },
       { path: 'bcs', component: CalculatorComponent, data: { lang: 'bcs' } },
+      // Paginas legales: publicas y prerenderizadas (Google Play exige URLs de privacidad y borrado).
+      { path: 'privacy', component: LegalPageComponent, data: { doc: 'privacy' } },
+      { path: 'impressum', component: LegalPageComponent, data: { doc: 'impressum' } },
+      { path: 'delete-account', component: LegalPageComponent, data: { doc: 'deleteAccount' } },
       { path: 'profile', component: AccountPageComponent },
       { path: 'banking', component: BankingPageComponent },
       { path: 'banking/callback', component: BankingCallbackComponent },

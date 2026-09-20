@@ -67,6 +67,9 @@ export interface TranslationSchema {
   paymentRequiredHint: string;
   upgradeToPro: string;
   upgradeCta: string;
+  legalImprint: string;
+  legalPrivacy: string;
+  legalDeleteAccount: string;
   compareTitle: string;
   compareSubtitle: string;
   compareFeatureCol: string;
@@ -289,6 +292,9 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     paymentRequiredHint: 'Upgrade auf Pro für unbegrenzte Berechnungen.',
     upgradeToPro: 'Jetzt upgraden',
     upgradeCta: 'Auf Pro upgraden',
+    legalImprint: 'Impressum',
+    legalPrivacy: 'Datenschutz',
+    legalDeleteAccount: 'Konto löschen',
     compareTitle: 'Gratis oder Pro',
     compareSubtitle: 'Das schaltest du mit Pro frei.',
     compareFeatureCol: 'Funktion',
@@ -514,6 +520,9 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     paymentRequiredHint: 'Upgrade to Pro for unlimited calculations.',
     upgradeToPro: 'Upgrade now',
     upgradeCta: 'Upgrade to Pro',
+    legalImprint: 'Legal notice',
+    legalPrivacy: 'Privacy',
+    legalDeleteAccount: 'Delete account',
     compareTitle: 'Free vs. Pro',
     compareSubtitle: 'Here is what you unlock with Pro.',
     compareFeatureCol: 'Feature',
@@ -734,6 +743,9 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     paymentRequiredHint: 'Pasa a Pro para cálculos ilimitados.',
     upgradeToPro: 'Mejorar plan',
     upgradeCta: 'Mejorar a Pro',
+    legalImprint: 'Aviso legal',
+    legalPrivacy: 'Privacidad',
+    legalDeleteAccount: 'Eliminar cuenta',
     compareTitle: 'Gratis vs. Pro',
     compareSubtitle: 'Esto es lo que desbloqueas con Pro.',
     compareFeatureCol: 'Función',
@@ -958,6 +970,9 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     paymentRequiredHint: 'Sınırsız hesap için Pro’ya geçin.',
     upgradeToPro: 'Pro’ya yükselt',
     upgradeCta: 'Pro\'ya geç',
+    legalImprint: 'Yasal bilgiler',
+    legalPrivacy: 'Gizlilik',
+    legalDeleteAccount: 'Hesabı sil',
     compareTitle: 'Ücretsiz ve Pro',
     compareSubtitle: 'Pro ile şunların kilidini açarsın.',
     compareFeatureCol: 'Özellik',
@@ -1181,6 +1196,9 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     paymentRequiredHint: 'Nadogradite na Pro za neograničene izračune.',
     upgradeToPro: 'Nadogradi',
     upgradeCta: 'Pređi na Pro',
+    legalImprint: 'Pravne informacije',
+    legalPrivacy: 'Privatnost',
+    legalDeleteAccount: 'Izbriši račun',
     compareTitle: 'Besplatno i Pro',
     compareSubtitle: 'Ovo otključavaš uz Pro.',
     compareFeatureCol: 'Funkcija',
@@ -1405,6 +1423,9 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     paymentRequiredHint: 'Оформіть Pro для необмежених розрахунків.',
     upgradeToPro: 'Оновити до Pro',
     upgradeCta: 'Перейти на Pro',
+    legalImprint: 'Правова інформація',
+    legalPrivacy: 'Конфіденційність',
+    legalDeleteAccount: 'Видалити акаунт',
     compareTitle: 'Безкоштовно та Pro',
     compareSubtitle: 'Ось що відкриває Pro.',
     compareFeatureCol: 'Функція',

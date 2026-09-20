@@ -14,7 +14,20 @@ import { PaymentModalComponent } from '../features/payment/payment-modal.compone
 import { UpgradeCompareModalComponent } from '../features/upgrade/upgrade-compare-modal.component';
 
 /** Unicas rutas publicas e indexables: la calculadora y sus versiones por idioma. */
-const INDEXABLE_PATHS = new Set(['/', '/en', '/es', '/tr', '/uk', '/bcs']);
+const INDEXABLE_PATHS = new Set([
+  '/',
+  '/en',
+  '/es',
+  '/tr',
+  '/uk',
+  '/bcs',
+  '/privacy',
+  '/impressum',
+  '/delete-account',
+]);
+
+/** Paginas legales: se muestran siempre, aunque el backend este dormido o falle la sesion. */
+const LEGAL_PATHS = new Set(['/privacy', '/impressum', '/delete-account']);
 
 /** Duracion del desvanecido antes de intercambiar los textos (coincide con --duration-fast). */
 const LANG_FADE_OUT_MS = 150;
@@ -51,6 +64,7 @@ export class AppShellComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
 
   readonly loginModalOpen = signal(false);
+  readonly isLegalRoute = signal(false);
   /** Fase de la animacion al cambiar de idioma: desvanecer ('out'), reaparecer ('in'). */
   readonly langPhase = signal<'idle' | 'out' | 'in'>('idle');
   /** Nombre (en su propio idioma) del idioma recien elegido; avisa del cambio. */
@@ -129,6 +143,7 @@ export class AppShellComponent implements OnInit {
   private applyIndexing(): void {
     const path = this.router.url.split(/[?#]/)[0];
     this.i18n.setIndexable(INDEXABLE_PATHS.has(path));
+    this.isLegalRoute.set(LEGAL_PATHS.has(path));
   }
 
   private applyRouteLang(): void {

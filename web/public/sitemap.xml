@@ -67,4 +67,16 @@
     <xhtml:link rel="alternate" hreflang="hr" href="https://xn--stitax-vxa.at/bcs" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://xn--stitax-vxa.at/" />
   </url>
+  <url>
+    <loc>https://xn--stitax-vxa.at/impressum</loc>
+    <lastmod>2026-09-20</lastmod>
+  </url>
+  <url>
+    <loc>https://xn--stitax-vxa.at/privacy</loc>
+    <lastmod>2026-09-20</lastmod>
+  </url>
+  <url>
+    <loc>https://xn--stitax-vxa.at/delete-account</loc>
+    <lastmod>2026-09-20</lastmod>
+  </url>
 </urlset>

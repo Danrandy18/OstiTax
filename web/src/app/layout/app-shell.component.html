@@ -44,13 +44,13 @@
 </header>
 
 <main class="app-main container">
-  @if (!session.ready()) {
+  @if (!isLegalRoute() && !session.ready()) {
     <div class="boot-skeleton" aria-hidden="true">
       <div class="skeleton boot-skeleton-line boot-skeleton-line-lg"></div>
       <div class="skeleton boot-skeleton-line"></div>
       <div class="skeleton boot-skeleton-card"></div>
     </div>
-  } @else if (session.error()) {
+  } @else if (!isLegalRoute() && session.error()) {
     <p class="loading-state error-text" role="alert">{{ 'errorGeneric' | translate }}</p>
   } @else {
     <router-outlet />
@@ -83,4 +83,9 @@
       <strong>{{ 'disclaimerTitle' | translate }}:</strong> {{ 'disclaimerText' | translate }}
     </p>
   </div>
+  <nav class="container legal-links" aria-label="Legal">
+    <a routerLink="/impressum">{{ 'legalImprint' | translate }}</a>
+    <a routerLink="/privacy">{{ 'legalPrivacy' | translate }}</a>
+    <a routerLink="/delete-account">{{ 'legalDeleteAccount' | translate }}</a>
+  </nav>
 </footer>

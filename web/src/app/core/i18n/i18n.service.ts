@@ -69,13 +69,22 @@ export class I18nService {
   readonly t = computed<TranslationSchema>(() => TRANSLATIONS[this.currentLang()]);
   readonly langOptions = LANG_OPTIONS;
 
+  /**
+   * Las paginas que no son la calculadora (legales) fijan aqui su propio titulo y ruta para que
+   * el canonical, el titulo y los datos estructurados no digan que son la portada.
+   */
+  readonly pageTitle = signal<string | null>(null);
+  readonly pageCanonicalPath = signal<string | null>(null);
+
   constructor() {
     effect(() => {
       const lang = this.currentLang();
       const translation = TRANSLATIONS[lang];
-      const title = DOCUMENT_TITLES[lang];
+      const pageTitle = this.pageTitle();
+      const pagePath = this.pageCanonicalPath();
+      const title = pageTitle ? `${pageTitle} — ${BRAND.name}` : DOCUMENT_TITLES[lang];
       const description = DOCUMENT_DESCRIPTIONS[lang];
-      const canonicalUrl = `${SITE_URL}/${LANG_PATHS[lang]}`;
+      const canonicalUrl = `${SITE_URL}/${pagePath ?? LANG_PATHS[lang]}`;
 
       this.document.title = title;
       this.document.documentElement.lang = HTML_LANGS[lang];
@@ -90,7 +99,12 @@ export class I18nService {
 
       this.document.querySelector('link[rel="canonical"]')?.setAttribute('href', canonicalUrl);
 
-      this.updateJsonLd(lang, translation, description, canonicalUrl);
+      if (pagePath) {
+        // El FAQ y la ficha de la aplicacion solo describen la calculadora.
+        this.document.getElementById(LD_JSON_ID)?.remove();
+      } else {
+        this.updateJsonLd(lang, translation, description, canonicalUrl);
+      }
     });
   }
 
