@@ -14,6 +14,7 @@ import finanzonlineConfig from './config/finanzonline.config';
 import openBankingConfig from './config/open-banking.config';
 import { FinanzOnlineModule } from './finanzonline/finanzonline.module';
 import { OpenBankingModule } from './open-banking/open-banking.module';
+import { ReceiptsModule } from './receipts/receipts.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -51,6 +52,7 @@ import { UsersModule } from './users/users.module';
     CalcModule,
     FinanzOnlineModule,
     OpenBankingModule,
+    ReceiptsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
