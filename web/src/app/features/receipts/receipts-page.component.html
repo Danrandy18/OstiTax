@@ -1,0 +1,159 @@
+<div class="receipts-page">
+  <h1>{{ text().title }}</h1>
+  <p class="subtitle">{{ text().subtitle }}</p>
+
+  @if (!auth.account()) {
+    <p class="muted">{{ text().loginRequired }}</p>
+    <a routerLink="/" class="back-link">{{ text().back }}</a>
+  } @else if (!isPro()) {
+    <section class="card">
+      <p>{{ text().proRequired }}</p>
+      <button type="button" class="btn-primary" (click)="upgrade.openCompare()">{{ text().upgrade }}</button>
+    </section>
+  } @else {
+    <p class="privacy">{{ text().privacy }}</p>
+
+    @if (step() === 'idle') {
+      <section class="card actions">
+        <label class="btn-primary file-btn">
+          {{ text().camera }}
+          <input type="file" accept="image/*" capture="environment" (change)="onFile($event)" hidden />
+        </label>
+        <label class="btn-secondary file-btn">
+          {{ text().chooseFile }}
+          <input type="file" accept="image/*" (change)="onFile($event)" hidden />
+        </label>
+      </section>
+    }
+
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+
+    @if (step() === 'reading') {
+      <section class="card">
+        <p>{{ text().reading }} {{ (progress() * 100).toFixed(0) }}%</p>
+        <progress [value]="progress()" max="1"></progress>
+      </section>
+    }
+    @if (step() === 'analyzing') {
+      <section class="card"><p>{{ text().analyzing }}</p></section>
+    }
+
+    @if (step() === 'review' && parsed(); as p) {
+      <section class="card review">
+        <h2>{{ text().reviewTitle }}</h2>
+        <p class="muted">{{ text().reviewHint }}</p>
+
+        @if (imageUrl()) {
+          <button type="button" class="zoom" [class.zoomed]="zoomed()" (click)="zoomed.set(!zoomed())">
+            <img [src]="imageUrl()" alt="" />
+          </button>
+        }
+
+        @for (w of p.warnings; track w) {
+          <p class="warning">{{ warningText(w) }}</p>
+        }
+
+        <label>
+          {{ text().merchant }}
+          <input type="text" name="merchant" [(ngModel)]="merchant" />
+          @if (p.merchant.evidence) {
+            <span class="evidence">{{ text().readFrom }}: <mark>{{ p.merchant.evidence }}</mark></span>
+          }
+        </label>
+
+        <label>
+          {{ text().date }}
+          <input type="date" name="date" [(ngModel)]="date" />
+          @if (p.date.evidence) {
+            <span class="evidence">{{ text().readFrom }}: <mark>{{ p.date.evidence }}</mark></span>
+          }
+        </label>
+
+        <label>
+          {{ text().total }}
+          <input type="number" step="0.01" min="0" name="total" [(ngModel)]="total" />
+          @if (p.total.evidence) {
+            <span class="evidence">{{ text().readFrom }}: <mark>{{ p.total.evidence }}</mark></span>
+          }
+        </label>
+
+        <label>
+          {{ text().vat }}
+          <select name="vatRate" [(ngModel)]="vatRate">
+            <option [ngValue]="null">{{ text().vatNone }}</option>
+            @for (r of vatRates; track r) {
+              <option [ngValue]="r">{{ r }} %</option>
+            }
+          </select>
+          @if (p.vat.evidence) {
+            <span class="evidence">{{ text().readFrom }}: <mark>{{ p.vat.evidence }}</mark></span>
+          }
+        </label>
+
+        <label>
+          {{ text().vatAmount }}
+          <input type="number" step="0.01" min="0" name="vatAmount" [(ngModel)]="vatAmount" />
+        </label>
+
+        <label>
+          {{ text().documentNumber }}
+          <input type="text" name="documentNumber" [(ngModel)]="documentNumber" />
+          @if (p.documentNumber.evidence) {
+            <span class="evidence">{{ text().readFrom }}: <mark>{{ p.documentNumber.evidence }}</mark></span>
+          }
+        </label>
+
+        <label>
+          {{ text().category }}
+          <select name="category" [(ngModel)]="category">
+            @for (c of categories; track c) {
+              <option [ngValue]="c">{{ categoryLabel(c) }}</option>
+            }
+          </select>
+          @if (p.categoryEvidence.length) {
+            <span class="evidence">{{ text().readFrom }}: <mark>{{ p.categoryEvidence.join(', ') }}</mark></span>
+          }
+        </label>
+
+        @if (gwgApplies()) {
+          <p class="warning">{{ text().gwgWarning }}</p>
+        }
+        <p class="muted small">{{ text().disclaimer }}</p>
+
+        <div class="row">
+          <button type="button" class="btn-primary" (click)="save()">{{ text().save }}</button>
+          <button type="button" class="btn-secondary" (click)="discard()">{{ text().discard }}</button>
+        </div>
+      </section>
+    }
+
+    <section class="card">
+      <h2>{{ text().savedTitle }}</h2>
+      @if (store.receipts().length === 0) {
+        <p class="muted">{{ text().empty }}</p>
+      } @else {
+        @for (r of store.receipts(); track r.id) {
+          <div class="receipt-row">
+            @if (r.thumbnail) {
+              <img [src]="r.thumbnail" alt="" class="thumb" />
+            }
+            <div class="info">
+              <strong>{{ r.merchant || '—' }}</strong>
+              <span class="muted small">{{ r.date }} · {{ categoryLabel(r.category) }}</span>
+            </div>
+            <span class="amount">{{ r.total ?? 0 | currency: 'EUR' }}</span>
+            <button type="button" class="btn-ghost" (click)="remove(r.id)">{{ text().remove }}</button>
+          </div>
+        }
+        @for (t of totals(); track t[0]) {
+          <p class="year-total">{{ t[0] }} — {{ text().yearTotal }}: <strong>{{ t[1] | currency: 'EUR' }}</strong></p>
+        }
+        <button type="button" class="btn-secondary" (click)="exportJson()">{{ text().exportJson }}</button>
+      }
+    </section>
+
+    <a routerLink="/" class="back-link">{{ text().back }}</a>
+  }
+</div>

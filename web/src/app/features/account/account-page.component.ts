@@ -1,8 +1,9 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { I18nService } from '../../core/i18n/i18n.service';
+import { RECEIPTS_TEXT } from '../../core/receipts/receipts-i18n';
 import { TranslatePipe } from '../../shared/pipes/app.pipes';
 
 @Component({
@@ -17,6 +18,7 @@ export class AccountPageComponent {
   readonly auth = inject(AuthService);
   readonly i18n = inject(I18nService);
 
+  readonly receiptsLink = computed(() => RECEIPTS_TEXT[this.i18n.currentLang()].navLink);
   readonly confirmingDelete = signal(false);
   readonly deleting = signal(false);
   readonly error = signal<string | null>(null);

@@ -5,6 +5,7 @@ import { BankingPageComponent } from './features/banking/banking-page.component'
 import { CalculatorComponent } from './features/calculator/calculator.component';
 import { ForgotPasswordComponent } from './features/auth/forgot-password.component';
 import { ResetPasswordComponent } from './features/auth/reset-password.component';
+import { ReceiptsPageComponent } from './features/receipts/receipts-page.component';
 import { LegalPageComponent } from './features/legal/legal-page.component';
 import { AppShellComponent } from './layout/app-shell.component';
 import {
@@ -30,6 +31,7 @@ export const routes: Routes = [
       { path: 'impressum', component: LegalPageComponent, data: { doc: 'impressum' } },
       { path: 'delete-account', component: LegalPageComponent, data: { doc: 'deleteAccount' } },
       { path: 'profile', component: AccountPageComponent },
+      { path: 'receipts', component: ReceiptsPageComponent },
       { path: 'banking', component: BankingPageComponent },
       { path: 'banking/callback', component: BankingCallbackComponent },
       { path: 'forgot-password', component: ForgotPasswordComponent },
