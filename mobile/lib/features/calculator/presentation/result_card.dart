@@ -5,6 +5,7 @@ import '../../../core/l10n/tr.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/count_up_text.dart';
 import 'calculator_controller.dart';
+import 'pdf_export_button.dart';
 
 class ResultCard extends ConsumerWidget {
   const ResultCard({super.key});
@@ -84,6 +85,8 @@ class ResultCard extends ConsumerWidget {
               value: breakdown.net,
               key: ValueKey('net-${state.activeTab}-${breakdown.net}'),
             ),
+            const SizedBox(height: 14),
+            const PdfExportButton(),
           ],
         ),
       ),
