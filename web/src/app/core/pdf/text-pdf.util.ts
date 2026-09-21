@@ -6,6 +6,9 @@ import type {
 import type { Lang } from '../i18n/translations';
 import { formatOfficialDate, formatOfficialEuro } from './pdf-official-de';
 import { getPdfSchema, type PdfSchema } from './pdf-translations';
+import { buildTips, getPdfExtra, type PdfExtra, type PdfTier } from './pdf-extra';
+
+export type { PdfTier } from './pdf-extra';
 
 /**
  * Generador PDF sin dependencias externas: bytes crudos + WinAnsiEncoding.
@@ -164,7 +167,7 @@ function wrapText(text: string, maxCharsPerLine: number): string[] {
   return lines;
 }
 
-function assemblePdf(content: ByteBuffer): Blob {
+function assemblePdf(pages: ByteBuffer[]): Blob {
   const doc = new ByteBuffer();
   doc.ascii('%PDF-1.4\n');
   const offsets: number[] = [0];
@@ -172,32 +175,41 @@ function assemblePdf(content: ByteBuffer): Blob {
   const fontObject = (base: string) =>
     `<< /Type /Font /Subtype /Type1 /BaseFont /${base} /Encoding /WinAnsiEncoding >>endobj\n`;
 
+  // Objetos: 1 catalogo, 2 paginas, 3-6 fuentes, y despues (pagina, contenido) por cada pagina.
+  const firstPageObj = 7;
+  const kids = pages.map((_, i) => `${firstPageObj + i * 2} 0 R`).join(' ');
+
   offsets.push(doc.length);
   doc.ascii('1 0 obj<< /Type /Catalog /Pages 2 0 R >>endobj\n');
 
   offsets.push(doc.length);
-  doc.ascii('2 0 obj<< /Type /Pages /Kids [3 0 R] /Count 1 >>endobj\n');
+  doc.ascii(`2 0 obj<< /Type /Pages /Kids [${kids}] /Count ${pages.length} >>endobj\n`);
 
   offsets.push(doc.length);
-  doc.ascii(
-    `3 0 obj<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PAGE_W} ${PAGE_H}] /Contents 4 0 R ` +
-      '/Resources << /Font << /F1 5 0 R /F2 6 0 R /F3 7 0 R /F4 8 0 R >> >> >>endobj\n',
-  );
+  doc.ascii(`3 0 obj${fontObject('Helvetica')}`);
+  offsets.push(doc.length);
+  doc.ascii(`4 0 obj${fontObject('Helvetica-Bold')}`);
+  offsets.push(doc.length);
+  doc.ascii(`5 0 obj${fontObject('Courier')}`);
+  offsets.push(doc.length);
+  doc.ascii(`6 0 obj${fontObject('Courier-Bold')}`);
 
-  offsets.push(doc.length);
-  const contentBytes = content.toUint8Array();
-  doc.ascii(`4 0 obj<< /Length ${contentBytes.length} >>\nstream\n`);
-  doc.raw(contentBytes);
-  doc.ascii('\nendstream\nendobj\n');
+  pages.forEach((content, i) => {
+    const pageObj = firstPageObj + i * 2;
+    const contentObj = pageObj + 1;
 
-  offsets.push(doc.length);
-  doc.ascii(`5 0 obj${fontObject('Helvetica')}`);
-  offsets.push(doc.length);
-  doc.ascii(`6 0 obj${fontObject('Helvetica-Bold')}`);
-  offsets.push(doc.length);
-  doc.ascii(`7 0 obj${fontObject('Courier')}`);
-  offsets.push(doc.length);
-  doc.ascii(`8 0 obj${fontObject('Courier-Bold')}`);
+    offsets.push(doc.length);
+    doc.ascii(
+      `${pageObj} 0 obj<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PAGE_W} ${PAGE_H}] /Contents ${contentObj} 0 R ` +
+        '/Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> >>endobj\n',
+    );
+
+    offsets.push(doc.length);
+    const contentBytes = content.toUint8Array();
+    doc.ascii(`${contentObj} 0 obj<< /Length ${contentBytes.length} >>\nstream\n`);
+    doc.raw(contentBytes);
+    doc.ascii('\nendstream\nendobj\n');
+  });
 
   const xrefOffset = doc.length;
   const objectCount = offsets.length;
@@ -262,21 +274,13 @@ function buildInputRows(request: CalculateRequest, de: PdfSchema): Array<[string
   return rows;
 }
 
-export function exportOfficialCalculationPdf(
-  request: CalculateRequest,
-  response: CalculateResponse,
-  lang: Lang = 'de',
-): void {
-  const de = getPdfSchema(lang);
-  const buf = new ByteBuffer();
-  let y = PAGE_H;
+const HEADER_H = 74;
 
-  // Kopfband (Markenfarbe).
-  const headerH = 74;
-  fillRect(buf, 0, PAGE_H - headerH, PAGE_W, headerH, COLOR_BRAND);
+function drawHeader(buf: ByteBuffer, de: PdfSchema, tableYear: number): number {
+  fillRect(buf, 0, PAGE_H - HEADER_H, PAGE_W, HEADER_H, COLOR_BRAND);
   drawText(buf, MARGIN_X, PAGE_H - 30, 'F2', 19, de.productName, COLOR_WHITE);
   drawText(buf, MARGIN_X, PAGE_H - 48, 'F1', 10.5, de.documentTitle, COLOR_WHITE);
-  drawTextRight(buf, PAGE_W - MARGIN_X, PAGE_H - 30, 'F3', 9, `${de.standPrefix}: ${response.tableYear}`, COLOR_WHITE);
+  drawTextRight(buf, PAGE_W - MARGIN_X, PAGE_H - 30, 'F3', 9, `${de.standPrefix}: ${tableYear}`, COLOR_WHITE);
   drawTextRight(
     buf,
     PAGE_W - MARGIN_X,
@@ -286,37 +290,52 @@ export function exportOfficialCalculationPdf(
     `${de.createdPrefix}: ${formatOfficialDate(new Date())}`,
     COLOR_WHITE,
   );
-  y = PAGE_H - headerH - 34;
+  return PAGE_H - HEADER_H - 34;
+}
 
-  // Abschnitt: Eingaben.
-  drawText(buf, MARGIN_X, y, 'F2', 12.5, de.sectionInputs, COLOR_BRAND);
-  y -= 8;
-  drawLine(buf, MARGIN_X, y, PAGE_W - MARGIN_X, y, COLOR_BORDER);
-  y -= 18;
+function drawFooter(buf: ByteBuffer, de: PdfSchema, extra: PdfExtra, page: number, total: number): void {
+  drawLine(buf, MARGIN_X, 40, PAGE_W - MARGIN_X, 40, COLOR_BORDER);
+  drawText(buf, MARGIN_X, 28, 'F1', 8, `${de.productName} - ${de.footerTagline}`, COLOR_MUTED);
+  drawTextRight(buf, PAGE_W - MARGIN_X, 28, 'F1', 8, `${extra.pageWord} ${page}/${total}`, COLOR_MUTED);
+}
 
-  const inputRows = buildInputRows(request, de);
-  for (const [label, value] of inputRows) {
+function drawSectionTitle(buf: ByteBuffer, y: number, title: string): number {
+  drawText(buf, MARGIN_X, y, 'F2', 12.5, title, COLOR_BRAND);
+  drawLine(buf, MARGIN_X, y - 8, PAGE_W - MARGIN_X, y - 8, COLOR_BORDER);
+  return y - 26;
+}
+
+function drawDisclaimer(buf: ByteBuffer, de: PdfSchema, y: number): number {
+  fillRect(buf, MARGIN_X - 8, y - 34, CONTENT_W + 16, 44, COLOR_BRAND_TEXT_TINT);
+  let hintY = y - 8;
+  for (const line of wrapText(de.disclaimer, 108)) {
+    drawText(buf, MARGIN_X, hintY, 'F1', 8, line, COLOR_MUTED);
+    hintY -= 11;
+  }
+  return y - 60;
+}
+
+/** Pagina 1 del PDF completo (Pro): todas las entradas y las cuatro columnas de resultados. */
+function renderFullPage(buf: ByteBuffer, request: CalculateRequest, response: CalculateResponse, de: PdfSchema): void {
+  let y = drawHeader(buf, de, response.tableYear);
+
+  y = drawSectionTitle(buf, y, de.sectionInputs);
+  y += 8;
+  for (const [label, value] of buildInputRows(request, de)) {
     drawText(buf, MARGIN_X, y, 'F1', 9.5, label, COLOR_MUTED);
     drawText(buf, MARGIN_X + 235, y, 'F2', 9.5, value, COLOR_TEXT);
     y -= 15.5;
   }
-
   y -= 14;
 
-  // Abschnitt: Ergebnis.
-  drawText(buf, MARGIN_X, y, 'F2', 12.5, de.sectionResult, COLOR_BRAND);
-  y -= 8;
-  drawLine(buf, MARGIN_X, y, PAGE_W - MARGIN_X, y, COLOR_BORDER);
-  y -= 20;
+  y = drawSectionTitle(buf, y, de.sectionResult);
+  y += 6;
 
   const labelColW = 150;
   const numColW = (CONTENT_W - labelColW) / 4;
   const colRightX = [0, 1, 2, 3].map((i) => MARGIN_X + labelColW + numColW * (i + 1) - 6);
   const columnTitles = [de.columns.recurring, de.columns.thirteenth, de.columns.fourteenth, de.columns.annual];
-
-  columnTitles.forEach((title, i) => {
-    drawTextRight(buf, colRightX[i], y, 'F4', 8.5, title, COLOR_MUTED);
-  });
+  columnTitles.forEach((title, i) => drawTextRight(buf, colRightX[i], y, 'F4', 8.5, title, COLOR_MUTED));
   y -= 8;
   drawLine(buf, MARGIN_X, y, PAGE_W - MARGIN_X, y, COLOR_BORDER);
   y -= 17;
@@ -332,38 +351,238 @@ export function exportOfficialCalculationPdf(
     drawText(buf, MARGIN_X, y, 'F1', 9.5, row.label, COLOR_TEXT);
     breakdowns.forEach((b, i) => {
       const amount = formatOfficialEuro(b[row.key]);
-      const text = row.deduction ? `- ${amount}` : amount;
-      drawTextRight(buf, colRightX[i], y, 'F3', 9.5, text, row.deduction ? COLOR_MUTED : COLOR_TEXT);
+      drawTextRight(buf, colRightX[i], y, 'F3', 9.5, row.deduction ? `- ${amount}` : amount, row.deduction ? COLOR_MUTED : COLOR_TEXT);
     });
     y -= 16.5;
   }
 
-  // Nettobezug: Zeile hervorgehoben.
   y -= 4;
   fillRect(buf, MARGIN_X - 8, y - 6, CONTENT_W + 16, 24, COLOR_SUCCESS_TINT);
   drawText(buf, MARGIN_X, y + 2, 'F2', 10.5, de.rows.net, COLOR_SUCCESS);
-  breakdowns.forEach((b, i) => {
-    drawTextRight(buf, colRightX[i], y + 2, 'F4', 10.5, formatOfficialEuro(b.net), COLOR_SUCCESS);
-  });
+  breakdowns.forEach((b, i) => drawTextRight(buf, colRightX[i], y + 2, 'F4', 10.5, formatOfficialEuro(b.net), COLOR_SUCCESS));
   y -= 40;
 
-  // Hinweis.
-  fillRect(buf, MARGIN_X - 8, y - 34, CONTENT_W + 16, 44, COLOR_BRAND_TEXT_TINT);
-  const disclaimerLines = wrapText(de.disclaimer, 108);
-  let hintY = y - 8;
-  for (const line of disclaimerLines) {
-    drawText(buf, MARGIN_X, hintY, 'F1', 8, line, COLOR_MUTED);
-    hintY -= 11;
+  drawDisclaimer(buf, de, y);
+}
+
+/**
+ * Pagina unica del PDF Basico (gratis): resumen del resultado, datos basicos y un desglose
+ * general (laufend / Jahresbezug) sin el detalle, mas un aviso para pasarse a Pro.
+ */
+function renderBasicPage(
+  buf: ByteBuffer,
+  request: CalculateRequest,
+  response: CalculateResponse,
+  de: PdfSchema,
+  extra: PdfExtra,
+): void {
+  let y = drawHeader(buf, de, response.tableYear);
+
+  y = drawSectionTitle(buf, y, extra.basicSummary);
+  y += 6;
+  fillRect(buf, MARGIN_X - 8, y - 52, CONTENT_W + 16, 66, COLOR_SUCCESS_TINT);
+  drawText(buf, MARGIN_X, y - 8, 'F2', 10.5, extra.basicNetLabel, COLOR_SUCCESS);
+  drawTextRight(buf, PAGE_W - MARGIN_X, y - 12, 'F4', 20, formatOfficialEuro(response.recurring.net), COLOR_SUCCESS);
+  drawText(buf, MARGIN_X, y - 38, 'F1', 9.5, extra.basicAnnualNet, COLOR_MUTED);
+  drawTextRight(buf, PAGE_W - MARGIN_X, y - 38, 'F3', 9.5, formatOfficialEuro(response.annual.net), COLOR_MUTED);
+  y -= 84;
+
+  y = drawSectionTitle(buf, y, extra.basicInputs);
+  y += 8;
+  const basicRows: Array<[string, string]> = [
+    [de.labels.employment, de.employment[request.employmentType]],
+    [de.labels.gross, `${formatOfficialEuro(request.grossAmount)} (${de.incomePeriod[request.incomePeriod]})`],
+    [de.labels.state, de.states[request.state]],
+  ];
+  for (const [label, value] of basicRows) {
+    drawText(buf, MARGIN_X, y, 'F1', 9.5, label, COLOR_MUTED);
+    drawText(buf, MARGIN_X + 235, y, 'F2', 9.5, value, COLOR_TEXT);
+    y -= 15.5;
+  }
+  y -= 14;
+
+  y = drawSectionTitle(buf, y, extra.basicOverview);
+  y += 6;
+  const labelColW = 260;
+  const numColW = (CONTENT_W - labelColW) / 2;
+  const colRightX = [0, 1].map((i) => MARGIN_X + labelColW + numColW * (i + 1) - 6);
+  drawTextRight(buf, colRightX[0], y, 'F4', 8.5, de.columns.recurring, COLOR_MUTED);
+  drawTextRight(buf, colRightX[1], y, 'F4', 8.5, de.columns.annual, COLOR_MUTED);
+  y -= 8;
+  drawLine(buf, MARGIN_X, y, PAGE_W - MARGIN_X, y, COLOR_BORDER);
+  y -= 17;
+
+  const rows: Array<{ key: keyof PaymentBreakdown; label: string; deduction?: boolean }> = [
+    { key: 'gross', label: de.rows.gross },
+    { key: 'socialInsurance', label: de.rows.socialInsurance, deduction: true },
+    { key: 'incomeTax', label: de.rows.incomeTax, deduction: true },
+  ];
+  for (const row of rows) {
+    drawText(buf, MARGIN_X, y, 'F1', 9.5, row.label, COLOR_TEXT);
+    [response.recurring, response.annual].forEach((b, i) => {
+      const amount = formatOfficialEuro(b[row.key]);
+      drawTextRight(buf, colRightX[i], y, 'F3', 9.5, row.deduction ? `- ${amount}` : amount, row.deduction ? COLOR_MUTED : COLOR_TEXT);
+    });
+    y -= 16.5;
+  }
+  y -= 4;
+  fillRect(buf, MARGIN_X - 8, y - 6, CONTENT_W + 16, 24, COLOR_SUCCESS_TINT);
+  drawText(buf, MARGIN_X, y + 2, 'F2', 10.5, de.rows.net, COLOR_SUCCESS);
+  [response.recurring, response.annual].forEach((b, i) =>
+    drawTextRight(buf, colRightX[i], y + 2, 'F4', 10.5, formatOfficialEuro(b.net), COLOR_SUCCESS),
+  );
+  y -= 40;
+
+  drawDisclaimer(buf, de, y);
+
+  // Aviso de mejora a Pro: sin enlace ni precio (la version de Google Play no vende suscripciones).
+  const bannerY = 150;
+  fillRect(buf, MARGIN_X - 8, bannerY - 46, CONTENT_W + 16, 70, COLOR_BRAND);
+  drawText(buf, MARGIN_X + 6, bannerY, 'F2', 13, extra.upgradeTitle, COLOR_WHITE);
+  let bodyY = bannerY - 20;
+  for (const line of wrapText(extra.upgradeBody, 88)) {
+    drawText(buf, MARGIN_X + 6, bodyY, 'F1', 9.5, line, COLOR_WHITE);
+    bodyY -= 13;
+  }
+}
+
+function fillVars(text: string, vars: Record<string, string | number>): string {
+  return text.replace(/\{(\w+)\}/g, (_, key: string) => String(vars[key] ?? ''));
+}
+
+/** Lo que el usuario marco y se tuvo en cuenta (sin importes: el motor solo devuelve totales). */
+export function buildAppliedLines(request: CalculateRequest, extra: PdfExtra): string[] {
+  const lines: string[] = [];
+  const a = extra.applied;
+  if (request.soleEarnerDeduction) lines.push(a.soleEarner);
+  if (request.familyBonus === 'full') lines.push(a.familyBonusFull);
+  if (request.familyBonus === 'shared') lines.push(a.familyBonusShared);
+  if (request.childrenUnder18 > 0 || request.childrenOver18WithFamilyAllowance > 0) {
+    lines.push(
+      fillVars(a.children, { u18: request.childrenUnder18, o18: request.childrenOver18WithFamilyAllowance }),
+    );
+  }
+  if (!request.benefitInKindFromCompanyCar && request.commuteOneWayKm > 0) {
+    lines.push(fillVars(a.commute, { km: request.commuteOneWayKm }));
+  }
+  if (request.taxFreeAllowanceMonthly > 0) {
+    lines.push(fillVars(a.allowance, { amount: formatOfficialEuro(request.taxFreeAllowanceMonthly) }));
+  }
+  if (request.benefitInKindMonthly > 0) {
+    lines.push(fillVars(a.benefitInKind, { amount: formatOfficialEuro(request.benefitInKindMonthly) }));
+  }
+  if (request.benefitInKindFromCompanyCar) lines.push(a.companyCar);
+  return lines;
+}
+
+/** Paginas de explicaciones, consejos y guia del PDF completo. Reparte el texto en las paginas que hagan falta. */
+function renderExtraPages(
+  request: CalculateRequest,
+  response: CalculateResponse,
+  de: PdfSchema,
+  extra: PdfExtra,
+): ByteBuffer[] {
+  const pages: ByteBuffer[] = [];
+  let buf = new ByteBuffer();
+  let y = 0;
+
+  const newPage = () => {
+    buf = new ByteBuffer();
+    pages.push(buf);
+    y = drawHeader(buf, de, response.tableYear);
+  };
+  const ensure = (needed: number) => {
+    if (y - needed < 62) newPage();
+  };
+  const heading = (title: string) => {
+    ensure(70);
+    y = drawSectionTitle(buf, y, title);
+  };
+  const paragraph = (text: string, opts: { indent?: number; bullet?: string; muted?: boolean; size?: number } = {}) => {
+    const indent = opts.indent ?? 0;
+    const lines = wrapText(text, 96 - Math.round(indent / 5));
+    lines.forEach((line, index) => {
+      ensure(14);
+      if (opts.bullet && index === 0) {
+        drawText(buf, MARGIN_X, y, 'F1', 9.5, opts.bullet, COLOR_BRAND);
+      }
+      drawText(buf, MARGIN_X + indent, y, 'F1', opts.size ?? 9.5, line, opts.muted ? COLOR_MUTED : COLOR_TEXT);
+      y -= 13.5;
+    });
+    y -= 4;
+  };
+
+  newPage();
+
+  heading(extra.appliedTitle);
+  const applied = buildAppliedLines(request, extra);
+  if (applied.length === 0) {
+    paragraph(extra.appliedNone, { muted: true });
+  } else {
+    applied.forEach((line) => paragraph(line, { indent: 12, bullet: '-' }));
+  }
+  y -= 8;
+
+  heading(extra.explainTitle);
+  for (const item of extra.explain) {
+    ensure(46);
+    drawText(buf, MARGIN_X, y, 'F2', 10, item.heading, COLOR_TEXT);
+    y -= 14;
+    paragraph(item.text, { muted: true });
+  }
+  y -= 4;
+
+  heading(extra.tipsTitle);
+  paragraph(extra.tipsIntro, { muted: true, size: 9 });
+  buildTips(request, extra).forEach((tip) => paragraph(tip, { indent: 12, bullet: '-' }));
+  y -= 8;
+
+  heading(extra.guideTitle);
+  extra.guide.forEach((step, index) => paragraph(step, { indent: 16, bullet: `${index + 1}.` }));
+  ensure(60);
+  paragraph(extra.guideNote, { muted: true, size: 8 });
+
+  return pages;
+}
+
+/**
+ * Exporta el PDF de un calculo. 'basic' (gratis): una pagina con el resumen y un aviso para pasarse
+ * a Pro. 'pro': el informe completo, con explicaciones, consejos y guia de presentacion.
+ */
+export function exportOfficialCalculationPdf(
+  request: CalculateRequest,
+  response: CalculateResponse,
+  lang: Lang = 'de',
+  tier: PdfTier = 'pro',
+): void {
+  const blob = buildOfficialCalculationPdf(request, response, lang, tier);
+  const datePart = formatOfficialDate(new Date()).replace(/\./g, '-');
+  const suffix = tier === 'basic' ? '-Basis' : '';
+  downloadBlob(blob, `${getPdfSchema(lang).productName}-Berechnung-${lang}-${datePart}${suffix}.pdf`);
+}
+
+/** Construye el PDF sin descargarlo (los tests lo usan). */
+export function buildOfficialCalculationPdf(
+  request: CalculateRequest,
+  response: CalculateResponse,
+  lang: Lang = 'de',
+  tier: PdfTier = 'pro',
+): Blob {
+  const de = getPdfSchema(lang);
+  const extra = getPdfExtra(lang);
+
+  const pages: ByteBuffer[] = [];
+  const first = new ByteBuffer();
+  pages.push(first);
+  if (tier === 'basic') {
+    renderBasicPage(first, request, response, de, extra);
+  } else {
+    renderFullPage(first, request, response, de);
+    pages.push(...renderExtraPages(request, response, de, extra));
   }
 
-  // Fuss.
-  drawLine(buf, MARGIN_X, 40, PAGE_W - MARGIN_X, 40, COLOR_BORDER);
-  drawText(buf, MARGIN_X, 28, 'F1', 8, `${de.productName} - ${de.footerTagline}`, COLOR_MUTED);
-  drawTextRight(buf, PAGE_W - MARGIN_X, 28, 'F1', 8, de.pageLabel, COLOR_MUTED);
-
-  const blob = assemblePdf(buf);
-  const datePart = formatOfficialDate(new Date()).replace(/\./g, '-');
-  downloadBlob(blob, `${de.productName}-Berechnung-${lang}-${datePart}.pdf`);
+  pages.forEach((page, index) => drawFooter(page, de, extra, index + 1, pages.length));
+  return assemblePdf(pages);
 }
 
 function downloadBlob(blob: Blob, filename: string): void {

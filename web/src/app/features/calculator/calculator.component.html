@@ -376,7 +376,7 @@
               <span class="meta">{{ 'tableYear' | translate }}: {{ data.tableYear }}</span>
             </div>
             <div class="export-pdf-group">
-              <label class="pdf-lang-select" [title]="'PDF: ' + (isPro() ? '' : ('exportPdfProHint' | translate))">
+              <label class="pdf-lang-select" title="PDF">
                 <span class="sr-only">PDF</span>
                 <select
                   [ngModel]="pdfLang()"
@@ -392,7 +392,7 @@
                 type="button"
                 class="btn-export-pdf"
                 (click)="exportPdf()"
-                [title]="isPro() ? ('exportPdf' | translate) : ('exportPdfProHint' | translate)"
+                [title]="'exportPdf' | translate"
               >
                 {{ 'exportPdf' | translate }}
               </button>

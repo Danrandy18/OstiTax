@@ -279,11 +279,9 @@ export class CalculatorComponent {
     if (!data) {
       return;
     }
-    if (!this.isPro()) {
-      this.upgrade.openPayment();
-      return;
-    }
-    exportOfficialCalculationPdf(this.buildCalculateRequest(), data, this.pdfLang());
+    // Gratis: PDF basico (con aviso para pasarse a Pro). Pro: informe completo.
+    const tier = this.isPro() ? 'pro' : 'basic';
+    exportOfficialCalculationPdf(this.buildCalculateRequest(), data, this.pdfLang(), tier);
   }
 
   /** Solo QA: descarga el PDF sin exigir Pro. No debe usarse en producción. */
