@@ -132,6 +132,49 @@ void main() {
       expect(bytes.length, greaterThan(5000));
     });
 
+    test('el PDF básico es de una página y el Pro tiene varias', () async {
+      const request = CalculateRequest(
+        familyBonus: FamilyBonusType.full,
+        childrenUnder18: 1,
+        commuteOneWayKm: 30,
+      );
+      final basic = await buildCalculationPdf(
+        request: request,
+        response: _response,
+        now: DateTime(2026, 9, 20),
+        tier: PdfTier.basic,
+      );
+      final pro = await buildCalculationPdf(
+        request: request,
+        response: _response,
+        now: DateTime(2026, 9, 20),
+        tier: PdfTier.pro,
+      );
+      for (final file in {'basic': basic, 'pro': pro}.entries) {
+        final out = File('build/test_output/muestra_${file.key}.pdf');
+        await out.parent.create(recursive: true);
+        await out.writeAsBytes(file.value);
+      }
+      int pages(List<int> b) =>
+          RegExp(r'/Type\s*/Page(?![a-z])')
+              .allMatches(String.fromCharCodes(b))
+              .length;
+      expect(pages(basic), 1);
+      expect(pages(pro), greaterThanOrEqualTo(2));
+    });
+
+    test('lista lo aplicado y da consejos sin dejar marcadores', () {
+      const request = CalculateRequest(
+        familyBonus: FamilyBonusType.full,
+        childrenUnder18: 2,
+        commuteOneWayKm: 30,
+      );
+      final applied = pdfAppliedLines(request);
+      expect(applied.length, greaterThanOrEqualTo(3));
+      expect(applied.join(' '), isNot(contains('{')));
+      expect(pdfTips(request), isNotEmpty);
+    });
+
     test('deja una muestra en build/ para revisarla a ojo', () async {
       final bytes = await buildCalculationPdf(
         request: const CalculateRequest(

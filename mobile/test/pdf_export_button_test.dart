@@ -152,23 +152,26 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('sin Pro: avisa, no genera nada y no ofrece ningún pago', (
+  testWidgets('sin Pro: descarga el PDF básico, sin pagos ni bloqueo', (
     tester,
   ) async {
     final shared = await _pump(tester, isPro: false);
-    expect(find.byIcon(Icons.lock_outline_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.picture_as_pdf_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.lock_outline_rounded), findsNothing);
 
-    await tester.tap(find.text('Exportar PDF'));
-    await tester.pumpAndSettle();
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Exportar PDF'));
+      final deadline = DateTime.now().add(const Duration(seconds: 20));
+      while (shared.calls == 0 && DateTime.now().isBefore(deadline)) {
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+      }
+    });
+    await tester.pump();
 
-    expect(
-      find.textContaining('La exportación PDF es una función Pro.'),
-      findsOneWidget,
-    );
-    expect(find.textContaining('inicia sesión'), findsOneWidget);
+    expect(shared.calls, 1);
+    expect(String.fromCharCodes(shared.bytes!.take(5)), '%PDF-');
     expect(find.textContaining('Stripe'), findsNothing);
     expect(find.textContaining('PayPal'), findsNothing);
-    expect(shared.calls, 0);
     expect(tester.takeException(), isNull);
   });
 

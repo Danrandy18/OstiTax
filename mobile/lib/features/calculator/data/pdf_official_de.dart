@@ -11,7 +11,6 @@ abstract final class PdfOfficialDe {
   static const createdPrefix = 'Erstellt am';
   static const sectionInputs = 'Eingaben';
   static const sectionResult = 'Ergebnis';
-  static const pageLabel = 'Seite 1/1';
   static const disclaimer =
       'Diese Berechnung dient als Orientierungshilfe. Das Ergebnis entspricht '
       'dem dargestellten Bezug bei 14 gleich hohen Monatsbezügen. Abweichungen '
