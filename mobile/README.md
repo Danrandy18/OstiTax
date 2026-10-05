@@ -63,6 +63,20 @@ flutter build appbundle --release
 
 Resultado: `build/app/outputs/bundle/release/app-release.aab`.
 
+### 3b. Subir con la API (sin abrir Play Console)
+
+Con la cuenta de servicio `play-publisher@ostitax-publisher.iam.gserviceaccount.com` (permisos en
+Play Console > Usuarios y permisos) y su clave en `android/play-service-account.json` (ignorada por
+git, nunca subirla):
+
+```bash
+node scripts/play-upload.mjs --check                 # comprueba el acceso y lista las pistas
+node scripts/play-upload.mjs                         # sube el AAB a pruebas internas
+node scripts/play-upload.mjs --track production      # a produccion
+```
+
+Las notas de la version salen de `store/release-notes.json`.
+
 ### 4. Ficha de Play Console
 
 Recursos listos en `store/`: `icon-512.png` (icono) y `feature-graphic-1024x500.png` (gráfico
