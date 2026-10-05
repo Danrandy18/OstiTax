@@ -13,7 +13,9 @@ export default registerAs('auth', () => ({
   // Correo con Resend: basta la clave y un remitente de un dominio verificado en Resend.
   mail: {
     resendApiKey: process.env.RESEND_API_KEY ?? '',
-    from: process.env.MAIL_FROM ?? 'ÖstiTax <no-reply@xn--stitax-vxa.at>',
-    replyTo: process.env.MAIL_REPLY_TO ?? '',
+    // Remitente de nuestro dominio (Resend no envia desde @gmail.com); las respuestas de los
+    // usuarios llegan al buzon de soporte.
+    from: process.env.MAIL_FROM || 'ÖstiTax <info@xn--stitax-vxa.at>',
+    replyTo: process.env.MAIL_REPLY_TO || 'korevan.software@gmail.com',
   },
 }));
