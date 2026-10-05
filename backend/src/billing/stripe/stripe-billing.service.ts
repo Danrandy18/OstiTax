@@ -7,6 +7,8 @@ import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import { AccountsService } from '../../auth/accounts.service';
 import type { Account } from '../../auth/entities/account.entity';
+import { MailService } from '../../auth/mail.service';
+import { intervalFromPeriod } from '../billing-interval.util';
 import { SubscriptionProvider } from '../../users/enums/user-plan.enum';
 import { PlanInterval } from '../enums/plan-interval.enum';
 import { WebhookEventsService } from '../webhooks/webhook-events.service';
@@ -19,6 +21,7 @@ export class StripeBillingService {
     private readonly configService: ConfigService,
     private readonly accountsService: AccountsService,
     private readonly webhookEventsService: WebhookEventsService,
+    private readonly mailService: MailService,
   ) {}
 
   private getStripe(): Stripe {
@@ -26,7 +29,9 @@ export class StripeBillingService {
       return this.stripe;
     }
 
-    const secretKey = this.configService.get<string>('billing.stripe.secretKey');
+    const secretKey = this.configService.get<string>(
+      'billing.stripe.secretKey',
+    );
     if (!secretKey) {
       throw new ServiceUnavailableException('Stripe is not configured');
     }
@@ -101,6 +106,20 @@ export class StripeBillingService {
     }
   }
 
+  /** Cancelacion pedida por el usuario: Pro sigue hasta el final del periodo ya pagado. */
+  async scheduleCancellation(subscriptionId: string): Promise<void> {
+    await this.getStripe().subscriptions.update(subscriptionId, {
+      cancel_at_period_end: true,
+    });
+  }
+
+  /** Deshace la cancelacion mientras el periodo pagado no haya terminado. */
+  async resumeSubscription(subscriptionId: string): Promise<void> {
+    await this.getStripe().subscriptions.update(subscriptionId, {
+      cancel_at_period_end: false,
+    });
+  }
+
   constructWebhookEvent(payload: Buffer, signature: string): Stripe.Event {
     const webhookSecret = this.configService.get<string>(
       'billing.stripe.webhookSecret',
@@ -133,7 +152,13 @@ export class StripeBillingService {
         await this.handleCheckoutCompleted(event.data.object);
         break;
       case 'customer.subscription.updated':
-        await this.handleSubscriptionUpdated(event.data.object);
+        await this.handleSubscriptionUpdated(
+          event.data.object,
+          event.data.previous_attributes,
+        );
+        break;
+      case 'invoice.paid':
+        await this.handleInvoicePaid(event.data.object);
         break;
       case 'customer.subscription.deleted':
         await this.handleSubscriptionDeleted(event.data.object);
@@ -153,7 +178,8 @@ export class StripeBillingService {
   private async handleCheckoutCompleted(
     session: Stripe.Checkout.Session,
   ): Promise<void> {
-    const accountId = session.metadata?.accountId ?? session.client_reference_id;
+    const accountId =
+      session.metadata?.accountId ?? session.client_reference_id;
     const subscriptionId =
       typeof session.subscription === 'string'
         ? session.subscription
@@ -174,12 +200,13 @@ export class StripeBillingService {
       stripeCustomerId:
         typeof session.customer === 'string'
           ? session.customer
-          : session.customer?.id ?? null,
+          : (session.customer?.id ?? null),
     });
   }
 
   private async handleSubscriptionUpdated(
     subscription: Stripe.Subscription,
+    previous?: Partial<Stripe.Subscription>,
   ): Promise<void> {
     const account =
       (await this.accountsService.findByStripeSubscriptionId(
@@ -193,9 +220,19 @@ export class StripeBillingService {
       return;
     }
 
+    const canceling = isCanceling(subscription);
+    // Recien cancelada (desde el perfil, el portal de Stripe o el dashboard): se confirma
+    // por correo una sola vez, en la transicion.
+    const justCanceled =
+      canceling &&
+      !!previous &&
+      ('cancel_at_period_end' in previous || 'cancel_at' in previous) &&
+      !isCanceling({ ...subscription, ...previous });
+
     const activeStatuses = new Set(['active', 'trialing', 'past_due']);
     if (activeStatuses.has(subscription.status)) {
-      await this.accountsService.activatePro(account.id, {
+      const updated = await this.accountsService.activatePro(account.id, {
+        cancelAtPeriodEnd: canceling,
         provider: SubscriptionProvider.STRIPE,
         subscriptionId: subscription.id,
         status: subscription.status,
@@ -203,8 +240,14 @@ export class StripeBillingService {
         stripeCustomerId:
           typeof subscription.customer === 'string'
             ? subscription.customer
-            : subscription.customer?.id ?? account.stripeCustomerId,
+            : (subscription.customer?.id ?? account.stripeCustomerId),
       });
+      if (justCanceled) {
+        await this.mailService.sendSubscriptionCanceled(
+          updated,
+          updated.subscriptionCurrentPeriodEnd,
+        );
+      }
       return;
     }
 
@@ -225,7 +268,55 @@ export class StripeBillingService {
       return;
     }
 
+    // Si ya estaba programada, el correo salio al cancelar; si se corto de golpe, se avisa ahora.
+    const alreadyNotified = account.subscriptionCancelAtPeriodEnd;
     await this.accountsService.downgradeToFree(account.id);
+    if (!alreadyNotified) {
+      await this.mailService.sendSubscriptionCanceled(account, null);
+    }
+  }
+
+  /** Cada cobro (alta y renovaciones): recibo por correo con el enlace a la factura de Stripe. */
+  private async handleInvoicePaid(invoice: Stripe.Invoice): Promise<void> {
+    if (!invoice.amount_paid) {
+      return;
+    }
+    const subscriptionRef = invoice.parent?.subscription_details?.subscription;
+    const subscriptionId =
+      typeof subscriptionRef === 'string'
+        ? subscriptionRef
+        : subscriptionRef?.id;
+    const customerId =
+      typeof invoice.customer === 'string'
+        ? invoice.customer
+        : invoice.customer?.id;
+
+    const account =
+      (subscriptionId
+        ? await this.accountsService.findByStripeSubscriptionId(subscriptionId)
+        : null) ??
+      (customerId
+        ? await this.accountsService.findByStripeCustomerId(customerId)
+        : null);
+    if (!account) {
+      return;
+    }
+
+    const line = invoice.lines?.data?.[0];
+    const periodStart = this.toDate(line?.period?.start);
+    const periodEnd = this.toDate(line?.period?.end);
+    await this.mailService.sendPaymentReceipt(account, {
+      amount: invoice.amount_paid / 100,
+      currency: invoice.currency,
+      interval: intervalFromPeriod(periodStart, periodEnd),
+      periodStart,
+      periodEnd,
+      invoiceNumber: invoice.number ?? null,
+      paidAt: this.toDate(invoice.status_transitions?.paid_at) ?? new Date(),
+      provider: 'Stripe',
+      invoiceUrl: invoice.hosted_invoice_url ?? null,
+      invoicePdfUrl: invoice.invoice_pdf ?? null,
+    });
   }
 
   private toDate(unixSeconds: number | null | undefined): Date | null {
@@ -234,4 +325,11 @@ export class StripeBillingService {
     }
     return new Date(unixSeconds * 1000);
   }
+}
+
+/** Cancelada pero aun vigente: por fin de periodo o con fecha fija (portal de Stripe). */
+function isCanceling(
+  subscription: Pick<Stripe.Subscription, 'cancel_at_period_end' | 'cancel_at'>,
+): boolean {
+  return subscription.cancel_at_period_end || !!subscription.cancel_at;
 }

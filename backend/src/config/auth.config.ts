@@ -8,14 +8,12 @@ export default registerAs('auth', () => ({
     process.env.PASSWORD_RESET_EXPIRES_MINUTES ?? '60',
     10,
   ),
-  // Modo de prueba (solo sin SMTP): un codigo fijo permite restablecer contrasenas.
+  // Modo de prueba (solo sin correo configurado): un codigo fijo permite restablecer contrasenas.
   passwordResetTestCode: process.env.PASSWORD_RESET_TEST_CODE ?? '',
-  smtp: {
-    host: process.env.SMTP_HOST ?? '',
-    port: parseInt(process.env.SMTP_PORT ?? '587', 10),
-    secure: process.env.SMTP_SECURE === 'true',
-    user: process.env.SMTP_USER ?? '',
-    pass: process.env.SMTP_PASS ?? '',
-    from: process.env.SMTP_FROM ?? 'ÖstiTax <no-reply@xn--stitax-vxa.at>',
+  // Correo con Resend: basta la clave y un remitente de un dominio verificado en Resend.
+  mail: {
+    resendApiKey: process.env.RESEND_API_KEY ?? '',
+    from: process.env.MAIL_FROM ?? 'ÖstiTax <no-reply@xn--stitax-vxa.at>',
+    replyTo: process.env.MAIL_REPLY_TO ?? '',
   },
 }));

@@ -25,6 +25,9 @@ const TEST_CODE_MAX_FAILURES_GLOBAL = 30;
 const TEST_CODE_WINDOW_MS = 15 * 60_000;
 const GLOBAL_FAILURE_KEY = '*';
 
+/** Intentos con la contrasena actual equivocada al cambiarla, por cuenta y ventana. */
+const CHANGE_PASSWORD_MAX_FAILURES = 5;
+
 /** 'email': se envia un enlace por correo. 'code': se pide el codigo de prueba (sin SMTP). */
 export type PasswordResetMode = 'email' | 'code';
 
@@ -37,7 +40,7 @@ export interface AuthResult {
 export class AuthService implements OnModuleInit {
   private readonly logger = new Logger(AuthService.name);
   private googleClient: OAuth2Client | null = null;
-  private readonly testCodeFailures = new Map<string, number[]>();
+  private readonly failedAttempts = new Map<string, number[]>();
 
   constructor(
     private readonly accountsService: AccountsService,
@@ -55,11 +58,11 @@ export class AuthService implements OnModuleInit {
     }
     if (this.isTestCodeResetEnabled()) {
       this.logger.warn(
-        'PASSWORD_RESET_TEST_CODE activo: quien conozca el codigo puede cambiar la contrasena de cualquier cuenta. Solo para pruebas; configura SMTP y quita la variable.',
+        'PASSWORD_RESET_TEST_CODE activo: quien conozca el codigo puede cambiar la contrasena de cualquier cuenta. Solo para pruebas; configura RESEND_API_KEY y quita la variable.',
       );
     } else {
       this.logger.warn(
-        'PASSWORD_RESET_TEST_CODE esta definido pero SMTP esta configurado: el codigo de prueba se ignora.',
+        'PASSWORD_RESET_TEST_CODE esta definido pero el correo (Resend) esta configurado: el codigo de prueba se ignora.',
       );
     }
   }
@@ -68,6 +71,7 @@ export class AuthService implements OnModuleInit {
     email: string,
     password: string,
     name?: string,
+    locale?: string,
   ): Promise<AuthResult> {
     const existing = await this.accountsService.findByEmail(email);
     if (existing) {
@@ -82,12 +86,17 @@ export class AuthService implements OnModuleInit {
       email,
       passwordHash,
       name,
+      locale,
     });
 
     return { accessToken: this.issueToken(account), account };
   }
 
-  async login(email: string, password: string): Promise<AuthResult> {
+  async login(
+    email: string,
+    password: string,
+    locale?: string,
+  ): Promise<AuthResult> {
     const account = await this.accountsService.findByEmail(email);
     if (!account || !account.passwordHash) {
       if (account && !account.passwordHash) {
@@ -103,10 +112,11 @@ export class AuthService implements OnModuleInit {
       throw new UnauthorizedException('Invalid email or password.');
     }
 
+    await this.accountsService.updateLocale(account, locale);
     return { accessToken: this.issueToken(account), account };
   }
 
-  async googleLogin(idToken: string): Promise<AuthResult> {
+  async googleLogin(idToken: string, locale?: string): Promise<AuthResult> {
     const payload = await this.verifyGoogleIdToken(idToken);
     const googleId = payload.sub;
     const email = payload.email;
@@ -130,10 +140,12 @@ export class AuthService implements OnModuleInit {
           email,
           googleId,
           name,
+          locale,
         });
       }
     }
 
+    await this.accountsService.updateLocale(account, locale);
     return { accessToken: this.issueToken(account), account };
   }
 
@@ -143,7 +155,10 @@ export class AuthService implements OnModuleInit {
    * Google-only (sin passwordHash), tampoco hay nada que restablecer y se
    * ignora en silencio.
    */
-  async forgotPassword(email: string): Promise<PasswordResetMode> {
+  async forgotPassword(
+    email: string,
+    locale?: string,
+  ): Promise<PasswordResetMode> {
     // Modo de prueba: no hay correo que enviar; el cliente pide el codigo. La respuesta solo
     // depende de la configuracion, nunca de si la cuenta existe.
     if (this.isTestCodeResetEnabled()) {
@@ -169,20 +184,82 @@ export class AuthService implements OnModuleInit {
       expiresAt,
     );
 
+    // El correo sale en el idioma de la pagina desde la que se pidio.
+    await this.accountsService.updateLocale(account, locale);
     const appUrl = this.configService.get<string>('billing.appUrl');
     const resetUrl = `${appUrl}/reset-password?token=${rawToken}`;
-    await this.mailService.sendPasswordResetEmail(account.email, resetUrl);
+    await this.mailService.sendPasswordReset(account, resetUrl, expiresMinutes);
     return 'email';
   }
 
-  /** El codigo de prueba solo vale mientras no haya SMTP: al configurar el correo se apaga solo. */
+  /** El codigo de prueba solo vale mientras no haya correo: al configurar Resend se apaga solo. */
   isTestCodeResetEnabled(): boolean {
     const code = this.configService.get<string>(
       'auth.passwordResetTestCode',
       '',
     );
-    const smtpHost = this.configService.get<string>('auth.smtp.host', '');
-    return !!code && !smtpHost;
+    return !!code && !this.mailService.isConfigured();
+  }
+
+  /** Los clientes solo muestran "olvide mi contrasena" si de verdad puede completarse. */
+  isPasswordResetAvailable(): boolean {
+    return this.mailService.isConfigured() || this.isTestCodeResetEnabled();
+  }
+
+  isPasswordResetByEmail(): boolean {
+    return this.mailService.isConfigured();
+  }
+
+  /**
+   * Cambio de contrasena con la sesion iniciada. Exige la actual, cierra las demas sesiones
+   * (los tokens anteriores dejan de valer) y devuelve un token nuevo para este dispositivo.
+   */
+  async changePassword(
+    account: Account,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<AuthResult> {
+    if (!account.passwordHash) {
+      throw new BadRequestException({
+        code: 'NO_PASSWORD',
+        message: 'This account signs in with Google and has no password.',
+      });
+    }
+
+    const key = `change:${account.id}`;
+    if (this.recentFailures(key).length >= CHANGE_PASSWORD_MAX_FAILURES) {
+      throw this.tooManyAttempts();
+    }
+    if (!(await bcrypt.compare(currentPassword, account.passwordHash))) {
+      this.recentFailures(key).push(Date.now());
+      throw new BadRequestException({
+        code: 'WRONG_PASSWORD',
+        message: 'The current password is incorrect.',
+      });
+    }
+    if (await bcrypt.compare(newPassword, account.passwordHash)) {
+      throw new BadRequestException({
+        code: 'SAME_PASSWORD',
+        message: 'The new password must be different from the current one.',
+      });
+    }
+
+    this.failedAttempts.delete(key);
+    await this.applyNewPassword(account, newPassword);
+    return { accessToken: this.issueToken(account), account };
+  }
+
+  private async applyNewPassword(
+    account: Account,
+    newPassword: string,
+  ): Promise<void> {
+    const passwordHash = await bcrypt.hash(newPassword, PASSWORD_SALT_ROUNDS);
+    // Al segundo: el "iat" del JWT tiene precision de segundos y el token nuevo debe valer.
+    const changedAt = new Date(Math.floor(Date.now() / 1000) * 1000);
+    await this.accountsService.setPassword(account.id, passwordHash, changedAt);
+    account.passwordHash = passwordHash;
+    account.passwordChangedAt = changedAt;
+    await this.mailService.sendPasswordChanged(account, changedAt);
   }
 
   async resetPasswordWithTestCode(
@@ -212,9 +289,8 @@ export class AuthService implements OnModuleInit {
       throw this.invalidResetCode();
     }
 
-    const passwordHash = await bcrypt.hash(newPassword, PASSWORD_SALT_ROUNDS);
-    await this.accountsService.resetPassword(account.id, passwordHash);
-    this.testCodeFailures.delete(emailKey);
+    await this.applyNewPassword(account, newPassword);
+    this.failedAttempts.delete(emailKey);
     this.logger.warn(
       `Contrasena restablecida con el codigo de prueba: cuenta ${account.id}`,
     );
@@ -236,8 +312,7 @@ export class AuthService implements OnModuleInit {
       });
     }
 
-    const passwordHash = await bcrypt.hash(newPassword, PASSWORD_SALT_ROUNDS);
-    await this.accountsService.resetPassword(account.id, passwordHash);
+    await this.applyNewPassword(account, newPassword);
   }
 
   private invalidResetCode(): BadRequestException {
@@ -255,10 +330,10 @@ export class AuthService implements OnModuleInit {
 
   private recentFailures(key: string): number[] {
     const cutoff = Date.now() - TEST_CODE_WINDOW_MS;
-    const recent = (this.testCodeFailures.get(key) ?? []).filter(
+    const recent = (this.failedAttempts.get(key) ?? []).filter(
       (at) => at > cutoff,
     );
-    this.testCodeFailures.set(key, recent);
+    this.failedAttempts.set(key, recent);
     return recent;
   }
 
@@ -269,14 +344,18 @@ export class AuthService implements OnModuleInit {
       this.recentFailures(GLOBAL_FAILURE_KEY).length >=
         TEST_CODE_MAX_FAILURES_GLOBAL
     ) {
-      throw new HttpException(
-        {
-          code: 'TOO_MANY_ATTEMPTS',
-          message: 'Too many attempts. Try again later.',
-        },
-        HttpStatus.TOO_MANY_REQUESTS,
-      );
+      throw this.tooManyAttempts();
     }
+  }
+
+  private tooManyAttempts(): HttpException {
+    return new HttpException(
+      {
+        code: 'TOO_MANY_ATTEMPTS',
+        message: 'Too many attempts. Try again later.',
+      },
+      HttpStatus.TOO_MANY_REQUESTS,
+    );
   }
 
   private recordTestCodeFailure(emailKey: string): void {

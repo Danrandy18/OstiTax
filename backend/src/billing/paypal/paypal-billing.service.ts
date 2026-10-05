@@ -6,6 +6,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { AccountsService } from '../../auth/accounts.service';
 import type { Account } from '../../auth/entities/account.entity';
+import { MailService } from '../../auth/mail.service';
 import { SubscriptionProvider } from '../../users/enums/user-plan.enum';
 import { PlanInterval } from '../enums/plan-interval.enum';
 import { WebhookEventsService } from '../webhooks/webhook-events.service';
@@ -45,6 +46,10 @@ interface PayPalWebhookEvent {
     billing_info?: {
       next_billing_time?: string;
     };
+    /** PAYMENT.SALE.COMPLETED */
+    amount?: { total?: string; currency?: string };
+    billing_agreement_id?: string;
+    create_time?: string;
   };
 }
 
@@ -57,6 +62,7 @@ export class PaypalBillingService {
     private readonly configService: ConfigService,
     private readonly accountsService: AccountsService,
     private readonly webhookEventsService: WebhookEventsService,
+    private readonly mailService: MailService,
   ) {}
 
   async createSubscription(
@@ -128,7 +134,9 @@ export class PaypalBillingService {
     headers: Record<string, string | undefined>,
     body: unknown,
   ): Promise<boolean> {
-    const webhookId = this.configService.get<string>('billing.paypal.webhookId');
+    const webhookId = this.configService.get<string>(
+      'billing.paypal.webhookId',
+    );
     if (!webhookId) {
       throw new ServiceUnavailableException(
         'PayPal webhook ID is not configured',
@@ -185,9 +193,14 @@ export class PaypalBillingService {
         await this.handleSubscriptionActivated(event.resource);
         break;
       case 'BILLING.SUBSCRIPTION.CANCELLED':
+        await this.handleSubscriptionEnded(event.resource, true);
+        break;
       case 'BILLING.SUBSCRIPTION.EXPIRED':
       case 'BILLING.SUBSCRIPTION.SUSPENDED':
-        await this.handleSubscriptionEnded(event.resource);
+        await this.handleSubscriptionEnded(event.resource, false);
+        break;
+      case 'PAYMENT.SALE.COMPLETED':
+        await this.handleSaleCompleted(event.resource);
         break;
       default:
         break;
@@ -219,6 +232,7 @@ export class PaypalBillingService {
 
   private async handleSubscriptionEnded(
     resource: PayPalWebhookEvent['resource'],
+    canceled: boolean,
   ): Promise<void> {
     if (!resource.id) {
       return;
@@ -232,6 +246,40 @@ export class PaypalBillingService {
     }
 
     await this.accountsService.downgradeToFree(account.id);
+    if (canceled) {
+      // PayPal termina la suscripcion al cancelarla: Pro acaba en ese momento.
+      await this.mailService.sendSubscriptionCanceled(account, null);
+    }
+  }
+
+  /** Cada cobro de la suscripcion: recibo por correo (PayPal envia ademas el suyo). */
+  private async handleSaleCompleted(
+    resource: PayPalWebhookEvent['resource'],
+  ): Promise<void> {
+    const total = Number(resource.amount?.total);
+    if (!resource.billing_agreement_id || !total) {
+      return;
+    }
+    const account = await this.accountsService.findByPaypalSubscriptionId(
+      resource.billing_agreement_id,
+    );
+    if (!account) {
+      return;
+    }
+    await this.mailService.sendPaymentReceipt(account, {
+      amount: total,
+      currency: resource.amount?.currency ?? 'EUR',
+      interval: null,
+      periodStart: null,
+      periodEnd: null,
+      invoiceNumber: resource.id ?? null,
+      paidAt: resource.create_time
+        ? new Date(resource.create_time)
+        : new Date(),
+      provider: 'PayPal',
+      invoiceUrl: null,
+      invoicePdfUrl: null,
+    });
   }
 
   private async getSubscription(
@@ -249,7 +297,9 @@ export class PaypalBillingService {
   ): Promise<T> {
     const apiBase = this.configService.get<string>('billing.paypal.apiBase');
     if (!apiBase) {
-      throw new ServiceUnavailableException('PayPal API base is not configured');
+      throw new ServiceUnavailableException(
+        'PayPal API base is not configured',
+      );
     }
 
     const token = await this.getAccessToken();
@@ -292,7 +342,9 @@ export class PaypalBillingService {
     const apiBase = this.configService.get<string>('billing.paypal.apiBase');
 
     if (!clientId || !clientSecret || !apiBase) {
-      throw new ServiceUnavailableException('PayPal credentials are not configured');
+      throw new ServiceUnavailableException(
+        'PayPal credentials are not configured',
+      );
     }
 
     const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString(

@@ -10,6 +10,11 @@ export class AccountStatusDto {
   subscriptionProvider!: string | null;
   subscriptionStatus!: string | null;
   subscriptionCurrentPeriodEnd!: string | null;
+  /** Cancelada: Pro sigue hasta subscriptionCurrentPeriodEnd y no se renueva. */
+  subscriptionCancelAtPeriodEnd!: boolean;
+  /** false en cuentas solo de Google: no hay contrasena que cambiar. */
+  hasPassword!: boolean;
+  locale!: string;
 
   static fromEntity(account: Account, isPro: boolean): AccountStatusDto {
     return {
@@ -23,6 +28,9 @@ export class AccountStatusDto {
       subscriptionCurrentPeriodEnd: account.subscriptionCurrentPeriodEnd
         ? account.subscriptionCurrentPeriodEnd.toISOString()
         : null,
+      subscriptionCancelAtPeriodEnd: account.subscriptionCancelAtPeriodEnd,
+      hasPassword: !!account.passwordHash,
+      locale: account.locale,
     };
   }
 }

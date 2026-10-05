@@ -34,6 +34,12 @@ import { MailService } from './mail.service';
     OptionalAccountAuthGuard,
     MailService,
   ],
-  exports: [AccountsService, AccountAuthGuard, OptionalAccountAuthGuard, JwtModule],
+  exports: [
+    AccountsService,
+    AccountAuthGuard,
+    OptionalAccountAuthGuard,
+    JwtModule,
+    MailService,
+  ],
 })
 export class AuthModule {}

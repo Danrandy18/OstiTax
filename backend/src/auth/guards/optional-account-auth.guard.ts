@@ -2,7 +2,10 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AccountsService } from '../accounts.service';
 import type { Account } from '../entities/account.entity';
-import { extractBearerToken } from './account-auth.guard';
+import {
+  extractBearerToken,
+  issuedBeforePasswordChange,
+} from './account-auth.guard';
 
 /**
  * Igual que AccountAuthGuard pero nunca lanza: si no hay token, o es
@@ -29,11 +32,12 @@ export class OptionalAccountAuthGuard implements CanActivate {
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync<{ sub: string }>(
-        token,
-      );
+      const payload = await this.jwtService.verifyAsync<{
+        sub: string;
+        iat?: number;
+      }>(token);
       const account = await this.accountsService.findById(payload.sub);
-      if (account) {
+      if (account && !issuedBeforePasswordChange(payload, account)) {
         request.account = account;
       }
     } catch {

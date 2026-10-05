@@ -1,9 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, LessThan, Repository } from 'typeorm';
 import { isSubscriptionActive } from '../common/utils/subscription-status.util';
 import { SubscriptionProvider, UserPlan } from '../users/enums/user-plan.enum';
 import { Account } from './entities/account.entity';
+import { MailService } from './mail.service';
+import { toMailLocale } from './mail/mail-i18n';
+
+/** Tras una cancelacion y una nueva alta, se vuelve a dar la bienvenida pasado este tiempo. */
+const PRO_WELCOME_COOLDOWN_MS = 24 * 60 * 60_000;
 
 export interface ActivateAccountProParams {
   provider: SubscriptionProvider;
@@ -11,6 +16,7 @@ export interface ActivateAccountProParams {
   status: string;
   currentPeriodEnd?: Date | null;
   stripeCustomerId?: string | null;
+  cancelAtPeriodEnd?: boolean;
 }
 
 @Injectable()
@@ -18,6 +24,7 @@ export class AccountsService {
   constructor(
     @InjectRepository(Account)
     private readonly accountsRepository: Repository<Account>,
+    private readonly mailService: MailService,
   ) {}
 
   async findById(id: string): Promise<Account | null> {
@@ -73,6 +80,7 @@ export class AccountsService {
     passwordHash?: string | null;
     googleId?: string | null;
     name?: string | null;
+    locale?: string | null;
   }): Promise<Account> {
     return this.accountsRepository.save(
       this.accountsRepository.create({
@@ -81,8 +89,29 @@ export class AccountsService {
         googleId: params.googleId ?? null,
         name: params.name ?? null,
         plan: UserPlan.FREE,
+        locale: toMailLocale(params.locale),
       }),
     );
+  }
+
+  /**
+   * Guarda el idioma con el que el usuario usa la app, para escribirle en ese idioma. Un valor
+   * desconocido se ignora (nunca cae a ingles por accidente).
+   */
+  async updateLocale(
+    account: Account,
+    locale: string | null | undefined,
+  ): Promise<Account> {
+    if (
+      !locale ||
+      toMailLocale(locale) !== locale ||
+      account.locale === locale
+    ) {
+      return account;
+    }
+    await this.accountsRepository.update({ id: account.id }, { locale });
+    account.locale = locale;
+    return account;
   }
 
   async linkGoogleId(accountId: string, googleId: string): Promise<Account> {
@@ -100,8 +129,10 @@ export class AccountsService {
     const account = await this.accountsRepository.findOneOrFail({
       where: { id: accountId },
     });
+    const wasPro = this.isPro(account);
 
     account.plan = UserPlan.PRO;
+    account.subscriptionCancelAtPeriodEnd = params.cancelAtPeriodEnd ?? false;
     account.subscriptionProvider = params.provider;
     account.subscriptionStatus = params.status;
     account.subscriptionCurrentPeriodEnd = params.currentPeriodEnd ?? null;
@@ -117,7 +148,46 @@ export class AccountsService {
       account.stripeSubscriptionId = null;
     }
 
-    return this.accountsRepository.save(account);
+    const saved = await this.accountsRepository.save(account);
+    if (
+      !wasPro &&
+      this.isPro(saved) &&
+      (await this.claimProWelcome(saved.id))
+    ) {
+      await this.mailService.sendProWelcome(
+        saved,
+        saved.subscriptionCurrentPeriodEnd,
+      );
+    }
+    return saved;
+  }
+
+  /**
+   * Marca la bienvenida como enviada en una sola sentencia: si dos webhooks llegan a la vez,
+   * solo uno la gana y el correo sale una vez.
+   */
+  private async claimProWelcome(accountId: string): Promise<boolean> {
+    const now = new Date();
+    const result = await this.accountsRepository.update(
+      [
+        { id: accountId, proWelcomeSentAt: IsNull() },
+        {
+          id: accountId,
+          proWelcomeSentAt: LessThan(
+            new Date(now.getTime() - PRO_WELCOME_COOLDOWN_MS),
+          ),
+        },
+      ],
+      { proWelcomeSentAt: now },
+    );
+    return (result.affected ?? 0) > 0;
+  }
+
+  async setCancelAtPeriodEnd(accountId: string, value: boolean): Promise<void> {
+    await this.accountsRepository.update(
+      { id: accountId },
+      { subscriptionCancelAtPeriodEnd: value },
+    );
   }
 
   async updateSubscriptionStatus(
@@ -147,6 +217,7 @@ export class AccountsService {
     });
 
     account.plan = UserPlan.FREE;
+    account.subscriptionCancelAtPeriodEnd = false;
     account.subscriptionProvider = null;
     account.subscriptionStatus = null;
     account.subscriptionCurrentPeriodEnd = null;
@@ -182,11 +253,17 @@ export class AccountsService {
     );
   }
 
-  async resetPassword(accountId: string, passwordHash: string): Promise<void> {
+  /** Nueva contrasena: invalida enlaces de recuperacion y las sesiones abiertas antes. */
+  async setPassword(
+    accountId: string,
+    passwordHash: string,
+    changedAt: Date,
+  ): Promise<void> {
     await this.accountsRepository.update(
       { id: accountId },
       {
         passwordHash,
+        passwordChangedAt: changedAt,
         passwordResetTokenHash: null,
         passwordResetExpiresAt: null,
       },

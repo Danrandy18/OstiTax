@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   Inject,
+  Patch,
   Post,
   UseGuards,
   forwardRef,
@@ -13,12 +14,14 @@ import { AccountsService } from './accounts.service';
 import { AuthService, type PasswordResetMode } from './auth.service';
 import { CurrentAccount } from './decorators/current-account.decorator';
 import { AccountStatusDto } from './dto/account-status.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { GoogleLoginDto } from './dto/google-login.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResetPasswordWithCodeDto } from './dto/reset-password-code.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { UpdateMeDto } from './dto/update-me.dto';
 import type { Account } from './entities/account.entity';
 import { AccountAuthGuard } from './guards/account-auth.guard';
 import { BillingService } from '../billing/billing.service';
@@ -38,6 +41,7 @@ export class AuthController {
       dto.email,
       dto.password,
       dto.name,
+      dto.locale,
     );
     return this.toResponse(accessToken, account);
   }
@@ -47,6 +51,7 @@ export class AuthController {
     const { accessToken, account } = await this.authService.login(
       dto.email,
       dto.password,
+      dto.locale,
     );
     return this.toResponse(accessToken, account);
   }
@@ -55,6 +60,7 @@ export class AuthController {
   async google(@Body() dto: GoogleLoginDto) {
     const { accessToken, account } = await this.authService.googleLogin(
       dto.idToken,
+      dto.locale,
     );
     return this.toResponse(accessToken, account);
   }
@@ -64,7 +70,7 @@ export class AuthController {
   async forgotPassword(
     @Body() dto: ForgotPasswordDto,
   ): Promise<{ ok: true; mode: PasswordResetMode }> {
-    const mode = await this.authService.forgotPassword(dto.email);
+    const mode = await this.authService.forgotPassword(dto.email, dto.locale);
     return { ok: true, mode };
   }
 
@@ -86,6 +92,48 @@ export class AuthController {
       dto.password,
     );
     return { ok: true };
+  }
+
+  /** Lo que los clientes deben mostrar segun la configuracion del servidor. */
+  @Get('config')
+  config(): { passwordReset: boolean; passwordResetByEmail: boolean } {
+    return {
+      passwordReset: this.authService.isPasswordResetAvailable(),
+      // La app solo tiene el flujo por correo (no el del codigo de prueba).
+      passwordResetByEmail: this.authService.isPasswordResetByEmail(),
+    };
+  }
+
+  @Post('change-password')
+  @HttpCode(200)
+  @UseGuards(AccountAuthGuard)
+  async changePassword(
+    @CurrentAccount() account: Account,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    const result = await this.authService.changePassword(
+      account,
+      dto.currentPassword,
+      dto.newPassword,
+    );
+    return this.toResponse(result.accessToken, result.account);
+  }
+
+  /** El cliente avisa al cambiar de idioma: los correos siguientes salen en ese idioma. */
+  @Patch('me')
+  @UseGuards(AccountAuthGuard)
+  async updateMe(
+    @CurrentAccount() account: Account,
+    @Body() dto: UpdateMeDto,
+  ): Promise<AccountStatusDto> {
+    const updated = await this.accountsService.updateLocale(
+      account,
+      dto.locale,
+    );
+    return AccountStatusDto.fromEntity(
+      updated,
+      this.accountsService.isPro(updated),
+    );
   }
 
   @Get('me')

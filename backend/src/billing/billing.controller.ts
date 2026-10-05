@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AccountsService } from '../auth/accounts.service';
 import { AccountStatusDto } from '../auth/dto/account-status.dto';
 import { CurrentAccount } from '../auth/decorators/current-account.decorator';
@@ -38,5 +45,27 @@ export class BillingController {
     @Body() dto: CreatePaypalSubscriptionDto,
   ) {
     return this.billingService.createPaypalSubscription(account, dto.interval);
+  }
+
+  @Post('cancel')
+  @HttpCode(200)
+  async cancel(@CurrentAccount() account: Account): Promise<AccountStatusDto> {
+    await this.billingService.cancelSubscription(account);
+    const updated =
+      (await this.accountsService.findById(account.id)) ?? account;
+    return AccountStatusDto.fromEntity(
+      updated,
+      this.accountsService.isPro(updated),
+    );
+  }
+
+  @Post('resume')
+  @HttpCode(200)
+  async resume(@CurrentAccount() account: Account): Promise<AccountStatusDto> {
+    await this.billingService.resumeSubscription(account);
+    return AccountStatusDto.fromEntity(
+      account,
+      this.accountsService.isPro(account),
+    );
   }
 }

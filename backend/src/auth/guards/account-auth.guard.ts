@@ -26,7 +26,7 @@ export class AccountAuthGuard implements CanActivate {
       throw new UnauthorizedException('Authorization header is required');
     }
 
-    let payload: { sub: string };
+    let payload: { sub: string; iat?: number };
     try {
       payload = await this.jwtService.verifyAsync(token);
     } catch {
@@ -36,6 +36,9 @@ export class AccountAuthGuard implements CanActivate {
     const account = await this.accountsService.findById(payload.sub);
     if (!account) {
       throw new UnauthorizedException('Account not found');
+    }
+    if (issuedBeforePasswordChange(payload, account)) {
+      throw new UnauthorizedException('Session ended after a password change');
     }
 
     request.account = account;
@@ -54,4 +57,18 @@ export function extractBearerToken(
     return null;
   }
   return token;
+}
+
+/**
+ * Un token emitido antes del ultimo cambio de contrasena ya no vale: cambiarla cierra la
+ * sesion en los demas dispositivos. `iat` va en segundos.
+ */
+export function issuedBeforePasswordChange(
+  payload: { iat?: number },
+  account: Pick<Account, 'passwordChangedAt'>,
+): boolean {
+  if (!account.passwordChangedAt || payload.iat === undefined) {
+    return false;
+  }
+  return payload.iat < Math.floor(account.passwordChangedAt.getTime() / 1000);
 }
