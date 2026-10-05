@@ -48,6 +48,10 @@ export interface MailText {
     renewal: string;
     manage: string;
     cta: string;
+    appTitle: string;
+    appBody: string;
+    playCta: string;
+    iosSoon: string;
   };
   passwordReset: {
     subject: string;
@@ -146,6 +150,11 @@ export const MAIL_TEXT: Record<MailLocale, MailText> = {
       manage:
         'Du kannst dein Abo jederzeit in deinem Profil verwalten oder kündigen.',
       cta: 'ÖstiTax öffnen',
+      appTitle: 'ÖstiTax auf deinem Handy',
+      appBody:
+        'Dein Pro-Zugang gilt auch in der App: einfach mit demselben Konto anmelden und Belege direkt mit der Kamera erfassen.',
+      playCta: 'Bei Google Play laden',
+      iosSoon: 'Für iPhone (iOS): demnächst verfügbar.',
     },
     passwordReset: {
       subject: 'Passwort zurücksetzen',
@@ -254,6 +263,11 @@ export const MAIL_TEXT: Record<MailLocale, MailText> = {
       manage:
         'You can manage or cancel your subscription at any time in your profile.',
       cta: 'Open ÖstiTax',
+      appTitle: 'ÖstiTax on your phone',
+      appBody:
+        'Your Pro access works in the app too: just sign in with the same account and capture receipts straight from your camera.',
+      playCta: 'Get it on Google Play',
+      iosSoon: 'For iPhone (iOS): coming soon.',
     },
     passwordReset: {
       subject: 'Reset your password',
@@ -361,6 +375,11 @@ export const MAIL_TEXT: Record<MailLocale, MailText> = {
       manage:
         'Aboneliğinizi istediğiniz zaman profilinizden yönetebilir veya iptal edebilirsiniz.',
       cta: 'ÖstiTax’i aç',
+      appTitle: 'ÖstiTax cebinizde',
+      appBody:
+        'Pro erişiminiz uygulamada da geçerli: aynı hesapla giriş yapın ve fişleri doğrudan kameranızla kaydedin.',
+      playCta: 'Google Play’den indirin',
+      iosSoon: 'iPhone (iOS) için: çok yakında.',
     },
     passwordReset: {
       subject: 'Şifrenizi sıfırlayın',
@@ -466,6 +485,11 @@ export const MAIL_TEXT: Record<MailLocale, MailText> = {
       manage:
         'Pretplatu možeš u svakom trenutku upravljati ili otkazati u svom profilu.',
       cta: 'Otvori ÖstiTax',
+      appTitle: 'ÖstiTax na tvom mobitelu',
+      appBody:
+        'Tvoj Pro pristup vrijedi i u aplikaciji: prijavi se istim nalogom i snimaj račune direktno kamerom.',
+      playCta: 'Preuzmi na Google Play',
+      iosSoon: 'Za iPhone (iOS): uskoro.',
     },
     passwordReset: {
       subject: 'Resetuj lozinku',
@@ -572,6 +596,11 @@ export const MAIL_TEXT: Record<MailLocale, MailText> = {
       manage:
         'Puedes gestionar o cancelar tu suscripción cuando quieras desde tu perfil.',
       cta: 'Abrir ÖstiTax',
+      appTitle: 'ÖstiTax en tu móvil',
+      appBody:
+        'Tu acceso Pro también funciona en la app: inicia sesión con la misma cuenta y escanea tus recibos directamente con la cámara.',
+      playCta: 'Descárgala en Google Play',
+      iosSoon: 'Para iPhone (iOS): próximamente.',
     },
     passwordReset: {
       subject: 'Restablece tu contraseña',
@@ -679,6 +708,11 @@ export const MAIL_TEXT: Record<MailLocale, MailText> = {
       manage:
         'Керувати підпискою або скасувати її можна будь-коли у вашому профілі.',
       cta: 'Відкрити ÖstiTax',
+      appTitle: 'ÖstiTax у вашому телефоні',
+      appBody:
+        'Доступ Pro працює і в застосунку: увійдіть з тим самим акаунтом і скануйте чеки камерою.',
+      playCta: 'Завантажити з Google Play',
+      iosSoon: 'Для iPhone (iOS): незабаром.',
     },
     passwordReset: {
       subject: 'Скидання пароля',

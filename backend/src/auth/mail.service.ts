@@ -65,7 +65,12 @@ export class MailService {
   sendProWelcome(to: MailRecipient, renewsOn: Date | null): Promise<void> {
     return this.sendSafely(
       to.email,
-      renderProWelcome({ recipient: to, appUrl: this.appUrl, renewsOn }),
+      renderProWelcome({
+        recipient: to,
+        appUrl: this.appUrl,
+        renewsOn,
+        playStoreUrl: this.configService.get<string>('auth.mail.playStoreUrl'),
+      }),
     );
   }
 

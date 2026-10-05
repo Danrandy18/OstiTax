@@ -17,5 +17,8 @@ export default registerAs('auth', () => ({
     // usuarios llegan al buzon de soporte.
     from: process.env.MAIL_FROM || 'ÖstiTax <info@xn--stitax-vxa.at>',
     replyTo: process.env.MAIL_REPLY_TO || 'korevan.software@gmail.com',
+    // Ficha de la app en Google Play: la bienvenida a Pro invita a descargarla. Vacio mientras la
+    // app no sea publica, para no enviar un enlace que da "no encontrada".
+    playStoreUrl: process.env.PLAY_STORE_URL ?? '',
   },
 }));

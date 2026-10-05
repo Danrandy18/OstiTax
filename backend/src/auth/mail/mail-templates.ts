@@ -235,6 +235,8 @@ export function renderProWelcome(params: {
   recipient: Recipient;
   appUrl: string;
   renewsOn: Date | null;
+  /** Ficha de Google Play; null mientras la app no sea publica (no se muestra la seccion). */
+  playStoreUrl?: string | null;
 }): RenderedMail {
   const locale = toMailLocale(params.recipient.locale);
   const t = MAIL_TEXT[locale];
@@ -268,6 +270,27 @@ ${paragraph(escapeHtml(intro))}
 ${renewal ? paragraph(escapeHtml(renewal), BRAND.muted) : ''}
 ${paragraph(escapeHtml(w.manage), BRAND.muted)}`;
 
+  const playStoreUrl = params.playStoreUrl || null;
+  const appSection = playStoreUrl
+    ? `
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 24px;border:1px solid ${BRAND.border};border-radius:12px;">
+  <tr>
+    <td style="padding:20px;">
+      <div style="font-size:16px;line-height:22px;font-weight:bold;color:${BRAND.text};">${escapeHtml(w.appTitle)}</div>
+      <div style="margin:6px 0 16px;font-size:14px;line-height:21px;color:${BRAND.muted};">${escapeHtml(w.appBody)}</div>
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+        <tr>
+          <td bgcolor="#000000" style="border-radius:8px;">
+            <a href="${escapeHtml(playStoreUrl)}" target="_blank" style="display:inline-block;padding:10px 18px;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;line-height:20px;color:#FFFFFF;text-decoration:none;border-radius:8px;">&#9654;&nbsp; ${escapeHtml(w.playCta)}</a>
+          </td>
+        </tr>
+      </table>
+      <div style="margin-top:12px;font-size:13px;line-height:19px;color:${BRAND.muted};">${escapeHtml(w.iosSoon)}</div>
+    </td>
+  </tr>
+</table>`
+    : '';
+
   const cta = { label: w.cta, url: params.appUrl };
   return {
     subject: w.subject,
@@ -280,6 +303,7 @@ ${paragraph(escapeHtml(w.manage), BRAND.muted)}`;
       title: w.title,
       body,
       cta,
+      after: appSection,
     }),
     text: plainText({
       t,
@@ -291,6 +315,13 @@ ${paragraph(escapeHtml(w.manage), BRAND.muted)}`;
         ...w.features.map((f) => `• ${f.title}: ${f.body}`),
         ...(renewal ? [renewal] : []),
         w.manage,
+        ...(playStoreUrl
+          ? [
+              `${w.appTitle}: ${w.appBody}`,
+              `${w.playCta}: ${playStoreUrl}`,
+              w.iosSoon,
+            ]
+          : []),
       ],
       cta,
     }),

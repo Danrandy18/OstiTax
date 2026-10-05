@@ -181,6 +181,31 @@ describe('plantillas', () => {
     expect(mail.html).toContain('https://pay.stripe.com/invoice/x/pdf');
   });
 
+  it('bienvenida Pro: invita a la app de Google Play solo cuando hay enlace', () => {
+    const play = 'https://play.google.com/store/apps/details?id=at.ostitax.app';
+    const without = renderProWelcome({
+      recipient: recipient('es'),
+      appUrl,
+      renewsOn: null,
+    });
+    expect(without.html).not.toContain('play.google.com');
+    expect(without.text).not.toContain(MAIL_TEXT.es.proWelcome.iosSoon);
+
+    for (const locale of MAIL_LOCALES) {
+      const mail = renderProWelcome({
+        recipient: recipient(locale),
+        appUrl,
+        renewsOn: null,
+        playStoreUrl: play,
+      });
+      const w = MAIL_TEXT[locale].proWelcome;
+      expect(mail.html).toContain(`href="${play}"`);
+      expect(mail.html).toContain(escapeHtml(w.playCta));
+      expect(mail.html).toContain(escapeHtml(w.iosSoon));
+      expect(mail.text).toContain(`${w.playCta}: ${play}`);
+    }
+  });
+
   it('escapa el nombre del usuario (sin HTML inyectado)', () => {
     const mail = renderProWelcome({
       recipient: recipient('en', '<script>alert(1)</script>'),
