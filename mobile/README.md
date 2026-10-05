@@ -72,10 +72,15 @@ git, nunca subirla):
 ```bash
 node scripts/play-upload.mjs --check                 # comprueba el acceso y lista las pistas
 node scripts/play-upload.mjs                         # sube el AAB a pruebas internas
+node scripts/play-upload.mjs --track alpha           # a la prueba cerrada
 node scripts/play-upload.mjs --track production      # a produccion
 ```
 
 Las notas de la version salen de `store/release-notes.json`.
+
+La ficha de la tienda (contacto, textos en los 6 idiomas, icono y grafico destacado) sale de
+`store/listing.json` y se publica con `node scripts/play-listing.mjs` (`--dry-run` comprueba los
+limites de caracteres). Necesita el permiso "Administrar la presencia en Google Play Store".
 
 ### 4. Ficha de Play Console
 
