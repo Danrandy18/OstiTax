@@ -50,6 +50,16 @@ export interface ParsedReceipt {
 /** Limite de bienes de escaso valor (GWG) en Austria desde 2023. Verificar con un asesor. */
 export const GWG_LIMIT_EUR = 1000;
 
+/** Un bien de trabajo por encima del limite GWG se amortiza (AfA) en vez de deducirse de golpe. */
+export function requiresDepreciation(
+  category: ReceiptCategory,
+  total: number | null,
+): boolean {
+  return (
+    category === 'workEquipment' && total !== null && total > GWG_LIMIT_EUR
+  );
+}
+
 const VAT_RATES: readonly VatRate[] = [20, 13, 10, 0];
 
 const AMOUNT_RE =
@@ -439,10 +449,7 @@ export function parseReceipt(text: string): ParsedReceipt {
   if (date.value === null) warnings.push('date_missing');
   if (merchant.value === null) warnings.push('merchant_missing');
 
-  const depreciation =
-    category === 'workEquipment' &&
-    total.value !== null &&
-    total.value > GWG_LIMIT_EUR;
+  const depreciation = requiresDepreciation(category, total.value);
 
   return {
     merchant,
