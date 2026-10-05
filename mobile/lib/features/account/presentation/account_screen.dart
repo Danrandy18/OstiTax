@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -116,6 +115,28 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                     ),
                   ],
                 ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Material(
+              color: AppColors.surfaceElevated,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+                side: const BorderSide(color: AppColors.border),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: ListTile(
+                key: const Key('accountReceiptsTile'),
+                leading: const Icon(
+                  Icons.receipt_long_rounded,
+                  color: AppColors.primary,
+                ),
+                title: Text(
+                  ref.tr('receiptsNavLink'),
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.push('/receipts'),
               ),
             ),
             const SizedBox(height: 24),

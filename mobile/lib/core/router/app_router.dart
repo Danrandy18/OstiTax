@@ -9,6 +9,7 @@ import '../../features/calculator/presentation/calculator_screen.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/onboarding/presentation/splash_screen.dart';
 import '../../features/open_banking/presentation/banking_screen.dart';
+import '../../features/receipts/presentation/receipts_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/splash',
@@ -32,6 +33,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/account',
       builder: (context, state) => const AccountScreen(),
+    ),
+    GoRoute(
+      path: '/receipts',
+      builder: (context, state) => const ReceiptsScreen(),
     ),
     GoRoute(
       path: '/banking',
