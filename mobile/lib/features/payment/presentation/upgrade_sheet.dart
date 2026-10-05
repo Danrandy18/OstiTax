@@ -18,13 +18,12 @@ Future<void> showUpgradeSheet(BuildContext context) {
   );
 }
 
-enum _CellKind { text, yes, no, soon }
+enum _CellKind { text, yes, no }
 
 class _Cell {
   const _Cell.text(this.key) : kind = _CellKind.text;
   const _Cell.yes() : kind = _CellKind.yes, key = null;
   const _Cell.no() : kind = _CellKind.no, key = null;
-  const _Cell.soon() : kind = _CellKind.soon, key = null;
 
   final _CellKind kind;
   final String? key;
@@ -47,7 +46,7 @@ const _rows = [
   ),
   _CompareRow('compareRowPdf', _Cell.no(), _Cell.yes()),
   _CompareRow('compareRowAccount', _Cell.no(), _Cell.yes()),
-  _CompareRow('compareRowOcr', _Cell.no(), _Cell.soon()),
+  _CompareRow('compareRowOcr', _Cell.no(), _Cell.yes()),
 ];
 
 class UpgradeSheet extends ConsumerWidget {
@@ -293,22 +292,6 @@ class _CellView extends ConsumerWidget {
         return const Text(
           '—',
           style: TextStyle(color: AppColors.textSecondary),
-        );
-      case _CellKind.soon:
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-          decoration: BoxDecoration(
-            color: AppColors.warningTint,
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: Text(
-            ref.tr('compareComingSoon'),
-            style: const TextStyle(
-              color: AppColors.warning,
-              fontSize: 10.5,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
         );
     }
   }

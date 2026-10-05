@@ -38,7 +38,7 @@ export class UpgradeCompareModalComponent {
     },
     { labelKey: 'compareRowPdf', free: { kind: 'no' }, pro: { kind: 'yes' } },
     { labelKey: 'compareRowAccount', free: { kind: 'no' }, pro: { kind: 'yes' } },
-    { labelKey: 'compareRowOcr', free: { kind: 'no' }, pro: { kind: 'soon' } },
+    { labelKey: 'compareRowOcr', free: { kind: 'no' }, pro: { kind: 'yes' } },
   ];
 
   @HostListener('document:keydown.escape')

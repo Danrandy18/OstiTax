@@ -59,7 +59,8 @@ void main() {
     expect(find.text('Gratis vs. Pro'), findsOneWidget);
     expect(find.text('3 cada 24 horas'), findsOneWidget);
     expect(find.text('Ilimitados'), findsOneWidget);
-    expect(find.text('Próximamente'), findsOneWidget);
+    // El escaner de recibos ya existe: ninguna fila queda como "Próximamente".
+    expect(find.text('Próximamente'), findsNothing);
     expect(find.text('Elegir mi plan'), findsOneWidget);
     // Sin sesión iniciada aparece el acceso para quien ya tiene cuenta.
     expect(find.text('¿Ya tienes cuenta? Inicia sesión'), findsOneWidget);
