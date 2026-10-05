@@ -43,6 +43,33 @@ String officialPdfFileName(DateTime date) =>
 List<(String, String)> pdfInputRows(CalculateRequest r) {
   String yesNo(bool value) => value ? PdfOfficialDe.yes : PdfOfficialDe.no;
 
+  if (r.isSelfEmployed) {
+    return [
+      (
+        PdfOfficialDe.labelEmployment,
+        PdfOfficialDe.employment[r.employmentType]!,
+      ),
+      (
+        PdfOfficialDe.seLabelProfit,
+        '${formatOfficialEuro(r.grossAmount)} (${PdfOfficialDe.incomePeriod[r.incomePeriod]})',
+      ),
+      (PdfOfficialDe.seLabelKind, PdfOfficialDe.seKind[r.selfEmployedKind]!),
+      (PdfOfficialDe.seLabelFirstYears, yesNo(r.selfEmployedFirstYears)),
+      (PdfOfficialDe.labelSoleEarner, yesNo(r.soleEarnerDeduction)),
+      (
+        PdfOfficialDe.labelFamilyBonus,
+        PdfOfficialDe.familyBonus[r.familyBonus]!,
+      ),
+      if (r.childrenUnder18 > 0 || r.childrenOver18WithFamilyAllowance > 0) ...[
+        (PdfOfficialDe.labelChildrenUnder18, '${r.childrenUnder18}'),
+        (
+          PdfOfficialDe.labelChildrenOver18,
+          '${r.childrenOver18WithFamilyAllowance}',
+        ),
+      ],
+    ];
+  }
+
   final rows = <(String, String)>[
     (
       PdfOfficialDe.labelEmployment,
@@ -203,7 +230,10 @@ Future<Uint8List> buildCalculationPdf({
     child: child,
   );
 
-  final body = tier == PdfTier.basic
+  // Autonomos: una pagina propia; las explicaciones y consejos hablan de la nomina.
+  final body = response.selfEmployed != null
+      ? _selfEmployedBody(request, response, detailed: tier == PdfTier.pro)
+      : tier == PdfTier.basic
       ? _basicBody(request, response)
       : [..._fullBody(request, response), ..._extraBody(request)];
 
@@ -317,28 +347,145 @@ List<pw.Widget> _basicBody(
     pw.SizedBox(height: 26),
     _disclaimer(),
     pw.SizedBox(height: 24),
-    pw.Container(
-      color: _brand,
-      padding: const pw.EdgeInsets.all(14),
-      child: pw.Column(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          pw.Text(
-            PdfExtraDe.upgradeTitle,
-            style: pw.TextStyle(
-              color: _white,
-              fontSize: 13,
-              fontWeight: pw.FontWeight.bold,
+    _upgradeBanner(),
+  ];
+}
+
+/// Aviso de mejora a Pro, sin enlace ni precio (la versión de Google Play no vende suscripciones).
+pw.Widget _upgradeBanner() {
+  return pw.Container(
+    color: _brand,
+    padding: const pw.EdgeInsets.all(14),
+    child: pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text(
+          PdfExtraDe.upgradeTitle,
+          style: pw.TextStyle(
+            color: _white,
+            fontSize: 13,
+            fontWeight: pw.FontWeight.bold,
+          ),
+        ),
+        pw.SizedBox(height: 6),
+        pw.Text(
+          PdfExtraDe.upgradeBody,
+          style: const pw.TextStyle(color: _white, fontSize: 9.5),
+        ),
+      ],
+    ),
+  );
+}
+
+/// Autonomos: entradas, media mensual / año y, en el PDF completo, el desglose anual.
+/// Espejo de renderSelfEmployedPage en la web.
+List<pw.Widget> _selfEmployedBody(
+  CalculateRequest request,
+  CalculateResponse response, {
+  required bool detailed,
+}) {
+  final se = response.selfEmployed!;
+
+  pw.Widget detailRow(String label, double value, {bool minus = false}) =>
+      pw.Padding(
+        padding: const pw.EdgeInsets.only(bottom: 5),
+        child: pw.Row(
+          children: [
+            pw.Expanded(
+              child: pw.Text(
+                label,
+                style: const pw.TextStyle(color: _text, fontSize: 9),
+              ),
             ),
+            pw.Text(
+              '${minus ? '- ' : ''}${formatOfficialEuro(value)}',
+              style: const pw.TextStyle(color: _muted, fontSize: 9),
+            ),
+          ],
+        ),
+      );
+
+  pw.Widget note(String text) => pw.Padding(
+    padding: const pw.EdgeInsets.only(bottom: 6),
+    child: pw.Text(
+      text,
+      style: const pw.TextStyle(color: _muted, fontSize: 8.5, lineSpacing: 2),
+    ),
+  );
+
+  final notes = <String>[
+    if (!se.insured)
+      PdfOfficialDe.seNotInsured
+    else if (se.minimumBaseApplied)
+      PdfOfficialDe.seMinBase
+    else if (se.maximumBaseApplied)
+      PdfOfficialDe.seMaxBase,
+    if (se.estimatedBackPayment != null &&
+        se.provisionalSocialInsurance != null)
+      PdfOfficialDe.seBackPayment
+          .replaceAll(
+            '{provisional}',
+            formatOfficialEuro(se.provisionalSocialInsurance!),
+          )
+          .replaceAll('{final}', formatOfficialEuro(se.socialInsurance))
+          .replaceAll(
+            '{backPayment}',
+            formatOfficialEuro(se.estimatedBackPayment!),
           ),
-          pw.SizedBox(height: 6),
-          pw.Text(
-            PdfExtraDe.upgradeBody,
-            style: const pw.TextStyle(color: _white, fontSize: 9.5),
-          ),
-        ],
+    PdfOfficialDe.seDisclaimer,
+  ];
+
+  return [
+    _sectionTitle(PdfOfficialDe.sectionInputs),
+    pw.SizedBox(height: 10),
+    for (final (label, value) in pdfInputRows(request)) _inputRow(label, value),
+    pw.SizedBox(height: 22),
+    _sectionTitle(PdfOfficialDe.sectionResult),
+    pw.SizedBox(height: 12),
+    _resultTable(
+      response,
+      general: true,
+      titles: const [
+        PdfOfficialDe.seColumnMonthly,
+        PdfOfficialDe.seColumnAnnual,
+      ],
+      rowLabels: const (
+        PdfOfficialDe.seRowProfit,
+        PdfOfficialDe.seRowSocialInsurance,
+        PdfOfficialDe.seRowIncomeTax,
+        PdfOfficialDe.seRowNet,
       ),
     ),
+    pw.SizedBox(height: 20),
+    if (detailed) ...[
+      _sectionTitle(PdfOfficialDe.seDetailTitle),
+      pw.SizedBox(height: 10),
+      if (se.insured) ...[
+        detailRow(PdfOfficialDe.sePension, se.pension, minus: true),
+        detailRow(PdfOfficialDe.seHealth, se.health, minus: true),
+        detailRow(PdfOfficialDe.seProvision, se.provision, minus: true),
+        detailRow(PdfOfficialDe.seAccident, se.accident, minus: true),
+      ],
+      detailRow(
+        PdfOfficialDe.seGewinnfreibetrag,
+        se.gewinnfreibetrag,
+        minus: true,
+      ),
+      detailRow(PdfOfficialDe.seTaxable, se.taxableIncome),
+      detailRow(PdfOfficialDe.seTariffTax, se.tariffTax),
+      if (se.familyBonus > 0)
+        detailRow(PdfOfficialDe.seFamilyBonus, se.familyBonus, minus: true),
+      if (se.soleEarnerCredit > 0)
+        detailRow(PdfOfficialDe.seSoleEarner, se.soleEarnerCredit, minus: true),
+      detailRow(
+        PdfOfficialDe.seQuarterlySocialInsurance,
+        se.quarterlySocialInsurance,
+      ),
+      detailRow(PdfOfficialDe.seQuarterlyTax, se.quarterlyTaxPrepayment),
+      pw.SizedBox(height: 14),
+    ],
+    for (final text in notes) note(text),
+    if (!detailed) ...[pw.SizedBox(height: 20), _upgradeBanner()],
   ];
 }
 
@@ -513,7 +660,20 @@ pw.Widget _inputRow(String label, String value) {
   );
 }
 
-pw.Widget _resultTable(CalculateResponse response, {bool general = false}) {
+pw.Widget _resultTable(
+  CalculateResponse response, {
+  bool general = false,
+  List<String>? titles,
+  (String, String, String, String)? rowLabels,
+}) {
+  final labels =
+      rowLabels ??
+      const (
+        PdfOfficialDe.rowGross,
+        PdfOfficialDe.rowSocialInsurance,
+        PdfOfficialDe.rowIncomeTax,
+        PdfOfficialDe.rowNet,
+      );
   final labelWidth = general ? 260.0 : 150.0;
   final breakdowns = general
       ? [response.recurring, response.annual]
@@ -523,14 +683,16 @@ pw.Widget _resultTable(CalculateResponse response, {bool general = false}) {
           response.fourteenth,
           response.annual,
         ];
-  final titles = general
-      ? const [PdfOfficialDe.columnRecurring, PdfOfficialDe.columnAnnual]
-      : const [
-          PdfOfficialDe.columnRecurring,
-          PdfOfficialDe.columnThirteenth,
-          PdfOfficialDe.columnFourteenth,
-          PdfOfficialDe.columnAnnual,
-        ];
+  final columnTitles =
+      titles ??
+      (general
+          ? const [PdfOfficialDe.columnRecurring, PdfOfficialDe.columnAnnual]
+          : const [
+              PdfOfficialDe.columnRecurring,
+              PdfOfficialDe.columnThirteenth,
+              PdfOfficialDe.columnFourteenth,
+              PdfOfficialDe.columnAnnual,
+            ]);
 
   pw.Widget numberCell(String text, pw.TextStyle style) => pw.Expanded(
     child: pw.Text(text, textAlign: pw.TextAlign.right, style: style),
@@ -572,7 +734,7 @@ pw.Widget _resultTable(CalculateResponse response, {bool general = false}) {
       pw.Row(
         children: [
           pw.SizedBox(width: labelWidth),
-          for (final title in titles)
+          for (final title in columnTitles)
             numberCell(
               title,
               pw.TextStyle(
@@ -586,13 +748,9 @@ pw.Widget _resultTable(CalculateResponse response, {bool general = false}) {
       pw.SizedBox(height: 6),
       pw.Container(height: 1, color: _border),
       pw.SizedBox(height: 10),
-      dataRow(PdfOfficialDe.rowGross, (b) => b.gross),
-      dataRow(
-        PdfOfficialDe.rowSocialInsurance,
-        (b) => b.socialInsurance,
-        deduction: true,
-      ),
-      dataRow(PdfOfficialDe.rowIncomeTax, (b) => b.incomeTax, deduction: true),
+      dataRow(labels.$1, (b) => b.gross),
+      dataRow(labels.$2, (b) => b.socialInsurance, deduction: true),
+      dataRow(labels.$3, (b) => b.incomeTax, deduction: true),
       pw.SizedBox(height: 2),
       pw.Container(
         color: _successTint,
@@ -602,7 +760,7 @@ pw.Widget _resultTable(CalculateResponse response, {bool general = false}) {
             pw.SizedBox(
               width: labelWidth - 8,
               child: pw.Text(
-                PdfOfficialDe.rowNet,
+                labels.$4,
                 style: pw.TextStyle(
                   color: _success,
                   fontSize: 10.5,

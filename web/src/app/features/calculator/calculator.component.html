@@ -56,12 +56,28 @@
             </span>
             <span>{{ 'employmentPensioner' | translate }}</span>
           </button>
+          <button
+            type="button"
+            class="employment-option"
+            [class.active]="form().employmentType === 'self_employed'"
+            (click)="setEmploymentType('self_employed')"
+          >
+            <span class="icon-badge" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="12" rx="2" />
+                <path d="M8 20h8M12 16v4" />
+              </svg>
+            </span>
+            <span>{{ 'employmentSelfEmployed' | translate }}</span>
+          </button>
         </div>
       </fieldset>
 
       <fieldset class="field">
         <legend>{{ 'incomePeriod' | translate }}</legend>
-        <p class="field-hint">{{ 'incomePeriodHint' | translate }}</p>
+        @if (!isSelfEmployed()) {
+          <p class="field-hint">{{ 'incomePeriodHint' | translate }}</p>
+        }
         <div class="segmented" [class.segmented-right]="form().incomePeriod === 'yearly'">
           <span class="segmented-thumb" aria-hidden="true"></span>
           <button
@@ -93,22 +109,63 @@
           name="grossAmount"
           required
         />
+        @if (isSelfEmployed()) {
+          <p class="field-hint">{{ 'profitHint' | translate }}</p>
+        }
       </label>
 
-      <label class="field">
-        <span>{{ 'state' | translate }}</span>
-        <p class="field-hint">{{ 'stateHint' | translate }}</p>
-        <select
-          class="input-field"
-          [ngModel]="form().state"
-          (ngModelChange)="updateForm('state', $event)"
-          name="state"
-        >
-          @for (option of stateOptions(); track option.value) {
-            <option [value]="option.value">{{ option.label }}</option>
-          }
-        </select>
-      </label>
+      @if (isSelfEmployed()) {
+        <label class="field reveal">
+          <span>{{ 'selfEmployedKind' | translate }}</span>
+          <p class="field-hint">{{ 'selfEmployedKindHint' | translate }}</p>
+          <select
+            class="input-field"
+            [ngModel]="form().selfEmployedKind"
+            (ngModelChange)="setSelfEmployedKind($event)"
+            name="selfEmployedKind"
+          >
+            <option value="trade">{{ 'selfEmployedKindTrade' | translate }}</option>
+            <option value="new_self_employed">{{ 'selfEmployedKindNew' | translate }}</option>
+          </select>
+        </label>
+
+        <fieldset class="field reveal">
+          <legend>{{ 'selfEmployedFirstYears' | translate }}</legend>
+          <p class="field-hint">{{ 'selfEmployedFirstYearsHint' | translate }}</p>
+          <div class="segmented" [class.segmented-right]="!form().selfEmployedFirstYears">
+            <span class="segmented-thumb" aria-hidden="true"></span>
+            <button
+              type="button"
+              [class.active]="form().selfEmployedFirstYears"
+              (click)="setFirstYears(true)"
+            >
+              {{ 'yes' | translate }}
+            </button>
+            <button
+              type="button"
+              [class.active]="!form().selfEmployedFirstYears"
+              (click)="setFirstYears(false)"
+            >
+              {{ 'no' | translate }}
+            </button>
+          </div>
+        </fieldset>
+      } @else {
+        <label class="field">
+          <span>{{ 'state' | translate }}</span>
+          <p class="field-hint">{{ 'stateHint' | translate }}</p>
+          <select
+            class="input-field"
+            [ngModel]="form().state"
+            (ngModelChange)="updateForm('state', $event)"
+            name="state"
+          >
+            @for (option of stateOptions(); track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </label>
+      }
 
       <div class="subsection">
         <h3>{{ 'deductions' | translate }}</h3>
@@ -179,6 +236,7 @@
           </div>
         }
 
+        @if (!isSelfEmployed()) {
         <label class="field">
           <span>{{ 'benefitInKind' | translate }}</span>
           <p class="field-hint">{{ 'benefitInKindHint' | translate }}</p>
@@ -281,8 +339,10 @@
             name="taxFreeAllowanceMonthly"
           />
         </label>
+        }
       </div>
 
+      @if (!isSelfEmployed()) {
       <div class="subsection" [class.subsection-disabled]="commuteBlocked()">
         <h3>{{ 'commute' | translate }}</h3>
         @if (commuteBlocked()) {
@@ -348,6 +408,7 @@
           </select>
         </label>
       </div>
+      }
 
       @if (error()) {
         <p class="error-text" role="alert">{{ error() }}</p>
@@ -400,48 +461,26 @@
           </header>
 
           <div class="tabs" role="tablist">
-            <button
-              type="button"
-              role="tab"
-              [class.active]="activeTab() === 'recurring'"
-              (click)="activeTab.set('recurring')"
-            >
-              {{ 'recurring' | translate }}
-            </button>
-            <button
-              type="button"
-              role="tab"
-              [class.active]="activeTab() === 'thirteenth'"
-              (click)="activeTab.set('thirteenth')"
-            >
-              {{ 'thirteenth' | translate }}
-            </button>
-            <button
-              type="button"
-              role="tab"
-              [class.active]="activeTab() === 'fourteenth'"
-              (click)="activeTab.set('fourteenth')"
-            >
-              {{ 'fourteenth' | translate }}
-            </button>
-            <button
-              type="button"
-              role="tab"
-              [class.active]="activeTab() === 'annual'"
-              (click)="activeTab.set('annual')"
-            >
-              {{ 'annual' | translate }}
-            </button>
+            @for (tab of resultTabs(); track tab) {
+              <button
+                type="button"
+                role="tab"
+                [class.active]="activeTab() === tab"
+                (click)="activeTab.set(tab)"
+              >
+                {{ (tab === 'recurring' && data.selfEmployed ? 'seMonthlyAverage' : tab) | translate }}
+              </button>
+            }
           </div>
 
           @if (activeBreakdown(); as row) {
             <dl class="breakdown" #breakdownEl>
               <div>
-                <dt>{{ 'gross' | translate }}</dt>
+                <dt>{{ (data.selfEmployed ? 'seProfit' : 'gross') | translate }}</dt>
                 <dd [countUp]="row.gross"></dd>
               </div>
               <div>
-                <dt>{{ 'socialInsurance' | translate }}</dt>
+                <dt>{{ (data.selfEmployed ? 'seSocialInsurance' : 'socialInsurance') | translate }}</dt>
                 <dd class="deduction">
                   <span aria-hidden="true">− </span><span [countUp]="row.socialInsurance"></span>
                 </dd>
@@ -463,6 +502,66 @@
                 <dd [countUp]="row.net"></dd>
               </div>
             </dl>
+          }
+
+          @if (data.selfEmployed; as se) {
+            <section class="se-detail" aria-labelledby="se-detail-title">
+              <h3 id="se-detail-title">{{ 'seDetailTitle' | translate }}</h3>
+              @if (!se.insured) {
+                <p class="se-note">{{ 'seNotInsuredNote' | translate }}</p>
+              } @else if (se.minimumBaseApplied) {
+                <p class="se-note">{{ 'seMinBaseNote' | translate }}</p>
+              } @else if (se.maximumBaseApplied) {
+                <p class="se-note">{{ 'seMaxBaseNote' | translate }}</p>
+              }
+              <dl class="se-table">
+                <div class="se-strong">
+                  <dt>{{ 'seProfit' | translate }}</dt>
+                  <dd>{{ se.annualProfit | eur }}</dd>
+                </div>
+                @if (se.insured) {
+                  <div><dt>{{ 'sePension' | translate }}</dt><dd>− {{ se.pension | eur }}</dd></div>
+                  <div><dt>{{ 'seHealth' | translate }}</dt><dd>− {{ se.health | eur }}</dd></div>
+                  <div><dt>{{ 'seProvision' | translate }}</dt><dd>− {{ se.provision | eur }}</dd></div>
+                  <div><dt>{{ 'seAccident' | translate }}</dt><dd>− {{ se.accident | eur }}</dd></div>
+                }
+                <div class="se-strong">
+                  <dt>{{ 'seSocialInsurance' | translate }}</dt>
+                  <dd>− {{ se.socialInsurance | eur }}</dd>
+                </div>
+                <div><dt>{{ 'seGewinnfreibetrag' | translate }}</dt><dd>− {{ se.gewinnfreibetrag | eur }}</dd></div>
+                <div><dt>{{ 'seTaxable' | translate }}</dt><dd>{{ se.taxableIncome | eur }}</dd></div>
+                <div><dt>{{ 'seTariffTax' | translate }}</dt><dd>{{ se.tariffTax | eur }}</dd></div>
+                @if (se.familyBonus > 0) {
+                  <div><dt>{{ 'seFamilyBonus' | translate }}</dt><dd>− {{ se.familyBonus | eur }}</dd></div>
+                }
+                @if (se.soleEarnerCredit > 0) {
+                  <div><dt>{{ 'seSoleEarner' | translate }}</dt><dd>− {{ se.soleEarnerCredit | eur }}</dd></div>
+                }
+                <div class="se-strong">
+                  <dt>{{ 'seIncomeTax' | translate }}</dt>
+                  <dd>− {{ se.incomeTax | eur }}</dd>
+                </div>
+                <div class="se-net"><dt>{{ 'seNet' | translate }}</dt><dd>{{ se.net | eur }}</dd></div>
+              </dl>
+
+              <h4>{{ 'seQuarterlyTitle' | translate }}</h4>
+              <dl class="se-table">
+                <div>
+                  <dt>{{ 'seQuarterlySocialInsurance' | translate }}</dt>
+                  <dd>{{ se.quarterlySocialInsurance | eur }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'seQuarterlyTax' | translate }}</dt>
+                  <dd>{{ se.quarterlyTaxPrepayment | eur }}</dd>
+                </div>
+              </dl>
+
+              @if (seBackPaymentText(); as warning) {
+                <p class="se-warning" role="note">{{ warning }}</p>
+              }
+              <p class="se-disclaimer">{{ 'seDisclaimer' | translate }}</p>
+            </section>
           }
         </article>
       } @else if (loading()) {

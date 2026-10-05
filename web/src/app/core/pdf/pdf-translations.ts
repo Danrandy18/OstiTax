@@ -19,7 +19,7 @@ export interface PdfSchema {
   pageLabel: string;
   disclaimer: string;
   footerTagline: string;
-  employment: { employee: string; apprentice: string; pensioner: string };
+  employment: { employee: string; apprentice: string; pensioner: string; self_employed: string };
   incomePeriod: { monthly: string; yearly: string };
   labels: {
     employment: string;
@@ -51,6 +51,75 @@ export interface PdfSchema {
     from_4_to_7: string;
     from_8_to_10: string;
     more_than_10: string;
+  };
+  /** Autonomos: mismas claves que la UI (seccion "se" de translations.ts). */
+  se: SelfEmployedPdfText;
+}
+
+export interface SelfEmployedPdfText {
+  profit: string;
+  /** Fila del resultado (sin unidad ni periodo): vale para la media mensual y el año. */
+  profitRow: string;
+  kind: string;
+  kindTrade: string;
+  kindNew: string;
+  firstYears: string;
+  monthlyAverage: string;
+  detailTitle: string;
+  pension: string;
+  health: string;
+  provision: string;
+  accident: string;
+  socialInsurance: string;
+  gewinnfreibetrag: string;
+  taxable: string;
+  tariffTax: string;
+  familyBonus: string;
+  soleEarner: string;
+  incomeTax: string;
+  net: string;
+  quarterlyTitle: string;
+  quarterlySocialInsurance: string;
+  quarterlyTax: string;
+  backPayment: string;
+  minBase: string;
+  maxBase: string;
+  notInsured: string;
+  disclaimer: string;
+}
+
+/** Textos de autonomos para el PDF a partir de los de la UI (en aleman, los mismos terminos). */
+export function selfEmployedPdfText(lang: Lang): SelfEmployedPdfText {
+  const t = TRANSLATIONS[lang];
+  return {
+    profit: t.profitAmountYearly,
+    profitRow: t.seProfit,
+    kind: t.selfEmployedKind,
+    kindTrade: t.selfEmployedKindTrade,
+    kindNew: t.selfEmployedKindNew,
+    firstYears: t.selfEmployedFirstYears,
+    monthlyAverage: t.seMonthlyAverage,
+    detailTitle: t.seDetailTitle,
+    pension: t.sePension,
+    health: t.seHealth,
+    provision: t.seProvision,
+    accident: t.seAccident,
+    socialInsurance: t.seSocialInsurance,
+    gewinnfreibetrag: t.seGewinnfreibetrag,
+    taxable: t.seTaxable,
+    tariffTax: t.seTariffTax,
+    familyBonus: t.seFamilyBonus,
+    soleEarner: t.seSoleEarner,
+    incomeTax: t.seIncomeTax,
+    net: t.seNet,
+    quarterlyTitle: t.seQuarterlyTitle,
+    quarterlySocialInsurance: t.seQuarterlySocialInsurance,
+    quarterlyTax: t.seQuarterlyTax,
+    backPayment: t.seBackPayment,
+    minBase: t.seMinBaseNote,
+    maxBase: t.seMaxBaseNote,
+    notInsured: t.seNotInsuredNote,
+    disclaimer: t.seDisclaimer,
   };
 }
 
@@ -125,7 +194,11 @@ const PDF_META: Record<Exclude<Lang, 'de'>, PdfMeta> = {
 
 export function getPdfSchema(lang: Lang): PdfSchema {
   if (lang === 'de') {
-    return { ...PDF_OFFICIAL_DE, footerTagline: 'Digitale Gehaltsberechnung Österreich' };
+    return {
+      ...PDF_OFFICIAL_DE,
+      footerTagline: 'Digitale Gehaltsberechnung Österreich',
+      se: selfEmployedPdfText('de'),
+    };
   }
 
   const t = TRANSLATIONS[lang];
@@ -145,6 +218,7 @@ export function getPdfSchema(lang: Lang): PdfSchema {
       employee: t.employmentEmployee,
       apprentice: t.employmentApprentice,
       pensioner: t.employmentPensioner,
+      self_employed: t.employmentSelfEmployed,
     },
     incomePeriod: { monthly: t.monthly, yearly: t.yearly },
     labels: {
@@ -178,5 +252,6 @@ export function getPdfSchema(lang: Lang): PdfSchema {
       from_8_to_10: t.commuteDays8to10,
       more_than_10: t.commuteDaysMore10,
     },
+    se: selfEmployedPdfText(lang),
   };
 }

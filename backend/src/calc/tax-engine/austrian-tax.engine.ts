@@ -1,10 +1,17 @@
 import type { Cents } from './money.util';
 import { assertCents } from './money.util';
-import { calculateIncomeTax, calculateSonstigeBezuegeIncomeTax } from './income-tax.calculator';
+import {
+  calculateIncomeTax,
+  calculateSonstigeBezuegeIncomeTax,
+} from './income-tax.calculator';
 import {
   hasCompanyCarBenefit,
   resolveBenefitInKindMonthly,
 } from './benefit-in-kind.util';
+import {
+  calculateSelfEmployed,
+  SelfEmployedKind,
+} from './self-employed.calculator';
 import { calculateSocialInsurance } from './social-insurance.calculator';
 import { TAX_TABLE_YEAR } from './tables/tax-tables-2026';
 import type {
@@ -12,7 +19,56 @@ import type {
   CalculationResult,
   PaymentBreakdown,
 } from './types';
-import { IncomePeriod } from './types';
+import { EmploymentType, IncomePeriod } from './types';
+
+const ZERO_ROW: PaymentBreakdown = {
+  gross: 0,
+  socialInsurance: 0,
+  incomeTax: 0,
+  net: 0,
+};
+
+/**
+ * Autonomos: sin 13./14. Bezug ni retencion mensual. La fila mensual es la media del año
+ * (anual ÷ 12) para que web y app la muestren igual que una nomina.
+ */
+function calculateSelfEmployedResult(
+  input: CalculationInput,
+): CalculationResult {
+  const annualProfit =
+    input.incomePeriod === IncomePeriod.MONTHLY
+      ? input.grossAmount * 12
+      : input.grossAmount;
+  const detail = calculateSelfEmployed({
+    annualProfit,
+    kind: input.selfEmployedKind ?? SelfEmployedKind.TRADE,
+    firstYears: input.selfEmployedFirstYears ?? false,
+    soleEarnerDeduction: input.soleEarnerDeduction,
+    familyBonus: input.familyBonus,
+    childrenUnder18: input.childrenUnder18,
+    childrenOver18WithFamilyAllowance: input.childrenOver18WithFamilyAllowance,
+  });
+  const annual: PaymentBreakdown = {
+    gross: detail.annualProfit,
+    socialInsurance: detail.socialInsurance,
+    incomeTax: detail.incomeTax,
+    net: detail.net,
+  };
+  const monthly = (value: Cents) => assertCents(value / 12);
+  return {
+    tableYear: TAX_TABLE_YEAR,
+    recurring: {
+      gross: monthly(annual.gross),
+      socialInsurance: monthly(annual.socialInsurance),
+      incomeTax: monthly(annual.incomeTax),
+      net: monthly(annual.net),
+    },
+    thirteenth: ZERO_ROW,
+    fourteenth: ZERO_ROW,
+    annual,
+    selfEmployed: detail,
+  };
+}
 
 function normalizeMonthlyGross(input: CalculationInput): Cents {
   if (input.incomePeriod === IncomePeriod.MONTHLY) {
@@ -116,14 +172,31 @@ function sumBreakdowns(...rows: PaymentBreakdown[]): PaymentBreakdown {
 
 export class AustrianTaxEngine {
   calculate(input: CalculationInput): CalculationResult {
+    if (input.employmentType === EmploymentType.SELF_EMPLOYED) {
+      return calculateSelfEmployedResult(input);
+    }
     const monthlyGross = normalizeMonthlyGross(input);
     const recurring = buildPaymentBreakdown(monthlyGross, input, 'recurring');
 
-    const thirteenthParts = computeAssessmentAndSocialInsurance(monthlyGross, input, '13th');
-    const fourteenthParts = computeAssessmentAndSocialInsurance(monthlyGross, input, '14th');
+    const thirteenthParts = computeAssessmentAndSocialInsurance(
+      monthlyGross,
+      input,
+      '13th',
+    );
+    const fourteenthParts = computeAssessmentAndSocialInsurance(
+      monthlyGross,
+      input,
+      '14th',
+    );
     const { thirteenthTax, fourteenthTax } = calculateSonstigeBezuegeIncomeTax(
-      { assessmentGross: thirteenthParts.assessment, socialInsurance: thirteenthParts.socialInsurance },
-      { assessmentGross: fourteenthParts.assessment, socialInsurance: fourteenthParts.socialInsurance },
+      {
+        assessmentGross: thirteenthParts.assessment,
+        socialInsurance: thirteenthParts.socialInsurance,
+      },
+      {
+        assessmentGross: fourteenthParts.assessment,
+        socialInsurance: fourteenthParts.socialInsurance,
+      },
       monthlyGross,
       input,
     );

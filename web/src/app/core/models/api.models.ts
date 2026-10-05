@@ -1,4 +1,6 @@
-export type EmploymentType = 'employee' | 'apprentice' | 'pensioner';
+export type EmploymentType = 'employee' | 'apprentice' | 'pensioner' | 'self_employed';
+/** Autonomos: Gewerbetreibende o Neue Selbständige (GSVG). */
+export type SelfEmployedKind = 'trade' | 'new_self_employed';
 export type IncomePeriod = 'monthly' | 'yearly';
 export type AustrianState =
   | 'wien'
@@ -41,6 +43,9 @@ export interface CalculateRequest {
   commuteOneWayKm: number;
   publicTransportReasonable: boolean;
   commuteDaysPerMonth: CommuteDaysPerMonth;
+  /** Solo autonomos. */
+  selfEmployedKind?: SelfEmployedKind;
+  selfEmployedFirstYears?: boolean;
 }
 
 export interface PaymentBreakdown {
@@ -48,6 +53,32 @@ export interface PaymentBreakdown {
   socialInsurance: number;
   incomeTax: number;
   net: number;
+}
+
+/** Detalle anual del calculo de autonomos (lo calcula el backend). */
+export interface SelfEmployedBreakdown {
+  annualProfit: number;
+  contributionBase: number;
+  insured: boolean;
+  minimumBaseApplied: boolean;
+  maximumBaseApplied: boolean;
+  pension: number;
+  health: number;
+  provision: number;
+  accident: number;
+  socialInsurance: number;
+  profitAfterSocialInsurance: number;
+  gewinnfreibetrag: number;
+  taxableIncome: number;
+  tariffTax: number;
+  familyBonus: number;
+  soleEarnerCredit: number;
+  incomeTax: number;
+  net: number;
+  quarterlyTaxPrepayment: number;
+  quarterlySocialInsurance: number;
+  provisionalSocialInsurance: number | null;
+  estimatedBackPayment: number | null;
 }
 
 export interface UsageInfo {
@@ -62,6 +93,7 @@ export interface CalculateResponse {
   thirteenth: PaymentBreakdown;
   fourteenth: PaymentBreakdown;
   annual: PaymentBreakdown;
+  selfEmployed?: SelfEmployedBreakdown;
   usage?: UsageInfo;
 }
 

@@ -125,7 +125,7 @@ fieldset.field {
 
 @media (min-width: 640px) {
   .employment-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -589,4 +589,84 @@ fieldset.field > .field-hint {
     font-size: 0.9375rem;
     line-height: 1.5;
   }
+}
+
+/* Autonomos: detalle del calculo anual */
+.se-detail {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+
+  h3 {
+    margin: 0 0 0.75rem;
+    font-size: 1rem;
+  }
+
+  h4 {
+    margin: 1rem 0 0.5rem;
+    font-size: 0.9375rem;
+  }
+}
+
+.se-table {
+  margin: 0;
+
+  > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.375rem 0;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.875rem;
+  }
+
+  dt {
+    color: var(--color-text-secondary);
+  }
+
+  dd {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .se-strong dt,
+  .se-strong dd {
+    color: var(--color-text-primary);
+    font-weight: 600;
+  }
+
+  .se-net {
+    border-bottom: none;
+
+    dt,
+    dd {
+      color: var(--color-primary);
+      font-weight: 700;
+      font-size: 1rem;
+    }
+  }
+}
+
+.se-note,
+.se-warning,
+.se-disclaimer {
+  margin: 0.75rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.se-note {
+  color: var(--color-text-secondary);
+}
+
+.se-warning {
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--radius-md, 8px);
+  background: rgba(200, 140, 0, 0.12);
+  color: var(--color-text-primary);
+}
+
+.se-disclaimer {
+  color: var(--color-text-secondary);
 }

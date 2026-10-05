@@ -10,6 +10,7 @@ import type {
   FamilyBonusType,
   IncomePeriod,
   PaymentBreakdown,
+  SelfEmployedKind,
 } from '../../core/models/api.models';
 import {
   CalculatorApiService,
@@ -20,7 +21,7 @@ import type { Lang } from '../../core/i18n/translations';
 import { AuthService } from '../../core/services/auth.service';
 import { SessionService } from '../../core/services/session.service';
 import { UpgradeService } from '../../core/services/upgrade.service';
-import { TranslatePipe } from '../../shared/pipes/app.pipes';
+import { EurPipe, TranslatePipe } from '../../shared/pipes/app.pipes';
 import { CountUpDirective } from '../../shared/animations/count-up.directive';
 import { exportOfficialCalculationPdf, PDF_SUPPORTED_LANGS } from '../../core/pdf/text-pdf.util';
 
@@ -40,7 +41,7 @@ const BMF_PENDLER_URL = 'https://www.bmf.gv.at/pendlerrechner';
 @Component({
   selector: 'app-calculator',
   standalone: true,
-  imports: [FormsModule, TranslatePipe, CountUpDirective],
+  imports: [FormsModule, TranslatePipe, EurPipe, CountUpDirective],
   templateUrl: './calculator.component.html',
   styleUrl: './calculator.component.scss',
 })
@@ -99,6 +100,8 @@ export class CalculatorComponent {
     commuteOneWayKm: 0,
     publicTransportReasonable: true,
     commuteDaysPerMonth: 'more_than_10',
+    selfEmployedKind: 'trade',
+    selfEmployedFirstYears: false,
   });
 
   readonly result = signal<CalculateResponse | null>(null);
@@ -113,11 +116,38 @@ export class CalculatorComponent {
     })),
   );
 
-  readonly grossLabel = computed(() =>
-    this.form().incomePeriod === 'yearly'
-      ? this.i18n.t().grossAmountYearly
-      : this.i18n.t().grossAmountMonthly,
+  /** Autonomos: beneficio anual, sin Estado federado, coche de empresa ni desplazamientos. */
+  readonly isSelfEmployed = computed(() => this.form().employmentType === 'self_employed');
+
+  readonly grossLabel = computed(() => {
+    const t = this.i18n.t();
+    const yearly = this.form().incomePeriod === 'yearly';
+    if (this.isSelfEmployed()) {
+      return yearly ? t.profitAmountYearly : t.profitAmountMonthly;
+    }
+    return yearly ? t.grossAmountYearly : t.grossAmountMonthly;
+  });
+
+  /** Autonomos: sin 13./14. Bezug; solo media mensual y año. */
+  readonly resultTabs = computed<ResultTab[]>(() =>
+    this.result()?.selfEmployed
+      ? ['recurring', 'annual']
+      : ['recurring', 'thirteenth', 'fourteenth', 'annual'],
   );
+
+  readonly seBackPaymentText = computed(() => {
+    const se = this.result()?.selfEmployed;
+    if (!se || se.estimatedBackPayment === null || se.provisionalSocialInsurance === null) {
+      return null;
+    }
+    const eur = (v: number) =>
+      new Intl.NumberFormat('de-AT', { style: 'currency', currency: 'EUR' }).format(v);
+    return this.i18n
+      .t()
+      .seBackPayment.replace('{provisional}', eur(se.provisionalSocialInsurance))
+      .replace('{final}', eur(se.socialInsurance))
+      .replace('{backPayment}', eur(se.estimatedBackPayment));
+  });
 
   readonly showChildrenFields = computed(() => {
     const f = this.form();
@@ -163,8 +193,27 @@ export class CalculatorComponent {
   }
 
   setEmploymentType(type: EmploymentType): void {
-    this.updateForm('employmentType', type);
+    const wasSelfEmployed = this.isSelfEmployed();
+    this.form.update((current) => ({
+      ...current,
+      employmentType: type,
+      // Un autonomo piensa en beneficio anual; al volver a nomina, en sueldo mensual.
+      ...(type === 'self_employed' && !wasSelfEmployed
+        ? { incomePeriod: 'yearly' as IncomePeriod, grossAmount: 40000 }
+        : {}),
+      ...(type !== 'self_employed' && wasSelfEmployed
+        ? { incomePeriod: 'monthly' as IncomePeriod, grossAmount: 3000 }
+        : {}),
+    }));
     this.error.set(null);
+  }
+
+  setSelfEmployedKind(kind: SelfEmployedKind): void {
+    this.updateForm('selfEmployedKind', kind);
+  }
+
+  setFirstYears(value: boolean): void {
+    this.updateForm('selfEmployedFirstYears', value);
   }
 
   setIncomePeriod(period: IncomePeriod): void {
@@ -227,6 +276,20 @@ export class CalculatorComponent {
   private buildCalculateRequest(): CalculateRequest {
     const form = this.form();
     const request: CalculateRequest = { ...form };
+
+    if (form.employmentType === 'self_employed') {
+      // Los campos de nomina no aplican a un autonomo.
+      delete request.companyCar;
+      return {
+        ...request,
+        benefitInKindMonthly: 0,
+        benefitInKindFromCompanyCar: false,
+        taxFreeAllowanceMonthly: 0,
+        commuteOneWayKm: 0,
+      };
+    }
+    delete request.selfEmployedKind;
+    delete request.selfEmployedFirstYears;
 
     if (!form.benefitInKindFromCompanyCar) {
       delete request.companyCar;

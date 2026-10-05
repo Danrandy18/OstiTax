@@ -15,6 +15,7 @@ import {
   FamilyBonusType,
   IncomePeriod,
 } from '../tax-engine/types';
+import { SelfEmployedKind } from '../tax-engine/self-employed.calculator';
 import { CompanyCarDto } from './company-car.dto';
 
 export class CalculateRequestDto {
@@ -73,6 +74,15 @@ export class CalculateRequestDto {
   publicTransportReasonable = true;
 
   @IsEnum(CommuteDaysPerMonth)
-  commuteDaysPerMonth: CommuteDaysPerMonth =
-    CommuteDaysPerMonth.FROM_4_TO_7;
+  commuteDaysPerMonth: CommuteDaysPerMonth = CommuteDaysPerMonth.FROM_4_TO_7;
+
+  /** Solo autonomos: Gewerbetreibende o Neue Selbständige. */
+  @IsOptional()
+  @IsEnum(SelfEmployedKind)
+  selfEmployedKind: SelfEmployedKind = SelfEmployedKind.TRADE;
+
+  /** Solo autonomos: en los tres primeros años la SVS cobra provisionalmente sobre la base minima. */
+  @IsOptional()
+  @IsBoolean()
+  selfEmployedFirstYears = false;
 }

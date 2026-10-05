@@ -13,6 +13,7 @@ export const PDF_OFFICIAL_DE = {
     employee: 'Arbeiter(in) / Angestellte(r)',
     apprentice: 'Lehrling',
     pensioner: 'Pensionist(in)',
+    self_employed: 'Selbstständig',
   },
   incomePeriod: {
     monthly: 'Monatlich',

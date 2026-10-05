@@ -18,8 +18,7 @@ export class CalcService {
       soleEarnerDeduction: dto.soleEarnerDeduction,
       familyBonus: dto.familyBonus,
       childrenUnder18: dto.childrenUnder18,
-      childrenOver18WithFamilyAllowance:
-        dto.childrenOver18WithFamilyAllowance,
+      childrenOver18WithFamilyAllowance: dto.childrenOver18WithFamilyAllowance,
       benefitInKindMonthly: eurosToCents(dto.benefitInKindMonthly),
       benefitInKindFromCompanyCar: dto.benefitInKindFromCompanyCar,
       companyCar: dto.companyCar,
@@ -27,6 +26,8 @@ export class CalcService {
       commuteOneWayKm: dto.commuteOneWayKm,
       publicTransportReasonable: dto.publicTransportReasonable,
       commuteDaysPerMonth: dto.commuteDaysPerMonth,
+      selfEmployedKind: dto.selfEmployedKind,
+      selfEmployedFirstYears: dto.selfEmployedFirstYears,
     };
 
     return CalculateResponseDto.fromResult(this.engine.calculate(input));

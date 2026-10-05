@@ -1,9 +1,21 @@
 enum EmploymentType {
   employee('employee'),
   apprentice('apprentice'),
-  pensioner('pensioner');
+  pensioner('pensioner'),
+
+  /// Autonomo: beneficio anual, cotizaciones SVS y Einkommensteuer (lo calcula el backend).
+  selfEmployed('self_employed');
 
   const EmploymentType(this.wire);
+  final String wire;
+}
+
+/// Autonomos: Gewerbetreibende o Neue Selbständige (GSVG).
+enum SelfEmployedKind {
+  trade('trade'),
+  newSelfEmployed('new_self_employed');
+
+  const SelfEmployedKind(this.wire);
   final String wire;
 }
 
@@ -87,6 +99,8 @@ class CalculateRequest {
     this.commuteOneWayKm = 0,
     this.publicTransportReasonable = true,
     this.commuteDaysPerMonth = CommuteDaysPerMonth.moreThan10,
+    this.selfEmployedKind = SelfEmployedKind.trade,
+    this.selfEmployedFirstYears = false,
   });
 
   final EmploymentType employmentType;
@@ -104,6 +118,10 @@ class CalculateRequest {
   final double commuteOneWayKm;
   final bool publicTransportReasonable;
   final CommuteDaysPerMonth commuteDaysPerMonth;
+  final SelfEmployedKind selfEmployedKind;
+  final bool selfEmployedFirstYears;
+
+  bool get isSelfEmployed => employmentType == EmploymentType.selfEmployed;
 
   CalculateRequest copyWith({
     EmploymentType? employmentType,
@@ -121,6 +139,8 @@ class CalculateRequest {
     double? commuteOneWayKm,
     bool? publicTransportReasonable,
     CommuteDaysPerMonth? commuteDaysPerMonth,
+    SelfEmployedKind? selfEmployedKind,
+    bool? selfEmployedFirstYears,
   }) {
     return CalculateRequest(
       employmentType: employmentType ?? this.employmentType,
@@ -145,27 +165,52 @@ class CalculateRequest {
       publicTransportReasonable:
           publicTransportReasonable ?? this.publicTransportReasonable,
       commuteDaysPerMonth: commuteDaysPerMonth ?? this.commuteDaysPerMonth,
+      selfEmployedKind: selfEmployedKind ?? this.selfEmployedKind,
+      selfEmployedFirstYears:
+          selfEmployedFirstYears ?? this.selfEmployedFirstYears,
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'employmentType': employmentType.wire,
-    'grossAmount': grossAmount,
-    'incomePeriod': incomePeriod.wire,
-    'state': state.wire,
-    'soleEarnerDeduction': soleEarnerDeduction,
-    'familyBonus': familyBonus.wire,
-    'childrenUnder18': childrenUnder18,
-    'childrenOver18WithFamilyAllowance': childrenOver18WithFamilyAllowance,
-    'benefitInKindMonthly': benefitInKindMonthly,
-    'benefitInKindFromCompanyCar': benefitInKindFromCompanyCar,
-    if (benefitInKindFromCompanyCar && companyCar != null)
-      'companyCar': companyCar!.toJson(),
-    'taxFreeAllowanceMonthly': taxFreeAllowanceMonthly,
-    'commuteOneWayKm': commuteOneWayKm,
-    'publicTransportReasonable': publicTransportReasonable,
-    'commuteDaysPerMonth': commuteDaysPerMonth.wire,
-  };
+  Map<String, dynamic> toJson() => isSelfEmployed
+      ? {
+          // Los campos de nomina no aplican a un autonomo.
+          'employmentType': employmentType.wire,
+          'grossAmount': grossAmount,
+          'incomePeriod': incomePeriod.wire,
+          'state': state.wire,
+          'soleEarnerDeduction': soleEarnerDeduction,
+          'familyBonus': familyBonus.wire,
+          'childrenUnder18': childrenUnder18,
+          'childrenOver18WithFamilyAllowance':
+              childrenOver18WithFamilyAllowance,
+          'benefitInKindMonthly': 0,
+          'benefitInKindFromCompanyCar': false,
+          'taxFreeAllowanceMonthly': 0,
+          'commuteOneWayKm': 0,
+          'publicTransportReasonable': true,
+          'commuteDaysPerMonth': commuteDaysPerMonth.wire,
+          'selfEmployedKind': selfEmployedKind.wire,
+          'selfEmployedFirstYears': selfEmployedFirstYears,
+        }
+      : {
+          'employmentType': employmentType.wire,
+          'grossAmount': grossAmount,
+          'incomePeriod': incomePeriod.wire,
+          'state': state.wire,
+          'soleEarnerDeduction': soleEarnerDeduction,
+          'familyBonus': familyBonus.wire,
+          'childrenUnder18': childrenUnder18,
+          'childrenOver18WithFamilyAllowance':
+              childrenOver18WithFamilyAllowance,
+          'benefitInKindMonthly': benefitInKindMonthly,
+          'benefitInKindFromCompanyCar': benefitInKindFromCompanyCar,
+          if (benefitInKindFromCompanyCar && companyCar != null)
+            'companyCar': companyCar!.toJson(),
+          'taxFreeAllowanceMonthly': taxFreeAllowanceMonthly,
+          'commuteOneWayKm': commuteOneWayKm,
+          'publicTransportReasonable': publicTransportReasonable,
+          'commuteDaysPerMonth': commuteDaysPerMonth.wire,
+        };
 }
 
 const _unset = Object();
@@ -190,6 +235,80 @@ class PaymentBreakdown {
         incomeTax: (json['incomeTax'] as num).toDouble(),
         net: (json['net'] as num).toDouble(),
       );
+}
+
+/// Detalle anual del calculo de autonomos (lo calcula el backend).
+class SelfEmployedBreakdown {
+  const SelfEmployedBreakdown({
+    required this.annualProfit,
+    required this.insured,
+    required this.minimumBaseApplied,
+    required this.maximumBaseApplied,
+    required this.pension,
+    required this.health,
+    required this.provision,
+    required this.accident,
+    required this.socialInsurance,
+    required this.gewinnfreibetrag,
+    required this.taxableIncome,
+    required this.tariffTax,
+    required this.familyBonus,
+    required this.soleEarnerCredit,
+    required this.incomeTax,
+    required this.net,
+    required this.quarterlyTaxPrepayment,
+    required this.quarterlySocialInsurance,
+    this.provisionalSocialInsurance,
+    this.estimatedBackPayment,
+  });
+
+  final double annualProfit;
+  final bool insured;
+  final bool minimumBaseApplied;
+  final bool maximumBaseApplied;
+  final double pension;
+  final double health;
+  final double provision;
+  final double accident;
+  final double socialInsurance;
+  final double gewinnfreibetrag;
+  final double taxableIncome;
+  final double tariffTax;
+  final double familyBonus;
+  final double soleEarnerCredit;
+  final double incomeTax;
+  final double net;
+  final double quarterlyTaxPrepayment;
+  final double quarterlySocialInsurance;
+  final double? provisionalSocialInsurance;
+  final double? estimatedBackPayment;
+
+  factory SelfEmployedBreakdown.fromJson(Map<String, dynamic> json) {
+    double d(String key) => (json[key] as num).toDouble();
+    double? n(String key) => (json[key] as num?)?.toDouble();
+    return SelfEmployedBreakdown(
+      annualProfit: d('annualProfit'),
+      insured: json['insured'] as bool,
+      minimumBaseApplied: json['minimumBaseApplied'] as bool,
+      maximumBaseApplied: json['maximumBaseApplied'] as bool,
+      pension: d('pension'),
+      health: d('health'),
+      provision: d('provision'),
+      accident: d('accident'),
+      socialInsurance: d('socialInsurance'),
+      gewinnfreibetrag: d('gewinnfreibetrag'),
+      taxableIncome: d('taxableIncome'),
+      tariffTax: d('tariffTax'),
+      familyBonus: d('familyBonus'),
+      soleEarnerCredit: d('soleEarnerCredit'),
+      incomeTax: d('incomeTax'),
+      net: d('net'),
+      quarterlyTaxPrepayment: d('quarterlyTaxPrepayment'),
+      quarterlySocialInsurance: d('quarterlySocialInsurance'),
+      provisionalSocialInsurance: n('provisionalSocialInsurance'),
+      estimatedBackPayment: n('estimatedBackPayment'),
+    );
+  }
 }
 
 class UsageInfo {
@@ -217,6 +336,7 @@ class CalculateResponse {
     required this.thirteenth,
     required this.fourteenth,
     required this.annual,
+    this.selfEmployed,
     this.usage,
   });
 
@@ -225,6 +345,7 @@ class CalculateResponse {
   final PaymentBreakdown thirteenth;
   final PaymentBreakdown fourteenth;
   final PaymentBreakdown annual;
+  final SelfEmployedBreakdown? selfEmployed;
   final UsageInfo? usage;
 
   factory CalculateResponse.fromJson(Map<String, dynamic> json) =>
@@ -242,6 +363,11 @@ class CalculateResponse {
         annual: PaymentBreakdown.fromJson(
           json['annual'] as Map<String, dynamic>,
         ),
+        selfEmployed: json['selfEmployed'] != null
+            ? SelfEmployedBreakdown.fromJson(
+                json['selfEmployed'] as Map<String, dynamic>,
+              )
+            : null,
         usage: json['usage'] != null
             ? UsageInfo.fromJson(json['usage'] as Map<String, dynamic>)
             : null,

@@ -4,6 +4,8 @@ export enum EmploymentType {
   EMPLOYEE = 'employee',
   APPRENTICE = 'apprentice',
   PENSIONER = 'pensioner',
+  /** Autonomo: beneficio anual, cotizaciones SVS y Einkommensteuer (ver self-employed.calculator). */
+  SELF_EMPLOYED = 'self_employed',
 }
 
 export enum IncomePeriod {
@@ -37,6 +39,10 @@ export enum CommuteDaysPerMonth {
 }
 
 import type { CompanyCarBenefitInput } from './company-car-benefit.calculator';
+import type {
+  SelfEmployedKind,
+  SelfEmployedResult,
+} from './self-employed.calculator';
 
 export interface CalculationInput {
   employmentType: EmploymentType;
@@ -55,6 +61,9 @@ export interface CalculationInput {
   commuteOneWayKm: number;
   publicTransportReasonable: boolean;
   commuteDaysPerMonth: CommuteDaysPerMonth;
+  /** Solo autonomos. */
+  selfEmployedKind?: SelfEmployedKind;
+  selfEmployedFirstYears?: boolean;
 }
 
 export interface PaymentBreakdown {
@@ -70,4 +79,6 @@ export interface CalculationResult {
   thirteenth: PaymentBreakdown;
   fourteenth: PaymentBreakdown;
   annual: PaymentBreakdown;
+  /** Solo autonomos: el detalle del calculo anual. */
+  selfEmployed?: SelfEmployedResult;
 }

@@ -71,3 +71,61 @@ describe('PDF por niveles', () => {
     expect(buildTips(request, PDF_EXTRA.es).length).toBeGreaterThan(0);
   });
 });
+
+describe('PDF de autonomos', () => {
+  const seRequest: CalculateRequest = {
+    ...request,
+    employmentType: 'self_employed',
+    grossAmount: 40000,
+    incomePeriod: 'yearly',
+    selfEmployedKind: 'trade',
+    selfEmployedFirstYears: true,
+  };
+  const zero = pb(0, 0, 0, 0);
+  const seResponse: CalculateResponse = {
+    tableYear: 2026,
+    recurring: pb(3333.33, 907.29, 209.72, 2216.32),
+    thirteenth: zero,
+    fourteenth: zero,
+    annual: pb(40000, 10887.52, 2516.68, 26595.8),
+    selfEmployed: {
+      annualProfit: 40000,
+      contributionBase: 40000,
+      insured: true,
+      minimumBaseApplied: false,
+      maximumBaseApplied: false,
+      pension: 7400,
+      health: 2720,
+      provision: 612,
+      accident: 155.52,
+      socialInsurance: 10887.52,
+      profitAfterSocialInsurance: 29112.48,
+      gewinnfreibetrag: 4366.87,
+      taxableIncome: 24745.61,
+      tariffTax: 2516.68,
+      familyBonus: 0,
+      soleEarnerCredit: 0,
+      incomeTax: 2516.68,
+      net: 26595.8,
+      quarterlyTaxPrepayment: 629.17,
+      quarterlySocialInsurance: 482.46,
+      provisionalSocialInsurance: 1929.84,
+      estimatedBackPayment: 8957.68,
+    },
+  };
+
+  for (const lang of ['de', 'en', 'es'] as const) {
+    it(`genera el PDF Pro en una pagina, sin pagas extra ni explicaciones de nomina (${lang})`, async () => {
+      const raw = await text(buildOfficialCalculationPdf(seRequest, seResponse, lang, 'pro'));
+      expect(raw).toContain('/Count 1');
+      expect(raw).not.toContain('13. Bezug');
+      expect(raw).not.toContain('{provisional}');
+    });
+  }
+
+  it('el PDF basico de un autonomo lleva el aviso de Pro', async () => {
+    const raw = await text(buildOfficialCalculationPdf(seRequest, seResponse, 'de', 'basic'));
+    expect(raw).toContain('/Count 1');
+    expect(raw).toContain('Selbstst');
+  });
+});

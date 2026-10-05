@@ -86,6 +86,30 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
   void _update(CalculateRequest Function(CalculateRequest) fn) =>
       ref.read(calculatorControllerProvider.notifier).updateForm(fn);
 
+  /// Un autonomo piensa en beneficio anual; al volver a nomina, en sueldo mensual.
+  void _setEmploymentType(EmploymentType type) {
+    final current = ref.read(calculatorControllerProvider).form;
+    final toSelfEmployed =
+        type == EmploymentType.selfEmployed && !current.isSelfEmployed;
+    final fromSelfEmployed =
+        type != EmploymentType.selfEmployed && current.isSelfEmployed;
+    if (toSelfEmployed || fromSelfEmployed) {
+      final amount = toSelfEmployed ? 40000.0 : 3000.0;
+      _grossCtrl.text = _fmt(amount);
+      _update(
+        (f) => f.copyWith(
+          employmentType: type,
+          grossAmount: amount,
+          incomePeriod: toSelfEmployed
+              ? IncomePeriod.yearly
+              : IncomePeriod.monthly,
+        ),
+      );
+      return;
+    }
+    _update((f) => f.copyWith(employmentType: type));
+  }
+
   @override
   Widget build(BuildContext context) {
     final calcState = ref.watch(calculatorControllerProvider);
@@ -194,13 +218,12 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
                 const SizedBox(height: 10),
                 _EmploymentGrid(
                   value: form.employmentType,
-                  onChanged: (v) =>
-                      _update((f) => f.copyWith(employmentType: v)),
+                  onChanged: _setEmploymentType,
                 ),
                 const SizedBox(height: 18),
                 _FieldLabel(
                   ref.tr('incomePeriod'),
-                  hint: ref.tr('incomePeriodHint'),
+                  hint: form.isSelfEmployed ? null : ref.tr('incomePeriodHint'),
                 ),
                 const SizedBox(height: 8),
                 SegmentedToggle(
@@ -217,22 +240,63 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
                 ),
                 const SizedBox(height: 16),
                 _FieldLabel(
-                  form.incomePeriod == IncomePeriod.monthly
-                      ? ref.tr('grossAmountMonthly')
-                      : ref.tr('grossAmountYearly'),
+                  ref.tr(
+                    form.isSelfEmployed
+                        ? (form.incomePeriod == IncomePeriod.monthly
+                              ? 'profitAmountMonthly'
+                              : 'profitAmountYearly')
+                        : (form.incomePeriod == IncomePeriod.monthly
+                              ? 'grossAmountMonthly'
+                              : 'grossAmountYearly'),
+                  ),
+                  hint: form.isSelfEmployed ? ref.tr('profitHint') : null,
                 ),
                 const SizedBox(height: 6),
                 _NumberField(
+                  key: const Key('grossAmountField'),
                   controller: _grossCtrl,
                   onChanged: (v) => _update((f) => f.copyWith(grossAmount: v)),
                 ),
                 const SizedBox(height: 16),
-                _FieldLabel(ref.tr('state'), hint: ref.tr('stateHint')),
-                const SizedBox(height: 6),
-                _StateDropdown(
-                  value: form.state,
-                  onChanged: (v) => _update((f) => f.copyWith(state: v)),
-                ),
+                if (form.isSelfEmployed) ...[
+                  _FieldLabel(
+                    ref.tr('selfEmployedKind'),
+                    hint: ref.tr('selfEmployedKindHint'),
+                  ),
+                  const SizedBox(height: 6),
+                  _StyledDropdown<SelfEmployedKind>(
+                    value: form.selfEmployedKind,
+                    items: SelfEmployedKind.values,
+                    labelOf: (k) => ref.tr(
+                      k == SelfEmployedKind.trade
+                          ? 'selfEmployedKindTrade'
+                          : 'selfEmployedKindNew',
+                    ),
+                    onChanged: (v) =>
+                        _update((f) => f.copyWith(selfEmployedKind: v)),
+                  ),
+                  const SizedBox(height: 16),
+                  _FieldLabel(
+                    ref.tr('selfEmployedFirstYears'),
+                    hint: ref.tr('selfEmployedFirstYearsHint'),
+                  ),
+                  const SizedBox(height: 8),
+                  SegmentedToggle(
+                    leftLabel: ref.tr('yes'),
+                    rightLabel: ref.tr('no'),
+                    valueIsLeft: form.selfEmployedFirstYears,
+                    onChanged: (isLeft) => _update(
+                      (f) => f.copyWith(selfEmployedFirstYears: isLeft),
+                    ),
+                  ),
+                ] else ...[
+                  _FieldLabel(ref.tr('state'), hint: ref.tr('stateHint')),
+                  const SizedBox(height: 6),
+                  _StateDropdown(
+                    value: form.state,
+                    onChanged: (v) => _update((f) => f.copyWith(state: v)),
+                  ),
+                ],
               ],
             ),
 
@@ -305,119 +369,121 @@ class _CalculatorScreenState extends ConsumerState<CalculatorScreen> {
                     ],
                   ),
                 ],
-                const SizedBox(height: 16),
-                _FieldLabel(
-                  ref.tr('benefitInKind'),
-                  hint: ref.tr('benefitInKindHint'),
-                ),
-                const SizedBox(height: 6),
-                _NumberField(
-                  controller: _benefitInKindCtrl,
-                  onChanged: (v) =>
-                      _update((f) => f.copyWith(benefitInKindMonthly: v)),
-                ),
-                const SizedBox(height: 16),
-                _FieldLabel(
-                  ref.tr('companyCarBenefit'),
-                  hint: ref.tr('companyCarHint'),
-                ),
-                const SizedBox(height: 8),
-                SegmentedToggle(
-                  leftLabel: ref.tr('yes'),
-                  rightLabel: ref.tr('no'),
-                  valueIsLeft: form.benefitInKindFromCompanyCar,
-                  onChanged: (isLeft) => _update((f) {
-                    if (!isLeft) {
+                if (!form.isSelfEmployed) ...[
+                  const SizedBox(height: 16),
+                  _FieldLabel(
+                    ref.tr('benefitInKind'),
+                    hint: ref.tr('benefitInKindHint'),
+                  ),
+                  const SizedBox(height: 6),
+                  _NumberField(
+                    controller: _benefitInKindCtrl,
+                    onChanged: (v) =>
+                        _update((f) => f.copyWith(benefitInKindMonthly: v)),
+                  ),
+                  const SizedBox(height: 16),
+                  _FieldLabel(
+                    ref.tr('companyCarBenefit'),
+                    hint: ref.tr('companyCarHint'),
+                  ),
+                  const SizedBox(height: 8),
+                  SegmentedToggle(
+                    leftLabel: ref.tr('yes'),
+                    rightLabel: ref.tr('no'),
+                    valueIsLeft: form.benefitInKindFromCompanyCar,
+                    onChanged: (isLeft) => _update((f) {
+                      if (!isLeft) {
+                        return f.copyWith(
+                          benefitInKindFromCompanyCar: false,
+                          companyCar: null,
+                        );
+                      }
                       return f.copyWith(
-                        benefitInKindFromCompanyCar: false,
-                        companyCar: null,
+                        benefitInKindFromCompanyCar: true,
+                        companyCar: CompanyCarInput(
+                          acquisitionCost:
+                              double.tryParse(_carCostCtrl.text) ?? 0,
+                          co2GramsPerKm: int.tryParse(_carCo2Ctrl.text) ?? 0,
+                          firstRegistrationYear:
+                              int.tryParse(_carYearCtrl.text) ??
+                              DateTime.now().year,
+                        ),
                       );
-                    }
-                    return f.copyWith(
-                      benefitInKindFromCompanyCar: true,
-                      companyCar: CompanyCarInput(
-                        acquisitionCost:
-                            double.tryParse(_carCostCtrl.text) ?? 0,
-                        co2GramsPerKm: int.tryParse(_carCo2Ctrl.text) ?? 0,
-                        firstRegistrationYear:
-                            int.tryParse(_carYearCtrl.text) ??
-                            DateTime.now().year,
-                      ),
-                    );
-                  }),
-                ),
-                if (form.benefitInKindFromCompanyCar) ...[
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _FieldLabel(ref.tr('companyCarAcquisitionCost')),
-                            const SizedBox(height: 6),
-                            _NumberField(
-                              controller: _carCostCtrl,
-                              onChanged: (v) => _update(
-                                (f) => f.copyWith(
-                                  companyCar: CompanyCarInput(
-                                    acquisitionCost: v,
-                                    co2GramsPerKm:
-                                        f.companyCar?.co2GramsPerKm ?? 0,
-                                    firstRegistrationYear:
-                                        f.companyCar?.firstRegistrationYear ??
-                                        DateTime.now().year,
+                    }),
+                  ),
+                  if (form.benefitInKindFromCompanyCar) ...[
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _FieldLabel(ref.tr('companyCarAcquisitionCost')),
+                              const SizedBox(height: 6),
+                              _NumberField(
+                                controller: _carCostCtrl,
+                                onChanged: (v) => _update(
+                                  (f) => f.copyWith(
+                                    companyCar: CompanyCarInput(
+                                      acquisitionCost: v,
+                                      co2GramsPerKm:
+                                          f.companyCar?.co2GramsPerKm ?? 0,
+                                      firstRegistrationYear:
+                                          f.companyCar?.firstRegistrationYear ??
+                                          DateTime.now().year,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _FieldLabel(ref.tr('companyCarCo2')),
-                            const SizedBox(height: 6),
-                            _NumberField(
-                              controller: _carCo2Ctrl,
-                              isInteger: true,
-                              onChanged: (v) => _update(
-                                (f) => f.copyWith(
-                                  companyCar: CompanyCarInput(
-                                    acquisitionCost:
-                                        f.companyCar?.acquisitionCost ?? 0,
-                                    co2GramsPerKm: v.toInt(),
-                                    firstRegistrationYear:
-                                        f.companyCar?.firstRegistrationYear ??
-                                        DateTime.now().year,
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _FieldLabel(ref.tr('companyCarCo2')),
+                              const SizedBox(height: 6),
+                              _NumberField(
+                                controller: _carCo2Ctrl,
+                                isInteger: true,
+                                onChanged: (v) => _update(
+                                  (f) => f.copyWith(
+                                    companyCar: CompanyCarInput(
+                                      acquisitionCost:
+                                          f.companyCar?.acquisitionCost ?? 0,
+                                      co2GramsPerKm: v.toInt(),
+                                      firstRegistrationYear:
+                                          f.companyCar?.firstRegistrationYear ??
+                                          DateTime.now().year,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  _FieldLabel(
+                    ref.tr('taxFreeAllowance'),
+                    hint: ref.tr('taxFreeAllowanceHint'),
+                  ),
+                  const SizedBox(height: 6),
+                  _NumberField(
+                    controller: _taxFreeCtrl,
+                    onChanged: (v) =>
+                        _update((f) => f.copyWith(taxFreeAllowanceMonthly: v)),
                   ),
                 ],
-                const SizedBox(height: 16),
-                _FieldLabel(
-                  ref.tr('taxFreeAllowance'),
-                  hint: ref.tr('taxFreeAllowanceHint'),
-                ),
-                const SizedBox(height: 6),
-                _NumberField(
-                  controller: _taxFreeCtrl,
-                  onChanged: (v) =>
-                      _update((f) => f.copyWith(taxFreeAllowanceMonthly: v)),
-                ),
               ],
             ),
 
-            if (!form.benefitInKindFromCompanyCar) ...[
+            if (!form.benefitInKindFromCompanyCar && !form.isSelfEmployed) ...[
               const SizedBox(height: 14),
               _SectionCard(
                 title: ref.tr('commute'),
@@ -705,6 +771,7 @@ class _FieldLabel extends StatelessWidget {
 
 class _NumberField extends StatelessWidget {
   const _NumberField({
+    super.key,
     required this.controller,
     required this.onChanged,
     this.isInteger = false,
@@ -748,14 +815,19 @@ class _EmploymentGrid extends ConsumerWidget {
         ref.tr('employmentPensioner'),
         Icons.wb_sunny_rounded,
       ),
+      (
+        EmploymentType.selfEmployed,
+        ref.tr('employmentSelfEmployed'),
+        Icons.laptop_mac_rounded,
+      ),
     ];
 
-    return Row(
-      children: options.map((opt) {
+    Widget row(List<(EmploymentType, String, IconData)> pair) => Row(
+      children: pair.map((opt) {
         final active = opt.$1 == value;
         return Expanded(
           child: Padding(
-            padding: EdgeInsets.only(right: opt == options.last ? 0 : 8),
+            padding: EdgeInsets.only(right: opt == pair.last ? 0 : 8),
             child: GestureDetector(
               onTap: () => onChanged(opt.$1),
               child: AnimatedContainer(
@@ -811,6 +883,14 @@ class _EmploymentGrid extends ConsumerWidget {
           ),
         );
       }).toList(),
+    );
+
+    return Column(
+      children: [
+        row(options.sublist(0, 2)),
+        const SizedBox(height: 8),
+        row(options.sublist(2)),
+      ],
     );
   }
 }

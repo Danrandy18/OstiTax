@@ -224,7 +224,29 @@ function assemblePdf(pages: ByteBuffer[]): Blob {
   return new Blob([doc.toUint8Array().buffer as ArrayBuffer], { type: 'application/pdf' });
 }
 
+/** Datos de un autonomo: beneficio, tipo de actividad, primeros años y familia. */
+function buildSelfEmployedInputRows(request: CalculateRequest, de: PdfSchema): Array<[string, string]> {
+  const rows: Array<[string, string]> = [
+    [de.labels.employment, de.employment.self_employed],
+    [de.se.profit, `${formatOfficialEuro(request.grossAmount)} (${de.incomePeriod[request.incomePeriod]})`],
+    [de.se.kind, request.selfEmployedKind === 'new_self_employed' ? de.se.kindNew : de.se.kindTrade],
+    [de.se.firstYears, request.selfEmployedFirstYears ? de.yesNo.yes : de.yesNo.no],
+    [de.labels.soleEarner, request.soleEarnerDeduction ? de.yesNo.yes : de.yesNo.no],
+    [de.labels.familyBonus, de.familyBonus[request.familyBonus]],
+  ];
+  if (request.childrenUnder18 > 0 || request.childrenOver18WithFamilyAllowance > 0) {
+    rows.push(
+      [de.labels.childrenUnder18, String(request.childrenUnder18)],
+      [de.labels.childrenOver18, String(request.childrenOver18WithFamilyAllowance)],
+    );
+  }
+  return rows;
+}
+
 function buildInputRows(request: CalculateRequest, de: PdfSchema): Array<[string, string]> {
+  if (request.employmentType === 'self_employed') {
+    return buildSelfEmployedInputRows(request, de);
+  }
   const rows: Array<[string, string]> = [
     [de.labels.employment, de.employment[request.employmentType]],
     [
@@ -315,8 +337,122 @@ function drawDisclaimer(buf: ByteBuffer, de: PdfSchema, y: number): number {
   return y - 60;
 }
 
+/**
+ * Autonomos: entradas, media mensual / año y el desglose anual (SVS, Gewinnfreibetrag, impuesto),
+ * con los pagos trimestrales y el aviso de pago atrasado de los primeros años.
+ */
+function renderSelfEmployedPage(
+  buf: ByteBuffer,
+  request: CalculateRequest,
+  response: CalculateResponse,
+  de: PdfSchema,
+  detailed: boolean,
+): void {
+  const se = response.selfEmployed!;
+  const t = de.se;
+  let y = drawHeader(buf, de, response.tableYear);
+
+  y = drawSectionTitle(buf, y, de.sectionInputs);
+  y += 8;
+  for (const [label, value] of buildSelfEmployedInputRows(request, de)) {
+    drawText(buf, MARGIN_X, y, 'F1', 9.5, label, COLOR_MUTED);
+    drawText(buf, MARGIN_X + 235, y, 'F2', 9.5, value, COLOR_TEXT);
+    y -= 15.5;
+  }
+  y -= 12;
+
+  y = drawSectionTitle(buf, y, de.sectionResult);
+  y += 6;
+  const labelColW = 260;
+  const numColW = (CONTENT_W - labelColW) / 2;
+  const colRightX = [0, 1].map((i) => MARGIN_X + labelColW + numColW * (i + 1) - 6);
+  drawTextRight(buf, colRightX[0], y, 'F4', 8.5, t.monthlyAverage, COLOR_MUTED);
+  drawTextRight(buf, colRightX[1], y, 'F4', 8.5, de.columns.annual, COLOR_MUTED);
+  y -= 8;
+  drawLine(buf, MARGIN_X, y, PAGE_W - MARGIN_X, y, COLOR_BORDER);
+  y -= 17;
+  const summary: Array<{ key: keyof PaymentBreakdown; label: string; deduction?: boolean }> = [
+    { key: 'gross', label: t.profitRow },
+    { key: 'socialInsurance', label: t.socialInsurance, deduction: true },
+    { key: 'incomeTax', label: t.incomeTax, deduction: true },
+  ];
+  for (const row of summary) {
+    drawText(buf, MARGIN_X, y, 'F1', 9.5, row.label, COLOR_TEXT);
+    [response.recurring, response.annual].forEach((b, i) => {
+      const amount = formatOfficialEuro(b[row.key]);
+      drawTextRight(buf, colRightX[i], y, 'F3', 9.5, row.deduction ? `- ${amount}` : amount, row.deduction ? COLOR_MUTED : COLOR_TEXT);
+    });
+    y -= 16.5;
+  }
+  y -= 4;
+  fillRect(buf, MARGIN_X - 8, y - 6, CONTENT_W + 16, 24, COLOR_SUCCESS_TINT);
+  drawText(buf, MARGIN_X, y + 2, 'F2', 10.5, t.net, COLOR_SUCCESS);
+  [response.recurring, response.annual].forEach((b, i) =>
+    drawTextRight(buf, colRightX[i], y + 2, 'F4', 10.5, formatOfficialEuro(b.net), COLOR_SUCCESS),
+  );
+  y -= 34;
+
+  if (detailed) {
+    y = drawSectionTitle(buf, y, t.detailTitle);
+    y += 8;
+    const detail: Array<[string, number, boolean]> = [];
+    if (se.insured) {
+      detail.push(
+        [t.pension, se.pension, true],
+        [t.health, se.health, true],
+        [t.provision, se.provision, true],
+        [t.accident, se.accident, true],
+      );
+    }
+    detail.push(
+      [t.gewinnfreibetrag, se.gewinnfreibetrag, true],
+      [t.taxable, se.taxableIncome, false],
+      [t.tariffTax, se.tariffTax, false],
+    );
+    if (se.familyBonus > 0) detail.push([t.familyBonus, se.familyBonus, true]);
+    if (se.soleEarnerCredit > 0) detail.push([t.soleEarner, se.soleEarnerCredit, true]);
+    detail.push(
+      [t.quarterlySocialInsurance, se.quarterlySocialInsurance, false],
+      [t.quarterlyTax, se.quarterlyTaxPrepayment, false],
+    );
+    for (const [label, value, deduction] of detail) {
+      drawText(buf, MARGIN_X, y, 'F1', 9, label, COLOR_TEXT);
+      const amount = formatOfficialEuro(value);
+      drawTextRight(buf, PAGE_W - MARGIN_X - 6, y, 'F3', 9, deduction ? `- ${amount}` : amount, COLOR_MUTED);
+      y -= 14;
+    }
+    y -= 8;
+  }
+
+  const notes: string[] = [];
+  if (!se.insured) notes.push(t.notInsured);
+  else if (se.minimumBaseApplied) notes.push(t.minBase);
+  else if (se.maximumBaseApplied) notes.push(t.maxBase);
+  if (se.estimatedBackPayment !== null && se.provisionalSocialInsurance !== null) {
+    notes.push(
+      fillVars(t.backPayment, {
+        provisional: formatOfficialEuro(se.provisionalSocialInsurance),
+        final: formatOfficialEuro(se.socialInsurance),
+        backPayment: formatOfficialEuro(se.estimatedBackPayment),
+      }),
+    );
+  }
+  notes.push(t.disclaimer);
+  for (const note of notes) {
+    for (const line of wrapText(note, 104)) {
+      drawText(buf, MARGIN_X, y, 'F1', 8.5, line, COLOR_MUTED);
+      y -= 11.5;
+    }
+    y -= 5;
+  }
+}
+
 /** Pagina 1 del PDF completo (Pro): todas las entradas y las cuatro columnas de resultados. */
 function renderFullPage(buf: ByteBuffer, request: CalculateRequest, response: CalculateResponse, de: PdfSchema): void {
+  if (response.selfEmployed) {
+    renderSelfEmployedPage(buf, request, response, de, true);
+    return;
+  }
   let y = drawHeader(buf, de, response.tableYear);
 
   y = drawSectionTitle(buf, y, de.sectionInputs);
@@ -376,6 +512,11 @@ function renderBasicPage(
   de: PdfSchema,
   extra: PdfExtra,
 ): void {
+  if (response.selfEmployed) {
+    renderSelfEmployedPage(buf, request, response, de, false);
+    drawUpgradeBanner(buf, extra);
+    return;
+  }
   let y = drawHeader(buf, de, response.tableYear);
 
   y = drawSectionTitle(buf, y, extra.basicSummary);
@@ -434,8 +575,11 @@ function renderBasicPage(
   y -= 40;
 
   drawDisclaimer(buf, de, y);
+  drawUpgradeBanner(buf, extra);
+}
 
-  // Aviso de mejora a Pro: sin enlace ni precio (la version de Google Play no vende suscripciones).
+/** Aviso de mejora a Pro: sin enlace ni precio (la version de Google Play no vende suscripciones). */
+function drawUpgradeBanner(buf: ByteBuffer, extra: PdfExtra): void {
   const bannerY = 150;
   fillRect(buf, MARGIN_X - 8, bannerY - 46, CONTENT_W + 16, 70, COLOR_BRAND);
   drawText(buf, MARGIN_X + 6, bannerY, 'F2', 13, extra.upgradeTitle, COLOR_WHITE);
@@ -578,7 +722,10 @@ export function buildOfficialCalculationPdf(
     renderBasicPage(first, request, response, de, extra);
   } else {
     renderFullPage(first, request, response, de);
-    pages.push(...renderExtraPages(request, response, de, extra));
+    // Las explicaciones, consejos y guia hablan de la nomina; a un autonomo no le aplican.
+    if (!response.selfEmployed) {
+      pages.push(...renderExtraPages(request, response, de, extra));
+    }
   }
 
   pages.forEach((page, index) => drawFooter(page, de, extra, index + 1, pages.length));
