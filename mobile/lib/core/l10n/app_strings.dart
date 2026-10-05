@@ -355,6 +355,8 @@ class AppStrings {
       'seMaxBaseNote': 'Dein Gewinn liegt über der Höchstbeitragsgrundlage: Die Beiträge sind gedeckelt.',
       'seNotInsuredNote': 'Als Neue/r Selbständige/r unter der Versicherungsgrenze (6.613,20 €/Jahr) bist du nicht pflichtversichert. Du kannst dich freiwillig versichern.',
       'seDisclaimer': 'Schätzung für Gewerbetreibende und Neue Selbständige (GSVG) 2026. Nicht enthalten: investitionsbedingter Gewinnfreibetrag über 33.000 €, Umsatzsteuer, Pauschalierungen und Kammer-Freiberufler (z. B. Ärzte, Anwälte).',
+      'comparePdfFree': 'Basis',
+      'comparePdfPro': 'Vollständig',
     },
     'en': {
       'appTitle': 'ÖstiTax',
@@ -682,6 +684,8 @@ class AppStrings {
       'seMaxBaseNote': 'Your profit is above the maximum contribution base: contributions are capped.',
       'seNotInsuredNote': 'As new self-employed below the insurance limit (€6,613.20/year) you are not compulsorily insured. You can insure yourself voluntarily.',
       'seDisclaimer': 'Estimate for traders and new self-employed (GSVG) 2026. Not included: investment-based profit allowance above €33,000, VAT, flat-rate schemes and chamber professions (e.g. doctors, lawyers).',
+      'comparePdfFree': 'Basic',
+      'comparePdfPro': 'Full report',
     },
     'tr': {
       'appTitle': 'ÖstiTax',
@@ -1007,6 +1011,8 @@ class AppStrings {
       'seMaxBaseNote': 'Kârınız azami prim matrahının üzerinde: primler üst sınırla sınırlıdır.',
       'seNotInsuredNote': 'Sigorta sınırının (yılda 6.613,20 €) altındaki yeni serbest çalışan olarak zorunlu sigortalı değilsiniz. İsteğe bağlı sigortalanabilirsiniz.',
       'seDisclaimer': 'Ticari faaliyet sahipleri ve yeni serbest çalışanlar (GSVG) için 2026 tahmini. Dahil değil: 33.000 € üzerindeki yatırıma bağlı kâr muafiyeti, KDV, götürü usuller ve oda üyesi meslekler (ör. doktorlar, avukatlar).',
+      'comparePdfFree': 'Temel',
+      'comparePdfPro': 'Tam rapor',
     },
     'bcs': {
       'appTitle': 'ÖstiTax',
@@ -1326,6 +1332,8 @@ class AppStrings {
           'Tvoja dobit je iznad maksimalne osnovice: doprinosi su ograničeni.',
       'seNotInsuredNote': 'Kao novi samostalni ispod granice osiguranja (6.613,20 €/godišnje) nisi obavezno osiguran/a. Možeš se dobrovoljno osigurati.',
       'seDisclaimer': 'Procjena za obrtnike i nove samostalne (GSVG) 2026. Nije uključeno: investicijsko oslobođenje dobiti iznad 33.000 €, PDV, paušalni sistemi i komorska zanimanja (npr. ljekari, advokati).',
+      'comparePdfFree': 'Osnovni',
+      'comparePdfPro': 'Kompletan',
     },
     'es': {
       'appTitle': 'ÖstiTax',
@@ -1652,6 +1660,8 @@ class AppStrings {
       'seMaxBaseNote': 'Tu beneficio supera la base máxima: las cotizaciones tienen un tope.',
       'seNotInsuredNote': 'Como nuevo autónomo por debajo del límite de aseguramiento (6.613,20 €/año) no estás obligado a cotizar. Puedes asegurarte de forma voluntaria.',
       'seDisclaimer': 'Estimación para actividades comerciales y nuevos autónomos (GSVG) 2026. No incluye: reducción por inversiones por encima de 33.000 €, IVA, regímenes de módulos ni profesiones colegiadas (p. ej. médicos, abogados).',
+      'comparePdfFree': 'Básico',
+      'comparePdfPro': 'Completo',
     },
     'uk': {
       'appTitle': 'ÖstiTax',
@@ -1974,6 +1984,8 @@ class AppStrings {
           'Ваш прибуток перевищує максимальну базу: внески обмежені.',
       'seNotInsuredNote': 'Як нові самозайняті нижче межі страхування (6 613,20 € на рік) ви не застраховані обов\'язково. Можна застрахуватися добровільно.',
       'seDisclaimer': 'Оцінка для підприємців і нових самозайнятих (GSVG) 2026. Не враховано: інвестиційне звільнення прибутку понад 33 000 €, ПДВ, спрощені режими та професії з палатами (напр. лікарі, адвокати).',
+      'comparePdfFree': 'Базовий',
+      'comparePdfPro': 'Повний',
     },
   };
 }

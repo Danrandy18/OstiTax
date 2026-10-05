@@ -111,6 +111,8 @@ export interface TranslationSchema {
   compareRowCalcs: string;
   compareCalcsFree: string;
   compareCalcsPro: string;
+  comparePdfFree: string;
+  comparePdfPro: string;
   compareRowPdf: string;
   compareRowAccount: string;
   compareRowOcr: string;
@@ -396,6 +398,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     compareRowCalcs: 'Nettogehalt-Berechnungen',
     compareCalcsFree: '3 alle 24 Stunden',
     compareCalcsPro: 'Unbegrenzt',
+    comparePdfFree: 'Basis',
+    comparePdfPro: 'Vollständig',
     compareRowPdf: 'Offizielles PDF auf Deutsch',
     compareRowAccount: 'Pro im Web und in der App mit deinem Konto',
     compareRowOcr: 'Beleg-Scanner (OCR) für absetzbare Ausgaben',
@@ -684,6 +688,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     compareRowCalcs: 'Net salary calculations',
     compareCalcsFree: '3 every 24 hours',
     compareCalcsPro: 'Unlimited',
+    comparePdfFree: 'Basic',
+    comparePdfPro: 'Full report',
     compareRowPdf: 'Official PDF in German',
     compareRowAccount: 'Pro on web and in the app with your account',
     compareRowOcr: 'Receipt scanner (OCR) for deductible expenses',
@@ -967,6 +973,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     compareRowCalcs: 'Cálculos de salario neto',
     compareCalcsFree: '3 cada 24 horas',
     compareCalcsPro: 'Ilimitados',
+    comparePdfFree: 'Básico',
+    comparePdfPro: 'Completo',
     compareRowPdf: 'PDF oficial en alemán',
     compareRowAccount: 'Pro en la web y en la app con tu cuenta',
     compareRowOcr: 'Escáner de recibos (OCR) para gastos deducibles',
@@ -1254,6 +1262,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     compareRowCalcs: 'Net maaş hesaplamaları',
     compareCalcsFree: 'Her 24 saatte 3',
     compareCalcsPro: 'Sınırsız',
+    comparePdfFree: 'Temel',
+    comparePdfPro: 'Tam rapor',
     compareRowPdf: 'Almanca resmi PDF',
     compareRowAccount: 'Hesabınla web ve uygulamada Pro',
     compareRowOcr: 'Düşülebilir giderler için fiş tarayıcı (OCR)',
@@ -1540,6 +1550,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     compareRowCalcs: 'Obračun neto plate',
     compareCalcsFree: '3 svaka 24 sata',
     compareCalcsPro: 'Neograničeno',
+    comparePdfFree: 'Osnovni',
+    comparePdfPro: 'Kompletan',
     compareRowPdf: 'Službeni PDF na njemačkom',
     compareRowAccount: 'Pro na webu i u aplikaciji s tvojim računom',
     compareRowOcr: 'Skener računa (OCR) za odbitne troškove',
@@ -1827,6 +1839,8 @@ export const TRANSLATIONS: Record<Lang, TranslationSchema> = {
     compareRowCalcs: 'Розрахунки нетто-зарплати',
     compareCalcsFree: '3 кожні 24 години',
     compareCalcsPro: 'Без обмежень',
+    comparePdfFree: 'Базовий',
+    comparePdfPro: 'Повний',
     compareRowPdf: 'Офіційний PDF німецькою',
     compareRowAccount: 'Pro у вебі та в застосунку з твоїм акаунтом',
     compareRowOcr: 'Сканер чеків (OCR) для витрат, що вираховуються з податку',

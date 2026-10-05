@@ -44,7 +44,11 @@ const _rows = [
     _Cell.text('compareCalcsFree'),
     _Cell.text('compareCalcsPro'),
   ),
-  _CompareRow('compareRowPdf', _Cell.no(), _Cell.yes()),
+  _CompareRow(
+    'compareRowPdf',
+    _Cell.text('comparePdfFree'),
+    _Cell.text('comparePdfPro'),
+  ),
   _CompareRow('compareRowAccount', _Cell.no(), _Cell.yes()),
   _CompareRow('compareRowOcr', _Cell.no(), _Cell.yes()),
 ];

@@ -36,7 +36,11 @@ export class UpgradeCompareModalComponent {
       free: { kind: 'text', key: 'compareCalcsFree' },
       pro: { kind: 'text', key: 'compareCalcsPro' },
     },
-    { labelKey: 'compareRowPdf', free: { kind: 'no' }, pro: { kind: 'yes' } },
+    {
+      labelKey: 'compareRowPdf',
+      free: { kind: 'text', key: 'comparePdfFree' },
+      pro: { kind: 'text', key: 'comparePdfPro' },
+    },
     { labelKey: 'compareRowAccount', free: { kind: 'no' }, pro: { kind: 'yes' } },
     { labelKey: 'compareRowOcr', free: { kind: 'no' }, pro: { kind: 'yes' } },
   ];
