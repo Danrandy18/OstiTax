@@ -26,21 +26,36 @@ export interface ParsedReceipt {
   warnings: string[];
 }
 
-/** Recibo guardado en este dispositivo (Fase 1: nunca se sube la imagen ni el texto). */
-export interface StoredReceipt {
-  id: string;
-  createdAt: string;
+/** Datos que el usuario confirma en la pantalla de revision (POST /api/receipts). */
+export interface ReceiptInput {
   merchant: string;
-  date: string;
+  date: string | null;
   total: number | null;
   vatRate: ReceiptVatRate | null;
   vatAmount: number | null;
   documentNumber: string;
   category: ReceiptCategory;
+}
+
+/**
+ * Recibo guardado en la cuenta (visible en web y app). Ni la imagen ni el texto del OCR salen
+ * del dispositivo; `depreciation` lo decide el backend.
+ */
+export interface Receipt extends ReceiptInput {
+  id: string;
+  createdAt: string;
   depreciation: boolean;
-  /** Miniatura JPEG pequena (data URL) para reconocer el recibo en la lista. */
+}
+
+/** Formato antiguo (Fase 1): recibos guardados solo en el navegador. */
+export interface LegacyStoredReceipt extends ReceiptInput {
+  id: string;
+  createdAt: string;
+  depreciation: boolean;
   thumbnail: string | null;
 }
+
+export type ReceiptExportFormat = 'pdf' | 'csv';
 
 export const RECEIPT_CATEGORIES: ReceiptCategory[] = [
   'workEquipment',

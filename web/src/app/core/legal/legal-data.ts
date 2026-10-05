@@ -12,7 +12,7 @@ export const LEGAL = {
   country: 'Österreich',
   email: 'randymendezcabrera893@gmail.com',
   /** Fecha de la ultima revision de los textos legales (se muestra en cada pagina). */
-  updatedAt: '2026-09-20',
+  updatedAt: '2026-10-05',
   /**
    * Opcionales: se muestran en el Impressum solo si tienen valor. Un autonomo austriaco con
    * actividad comercial suele tener que indicarlos; completar con los datos reales.

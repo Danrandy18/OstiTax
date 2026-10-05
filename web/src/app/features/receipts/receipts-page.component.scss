@@ -165,3 +165,21 @@ label {
 .back-link {
   color: var(--color-primary);
 }
+
+.legacy {
+  background: rgba(200, 140, 0, 0.08);
+}
+
+.export {
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    max-width: 12rem;
+  }
+
+  .danger {
+    align-self: flex-start;
+    color: var(--color-danger, #b3261e);
+  }
+}

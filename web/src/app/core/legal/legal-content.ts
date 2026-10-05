@@ -36,6 +36,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
             'Mit Konto: E-Mail-Adresse, optional dein Name, dein Passwort (nur als Hash, nie im Klartext) und bei Anmeldung mit Google die Google-Kennung.',
             'Bei einem Pro-Abo: Tarif, Status und Laufzeit sowie die Kunden- und Abo-Kennungen von Stripe bzw. PayPal. Karten- oder PayPal-Zugangsdaten erhalten wir nicht.',
             'Beim Aufruf entstehen technische Server-Protokolle (IP-Adresse, Zeitpunkt, aufgerufene Seite).',
+            'Belegscanner (Pro): Das Foto bleibt auf deinem Gerät und die Texterkennung läuft dort. Zur Auswertung wird nur der erkannte Text an unseren Server gesendet und nicht gespeichert. Wenn du einen Beleg speicherst, speichern wir in deinem Konto nur die von dir geprüften Angaben (Händler, Datum, Betrag, USt, Belegnummer, Kategorie).',
           ],
         },
         {
@@ -61,6 +62,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
           heading: 'Speicherung im Browser und in der App',
           body: [
             'Wir speichern lokal nur, was der Dienst braucht: Geräte-Kennung, Anmelde-Token und deine Spracheinstellung. Es gibt kein Tracking und keine Werbung.',
+            'Auf der Website kann zusätzlich eine kleine Vorschau deiner Belegfotos im Browser gespeichert werden; sie wird nie an uns übertragen.',
           ],
         },
         {
@@ -134,6 +136,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
           heading: 'Was gelöscht wird',
           body: [
             'Gelöscht werden E-Mail-Adresse, Name, Passwort-Hash, Google-Kennung und die Verknüpfung mit deinem Abo.',
+            'Gelöscht werden außerdem alle in deinem Konto gespeicherten Belege. Einzelne Belege kannst du jederzeit selbst löschen oder als PDF/CSV exportieren.',
           ],
         },
         {
@@ -163,6 +166,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
             'With an account: email address, optionally your name, your password (only as a hash, never in plain text) and, if you sign in with Google, your Google identifier.',
             'With a Pro subscription: plan, status and period, plus the customer and subscription identifiers from Stripe or PayPal. We do not receive card or PayPal login details.',
             'When you visit, technical server logs are created (IP address, time, requested page).',
+            'Receipt scanner (Pro): the photo stays on your device and text recognition runs there. Only the recognised text is sent to our server for analysis and it is not stored. When you save a receipt, we store only the details you checked in your account (merchant, date, amount, VAT, document number, category).',
           ],
         },
         {
@@ -188,6 +192,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
           heading: 'Storage in your browser and in the app',
           body: [
             'We only store locally what the service needs: device identifier, sign-in token and your language setting. There is no tracking and no advertising.',
+            'On the website, a small preview of your receipt photos may also be stored in your browser; it is never sent to us.',
           ],
         },
         {
@@ -261,6 +266,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
           heading: 'What is deleted',
           body: [
             'Your email address, name, password hash, Google identifier and the link to your subscription are deleted.',
+            'All receipts saved in your account are deleted as well. You can delete single receipts or export them as PDF/CSV at any time.',
           ],
         },
         {
@@ -290,6 +296,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
             'Con cuenta: correo electrónico, opcionalmente tu nombre, tu contraseña (solo como hash, nunca en texto plano) y, si entras con Google, el identificador de Google.',
             'Con una suscripción Pro: plan, estado y periodo, y los identificadores de cliente y suscripción de Stripe o PayPal. No recibimos datos de tarjeta ni de acceso a PayPal.',
             'Al visitar la web se generan registros técnicos del servidor (dirección IP, hora, página solicitada).',
+            'Escáner de recibos (Pro): la foto se queda en tu dispositivo y el reconocimiento de texto se hace allí. Solo el texto reconocido se envía a nuestro servidor para analizarlo y no se guarda. Si guardas un recibo, en tu cuenta guardamos únicamente los datos que revisaste (comercio, fecha, importe, IVA, número de documento y categoría).',
           ],
         },
         {
@@ -315,6 +322,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
           heading: 'Almacenamiento en tu navegador y en la app',
           body: [
             'Solo guardamos en local lo que el servicio necesita: identificador del dispositivo, token de sesión y tu idioma. No hay seguimiento ni publicidad.',
+            'En la web también puede guardarse en tu navegador una pequeña vista previa de las fotos de tus recibos; nunca se nos envía.',
           ],
         },
         {
@@ -388,6 +396,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
           heading: 'Qué se elimina',
           body: [
             'Se eliminan tu correo, nombre, hash de contraseña, identificador de Google y el vínculo con tu suscripción.',
+            'También se eliminan todos los recibos guardados en tu cuenta. Puedes borrar recibos sueltos o exportarlos en PDF/CSV cuando quieras.',
           ],
         },
         {
@@ -417,6 +426,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
             'Hesapla: e-posta adresi, isteğe bağlı adın, şifren (yalnızca hash olarak, asla düz metin değil) ve Google ile girersen Google kimliği.',
             'Pro aboneliğinde: plan, durum ve süre ile Stripe veya PayPal müşteri ve abonelik kimlikleri. Kart veya PayPal giriş bilgilerini almıyoruz.',
             'Ziyaret sırasında teknik sunucu kayıtları oluşur (IP adresi, zaman, istenen sayfa).',
+            'Fiş tarayıcı (Pro): fotoğraf cihazında kalır ve metin tanıma orada yapılır. Analiz için sunucumuza yalnızca tanınan metin gönderilir ve saklanmaz. Bir fişi kaydedersen hesabında yalnızca kontrol ettiğin bilgileri saklarız (satıcı, tarih, tutar, KDV, belge numarası, kategori).',
           ],
         },
         {
@@ -442,6 +452,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
           heading: 'Tarayıcıda ve uygulamada saklama',
           body: [
             'Yerel olarak yalnızca hizmetin ihtiyaç duyduğunu saklarız: cihaz kimliği, oturum belirteci ve dil ayarın. İzleme ve reklam yoktur.',
+            'Web sitesinde fiş fotoğraflarının küçük bir önizlemesi tarayıcında da saklanabilir; bize asla gönderilmez.',
           ],
         },
         {
@@ -513,6 +524,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
           heading: 'Neler silinir',
           body: [
             'E-posta adresin, adın, şifre hash’in, Google kimliğin ve aboneliğinle bağlantı silinir.',
+            'Hesabında kayıtlı tüm fişler de silinir. Fişleri tek tek silebilir veya istediğin zaman PDF/CSV olarak dışa aktarabilirsin.',
           ],
         },
         {
@@ -542,6 +554,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
             'S računom: adresa e-pošte, po želji tvoje ime, lozinka (samo kao hash, nikad kao običan tekst) i, ako se prijaviš preko Googlea, Google identifikator.',
             'S Pro pretplatom: paket, status i razdoblje te identifikatori kupca i pretplate iz Stripea ili PayPala. Ne primamo podatke o kartici ni pristupne podatke za PayPal.',
             'Pri posjeti nastaju tehnički zapisi poslužitelja (IP adresa, vrijeme, tražena stranica).',
+            'Skener računa (Pro): fotografija ostaje na tvom uređaju i prepoznavanje teksta radi se tamo. Na naš server šalje se samo prepoznati tekst radi analize i ne pohranjuje se. Kada sačuvaš račun, u tvom nalogu čuvamo samo podatke koje si provjerio/la (trgovac, datum, iznos, PDV, broj dokumenta, kategorija).',
           ],
         },
         {
@@ -567,6 +580,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
           heading: 'Pohrana u pregledniku i aplikaciji',
           body: [
             'Lokalno pohranjujemo samo ono što usluga treba: identifikator uređaja, token za prijavu i tvoju postavku jezika. Nema praćenja ni oglasa.',
+            'Na web stranici se u tvom pregledniku može sačuvati i mali pregled fotografija računa; nikad nam se ne šalje.',
           ],
         },
         {
@@ -642,6 +656,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
           heading: 'Što se briše',
           body: [
             'Brišu se tvoja e-pošta, ime, hash lozinke, Google identifikator i veza s pretplatom.',
+            'Brišu se i svi računi sačuvani u tvom nalogu. Pojedinačne račune možeš u svakom trenutku izbrisati ili izvesti kao PDF/CSV.',
           ],
         },
         {
@@ -671,6 +686,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
             'З акаунтом: адреса електронної пошти, за бажанням твоє ім’я, пароль (лише як хеш, ніколи відкритим текстом) і, якщо входиш через Google, ідентифікатор Google.',
             'З підпискою Pro: тариф, статус і період, а також ідентифікатори клієнта й підписки від Stripe або PayPal. Даних картки чи входу в PayPal ми не отримуємо.',
             'Під час відвідування створюються технічні журнали сервера (IP-адреса, час, запитана сторінка).',
+            'Сканер чеків (Pro): фото залишається на твоєму пристрої, і розпізнавання тексту відбувається там. На наш сервер для аналізу надсилається лише розпізнаний текст, і він не зберігається. Якщо ти зберігаєш чек, в акаунті ми зберігаємо лише перевірені тобою дані (продавець, дата, сума, ПДВ, номер документа, категорія).',
           ],
         },
         {
@@ -696,6 +712,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
           heading: 'Зберігання в браузері та застосунку',
           body: [
             'Локально ми зберігаємо лише те, що потрібно сервісу: ідентифікатор пристрою, токен входу та твою мову. Немає відстеження й реклами.',
+            'На вебсайті у твоєму браузері також може зберігатися невеликий перегляд фото чеків; він ніколи не надсилається нам.',
           ],
         },
         {
@@ -769,6 +786,7 @@ export const LEGAL_CONTENT: Record<Lang, Record<LegalDocId, LegalDoc>> = {
           heading: 'Що видаляється',
           body: [
             'Видаляються твоя ел. пошта, ім’я, хеш пароля, ідентифікатор Google і зв’язок із підпискою.',
+            'Також видаляються всі чеки, збережені в акаунті. Окремі чеки можна будь-коли видалити або експортувати в PDF/CSV.',
           ],
         },
         {

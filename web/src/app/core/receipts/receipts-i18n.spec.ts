@@ -1,10 +1,12 @@
+import { TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
+import { vi } from 'vitest';
 import { RECEIPTS_TEXT } from './receipts-i18n';
 import { ReceiptStoreService } from './receipt-store.service';
-import type { StoredReceipt } from './receipt.models';
+import type { LegacyStoredReceipt, Receipt, ReceiptInput } from './receipt.models';
+import { ReceiptsApiService } from './receipts-api.service';
 
-const sample = (over: Partial<StoredReceipt> = {}): StoredReceipt => ({
-  id: 'a',
-  createdAt: '2026-01-01T00:00:00Z',
+const input = (over: Partial<ReceiptInput> = {}): ReceiptInput => ({
   merchant: 'Shop',
   date: '2026-03-03',
   total: 10,
@@ -12,9 +14,14 @@ const sample = (over: Partial<StoredReceipt> = {}): StoredReceipt => ({
   vatAmount: 1.67,
   documentNumber: '1',
   category: 'other',
-  depreciation: false,
-  thumbnail: 'data:x',
   ...over,
+});
+
+const saved = (id: string, over: Partial<ReceiptInput> = {}): Receipt => ({
+  ...input(over),
+  id,
+  createdAt: '2026-01-01T00:00:00Z',
+  depreciation: false,
 });
 
 describe('receipts i18n', () => {
@@ -31,16 +38,59 @@ describe('receipts i18n', () => {
 });
 
 describe('ReceiptStoreService', () => {
-  beforeEach(() => localStorage.clear());
+  let api: Record<string, ReturnType<typeof vi.fn>>;
 
-  it('guarda, suma por ano y exporta sin miniaturas', () => {
-    const store = new ReceiptStoreService();
-    expect(store.add(sample())).toBe(true);
-    store.add(sample({ id: 'b', total: 5.5 }));
-    expect(store.totalsByYear()).toEqual([['2026', 15.5]]);
-    expect(JSON.parse(store.exportJson()).receipts[0].thumbnail).toBeUndefined();
-    store.remove('a');
-    expect(store.receipts().length).toBe(1);
-    expect(new ReceiptStoreService().receipts().length).toBe(1);
+  function setup(): ReceiptStoreService {
+    TestBed.configureTestingModule({ providers: [{ provide: ReceiptsApiService, useValue: api }] });
+    return TestBed.inject(ReceiptStoreService);
+  }
+
+  beforeEach(() => {
+    localStorage.clear();
+    TestBed.resetTestingModule();
+    api = {
+      list: vi.fn(() => of([saved('a'), saved('old', { date: '2025-05-05', total: 4 })])),
+      create: vi.fn((body: ReceiptInput) => of(saved('new', body))),
+      remove: vi.fn(() => of(undefined)),
+      removeAll: vi.fn(() => of(undefined)),
+      import: vi.fn((list: ReceiptInput[]) => of({ imported: list.length })),
+    };
+  });
+
+  it('carga de la cuenta y suma por ano en centimos', async () => {
+    const store = setup();
+    await store.load();
+    await store.add(input({ total: 0.1 }), null);
+    await store.add(input({ total: 0.2 }), null);
+    expect(store.totalsByYear()).toEqual([
+      ['2026', 10.3],
+      ['2025', 4],
+    ]);
+  });
+
+  it('la miniatura se queda en el navegador y no se envia al servidor', async () => {
+    const store = setup();
+    await store.add(input(), 'data:image/jpeg;base64,xx');
+    expect(api['create'].mock.calls[0][0]).not.toHaveProperty('thumbnail');
+    expect(store.thumbnail('new')).toBe('data:image/jpeg;base64,xx');
+
+    await store.remove('new');
+    expect(store.thumbnail('new')).toBeNull();
+    expect(store.receipts().some((r) => r.id === 'new')).toBe(false);
+  });
+
+  it('sube los recibos antiguos del navegador y los borra de alli', async () => {
+    const legacy: LegacyStoredReceipt[] = [
+      { ...saved('l1'), date: '', thumbnail: 'data:x' },
+    ];
+    localStorage.setItem('ostitax_receipts_v1', JSON.stringify(legacy));
+    const store = setup();
+    expect(store.legacy().length).toBe(1);
+
+    expect(await store.uploadLegacy()).toBe(1);
+    const sent = api['import'].mock.calls[0][0] as ReceiptInput[];
+    expect(sent[0]).toEqual({ ...input(), date: null });
+    expect(localStorage.getItem('ostitax_receipts_v1')).toBeNull();
+    expect(store.legacy()).toEqual([]);
   });
 });

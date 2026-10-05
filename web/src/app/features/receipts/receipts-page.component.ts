@@ -1,7 +1,8 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { OcrService } from '../../core/receipts/ocr.service';
 import {
@@ -9,6 +10,7 @@ import {
   RECEIPT_VAT_RATES,
   type ParsedReceipt,
   type ReceiptCategory,
+  type ReceiptExportFormat,
   type ReceiptVatRate,
 } from '../../core/receipts/receipt.models';
 import { ReceiptStoreService } from '../../core/receipts/receipt-store.service';
@@ -17,7 +19,7 @@ import { ReceiptsApiService } from '../../core/receipts/receipts-api.service';
 import { AuthService } from '../../core/services/auth.service';
 import { UpgradeService } from '../../core/services/upgrade.service';
 
-type Step = 'idle' | 'reading' | 'analyzing' | 'review';
+type Step = 'idle' | 'reading' | 'analyzing' | 'review' | 'saving';
 
 @Component({
   selector: 'app-receipts-page',
@@ -44,6 +46,7 @@ export class ReceiptsPageComponent implements OnDestroy {
   readonly imageUrl = signal<string | null>(null);
   readonly zoomed = signal(false);
   readonly parsed = signal<ParsedReceipt | null>(null);
+  readonly busy = signal(false);
 
   // Campos editables de la pantalla de revision.
   merchant = '';
@@ -53,6 +56,8 @@ export class ReceiptsPageComponent implements OnDestroy {
   vatAmount: number | null = null;
   documentNumber = '';
   category: ReceiptCategory = 'other';
+  /** Ano del export; null = todos. */
+  exportYear: number | null = null;
 
   private thumbnail: string | null = null;
 
@@ -60,8 +65,26 @@ export class ReceiptsPageComponent implements OnDestroy {
 
   /** Suma anual guardada: solo importes, sin decidir nada fiscal. */
   readonly totals = this.store.totalsByYear;
+  readonly years = computed(() => this.totals().map(([year]) => Number(year)));
+  readonly legacyText = computed(() =>
+    this.text().legacyText.replace('{n}', String(this.store.legacy().length)),
+  );
 
-  /** Un bien de trabajo por encima del limite GWG se amortiza (se recalcula si el usuario edita). */
+  constructor() {
+    // Carga los recibos de la cuenta en cuanto hay sesion (tambien tras iniciarla aqui).
+    effect(() => {
+      const accountId = this.auth.account()?.id;
+      if (!accountId) return;
+      untracked(() => {
+        void this.store.load().then(
+          () => (this.exportYear ??= this.years()[0] ?? null),
+          () => this.error.set(this.text().errorLoad),
+        );
+      });
+    });
+  }
+
+  /** Aviso en pantalla: un bien de trabajo por encima del limite GWG se amortiza. */
   gwgApplies(): boolean {
     const gwg = this.parsed()?.gwgLimit ?? 1000;
     return this.category === 'workEquipment' && (this.total ?? 0) > gwg;
@@ -114,44 +137,57 @@ export class ReceiptsPageComponent implements OnDestroy {
     });
   }
 
-  save(): void {
-    const t = this.text();
-    const ok = this.store.add({
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
-      merchant: this.merchant.trim(),
-      date: this.date,
-      total: this.total,
-      vatRate: this.vatRate,
-      vatAmount: this.vatAmount,
-      documentNumber: this.documentNumber.trim(),
-      category: this.category,
-      depreciation: this.gwgApplies(),
-      thumbnail: this.thumbnail,
-    });
-    if (!ok) {
-      this.error.set(t.errorStorage);
-      return;
+  async save(): Promise<void> {
+    this.error.set(null);
+    this.step.set('saving');
+    try {
+      await this.store.add(
+        {
+          merchant: this.merchant.trim(),
+          date: this.date || null,
+          total: this.total,
+          vatRate: this.vatRate,
+          vatAmount: this.vatAmount,
+          documentNumber: this.documentNumber.trim(),
+          category: this.category,
+        },
+        this.thumbnail,
+      );
+      this.exportYear ??= this.years()[0] ?? null;
+      this.reset();
+    } catch {
+      this.error.set(this.text().errorSave);
+      this.step.set('review');
     }
-    this.reset();
   }
 
   discard(): void {
     this.reset();
   }
 
-  remove(id: string): void {
-    this.store.remove(id);
+  async remove(id: string): Promise<void> {
+    await this.run(() => this.store.remove(id), this.text().errorAction);
   }
 
-  exportJson(): void {
-    const blob = new Blob([this.store.exportJson()], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'OestiTax-Belege.json';
-    a.click();
-    URL.revokeObjectURL(url);
+  async removeAll(): Promise<void> {
+    if (!confirm(this.text().removeAllConfirm)) return;
+    await this.run(() => this.store.removeAll(), this.text().errorAction);
+  }
+
+  async uploadLegacy(): Promise<void> {
+    await this.run(() => this.store.uploadLegacy(), this.text().errorSave);
+  }
+
+  async export(format: ReceiptExportFormat): Promise<void> {
+    await this.run(async () => {
+      const blob = await firstValueFrom(this.api.export(format, this.exportYear));
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `OestiTax-Belege${this.exportYear ? `-${this.exportYear}` : ''}.${format}`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }, this.text().errorExport);
   }
 
   warningText(code: string): string {
@@ -166,6 +202,18 @@ export class ReceiptsPageComponent implements OnDestroy {
     this.releaseImage();
   }
 
+  private async run(action: () => Promise<unknown>, errorText: string): Promise<void> {
+    this.error.set(null);
+    this.busy.set(true);
+    try {
+      await action();
+    } catch {
+      this.error.set(errorText);
+    } finally {
+      this.busy.set(false);
+    }
+  }
+
   private fail(message: string): void {
     this.error.set(message);
     this.step.set('idle');
@@ -174,6 +222,7 @@ export class ReceiptsPageComponent implements OnDestroy {
   private reset(): void {
     this.step.set('idle');
     this.parsed.set(null);
+    this.thumbnail = null;
     this.releaseImage();
   }
 
