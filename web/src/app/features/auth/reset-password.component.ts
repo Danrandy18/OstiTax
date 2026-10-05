@@ -30,6 +30,16 @@ import { TranslatePipe } from '../../shared/pipes/app.pipes';
             (ngModelChange)="password.set($event)"
             [placeholder]="'authNewPasswordLabel' | translate"
           />
+          <input
+            type="password"
+            name="confirmPassword"
+            required
+            autocomplete="new-password"
+            [ngModel]="confirmPassword()"
+            (ngModelChange)="confirmPassword.set($event)"
+            [placeholder]="'profileConfirmPasswordLabel' | translate"
+          />
+          <small class="hint">{{ 'profilePasswordRules' | translate }}</small>
           @if (error()) {
             <p class="error-text">{{ error() }}</p>
           }
@@ -55,12 +65,17 @@ export class ResetPasswordComponent {
 
   readonly token = this.route.snapshot.queryParamMap.get('token');
   readonly password = signal('');
+  readonly confirmPassword = signal('');
   readonly loading = signal(false);
   readonly done = signal(false);
   readonly error = signal<string | null>(null);
 
   submit(): void {
     if (!this.token) {
+      return;
+    }
+    if (this.password() !== this.confirmPassword()) {
+      this.error.set(this.i18n.t().profilePasswordMismatch);
       return;
     }
     this.loading.set(true);

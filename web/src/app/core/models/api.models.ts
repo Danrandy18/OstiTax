@@ -110,6 +110,12 @@ export interface AccountStatus {
   subscriptionProvider: string | null;
   subscriptionStatus: string | null;
   subscriptionCurrentPeriodEnd: string | null;
+  /** Cancelada: Pro sigue hasta subscriptionCurrentPeriodEnd y no se renueva. */
+  subscriptionCancelAtPeriodEnd: boolean;
+  /** false en cuentas solo de Google: no hay contrasena que cambiar. */
+  hasPassword: boolean;
+  /** Idioma en el que el backend envia los correos. */
+  locale: string;
 }
 
 export interface AuthResponse {

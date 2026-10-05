@@ -19,16 +19,116 @@
           {{ (account.isPro ? 'profilePlanPro' : 'profilePlanFree') | translate }}
         </span>
       </div>
-      @if (account.isPro && account.subscriptionCurrentPeriodEnd) {
+      @if (account.isPro && periodEnd()) {
         <div class="account-row">
-          <span class="account-label">{{ 'profileRenewsOn' | translate }}</span>
-          <span class="account-value">
-            {{ account.subscriptionCurrentPeriodEnd | date: 'mediumDate' }}
+          <span class="account-label">
+            {{ (account.subscriptionCancelAtPeriodEnd ? 'profileEndsOn' : 'profileRenewsOn') | translate }}
           </span>
+          <span class="account-value">{{ periodEnd() }}</span>
         </div>
       }
       <a routerLink="/receipts" class="banking-link">{{ receiptsLink() }}</a>
       <a routerLink="/banking" class="banking-link">{{ 'profileConnectBankLink' | translate }}</a>
+    </section>
+
+    @if (account.isPro) {
+      <section class="account-card">
+        <h2 class="section-title">{{ 'profileSubscriptionTitle' | translate }}</h2>
+        @if (account.subscriptionCancelAtPeriodEnd) {
+          <p class="notice">{{ withDate(i18n.t().profileCanceledNotice) }}</p>
+          <button
+            type="button"
+            class="btn-primary align-start"
+            [disabled]="subscriptionBusy()"
+            (click)="setCanceled(false)"
+          >
+            {{ 'profileResumeSubscription' | translate }}
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="btn-ghost align-start"
+            [disabled]="subscriptionBusy()"
+            (click)="confirmingCancel.set(true)"
+          >
+            {{ 'profileCancelSubscription' | translate }}
+          </button>
+        }
+        @if (subscriptionError()) {
+          <p class="account-error" role="alert">{{ subscriptionError() }}</p>
+        }
+      </section>
+    }
+
+    <section class="account-card">
+      <h2 class="section-title">{{ 'profileSecurityTitle' | translate }}</h2>
+      @if (!account.hasPassword) {
+        <p class="hint">{{ 'profileGooglePassword' | translate }}</p>
+      } @else {
+        <h3 class="subsection-title">{{ 'profileChangePasswordTitle' | translate }}</h3>
+        <p class="hint">{{ 'profileChangePasswordHint' | translate }}</p>
+
+        <form class="password-form" (ngSubmit)="changePassword()">
+          <!-- Campo oculto para que el gestor de contrasenas asocie el cambio a esta cuenta. -->
+          <input type="email" name="username" autocomplete="username" [value]="account.email" hidden />
+
+          <label>
+            <span>{{ 'profileCurrentPasswordLabel' | translate }}</span>
+            <input
+              [type]="showPasswords() ? 'text' : 'password'"
+              name="currentPassword"
+              autocomplete="current-password"
+              required
+              [ngModel]="currentPassword()"
+              (ngModelChange)="currentPassword.set($event); passwordChanged.set(false)"
+            />
+          </label>
+          <label>
+            <span>{{ 'profileNewPasswordLabel' | translate }}</span>
+            <input
+              [type]="showPasswords() ? 'text' : 'password'"
+              name="newPassword"
+              autocomplete="new-password"
+              required
+              [attr.minlength]="minPasswordLength"
+              aria-describedby="password-rules"
+              [ngModel]="newPassword()"
+              (ngModelChange)="newPassword.set($event)"
+            />
+            <small id="password-rules" class="hint">{{ 'profilePasswordRules' | translate }}</small>
+          </label>
+          <label>
+            <span>{{ 'profileConfirmPasswordLabel' | translate }}</span>
+            <input
+              [type]="showPasswords() ? 'text' : 'password'"
+              name="confirmPassword"
+              autocomplete="new-password"
+              required
+              [ngModel]="confirmPassword()"
+              (ngModelChange)="confirmPassword.set($event)"
+            />
+          </label>
+
+          <button type="button" class="link-button" (click)="showPasswords.set(!showPasswords())">
+            {{ (showPasswords() ? 'profileHidePassword' : 'profileShowPassword') | translate }}
+          </button>
+
+          @if (passwordError()) {
+            <p class="account-error" role="alert">{{ passwordError() }}</p>
+          }
+          @if (passwordChanged()) {
+            <p class="success" role="status">{{ 'profilePasswordChanged' | translate }}</p>
+          }
+
+          <button type="submit" class="btn-primary align-start" [disabled]="!canSubmitPassword()">
+            @if (changingPassword()) {
+              {{ 'loading' | translate }}
+            } @else {
+              {{ 'profileChangePasswordButton' | translate }}
+            }
+          </button>
+        </form>
+      }
     </section>
 
     <section class="danger-zone">
@@ -48,6 +148,46 @@
 
   <a routerLink="/" class="back-link">{{ 'backToCalculator' | translate }}</a>
 </div>
+
+@if (confirmingCancel()) {
+  <div class="confirm-backdrop" role="dialog" aria-modal="true">
+    <div class="confirm-shell">
+      <h2>{{ 'profileCancelConfirmTitle' | translate }}</h2>
+      <p>
+        {{
+          cancelKeepsAccess()
+            ? withDate(i18n.t().profileCancelConfirmBody)
+            : ('profileCancelConfirmBodyNow' | translate)
+        }}
+      </p>
+      <div class="confirm-actions">
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="confirmingCancel.set(false)"
+          [disabled]="subscriptionBusy()"
+        >
+          {{ 'profileKeepSubscription' | translate }}
+        </button>
+        <button
+          type="button"
+          class="btn-danger"
+          (click)="setCanceled(true)"
+          [disabled]="subscriptionBusy()"
+        >
+          @if (subscriptionBusy()) {
+            {{ 'loading' | translate }}
+          } @else {
+            {{ 'profileCancelConfirmButton' | translate }}
+          }
+        </button>
+      </div>
+      @if (subscriptionError()) {
+        <p class="account-error" role="alert">{{ subscriptionError() }}</p>
+      }
+    </div>
+  </div>
+}
 
 @if (confirmingDelete()) {
   <div class="confirm-backdrop" role="dialog" aria-modal="true">
