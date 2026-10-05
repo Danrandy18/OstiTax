@@ -53,3 +53,7 @@ web/.playwright/
 *.jks
 *.keystore
 key.properties
+
+# Clave de la cuenta de servicio de Google Play (publicacion automatica). Nunca subir.
+mobile/android/play-service-account.json
+*service-account*.json
