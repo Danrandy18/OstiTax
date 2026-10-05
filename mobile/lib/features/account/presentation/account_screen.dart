@@ -139,6 +139,47 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
                 onTap: () => context.push('/receipts'),
               ),
             ),
+            const SizedBox(height: 16),
+            Text(
+              ref.tr('profileSecurityTitle'),
+              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+            ),
+            const SizedBox(height: 8),
+            Material(
+              color: AppColors.surfaceElevated,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+                side: const BorderSide(color: AppColors.border),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: account.hasPassword
+                  ? ListTile(
+                      key: const Key('accountChangePasswordTile'),
+                      leading: const Icon(
+                        Icons.lock_reset_rounded,
+                        color: AppColors.primary,
+                      ),
+                      title: Text(
+                        ref.tr('profileChangePasswordTitle'),
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                      onTap: () => context.push('/change-password'),
+                    )
+                  : ListTile(
+                      leading: const Icon(
+                        Icons.lock_outline_rounded,
+                        color: AppColors.textSecondary,
+                      ),
+                      title: Text(
+                        ref.tr('profileGooglePassword'),
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+            ),
             const SizedBox(height: 24),
             Container(
               padding: const EdgeInsets.all(16),

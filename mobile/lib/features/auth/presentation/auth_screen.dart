@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/config/feature_flags.dart';
 import '../../../core/l10n/tr.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/legal_disclaimer_footer.dart';
@@ -57,7 +56,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
     setState(() {
       _loading = false;
-      _error = ref.read(authControllerProvider).error ?? ref.tr('authErrorGeneric');
+      _error =
+          ref.read(authControllerProvider).error ?? ref.tr('authErrorGeneric');
     });
   }
 
@@ -109,7 +109,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         height: 18,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : Text(ref.tr(isLogin ? 'authLoginButton' : 'authRegisterButton')),
+                    : Text(
+                        ref.tr(
+                          isLogin ? 'authLoginButton' : 'authRegisterButton',
+                        ),
+                      ),
               ),
               const SizedBox(height: 12),
               TextButton(
@@ -120,10 +124,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         _error = null;
                       }),
                 child: Text(
-                  ref.tr(isLogin ? 'authSwitchToRegister' : 'authSwitchToLogin'),
+                  ref.tr(
+                    isLogin ? 'authSwitchToRegister' : 'authSwitchToLogin',
+                  ),
                 ),
               ),
-              if (isLogin && passwordResetEnabled)
+              if (isLogin &&
+                  (ref.watch(passwordResetAvailableProvider).value ?? false))
                 TextButton(
                   onPressed: _loading
                       ? null

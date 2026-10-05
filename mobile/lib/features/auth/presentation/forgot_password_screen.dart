@@ -29,7 +29,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     try {
       await ref
           .read(authRepositoryProvider)
-          .forgotPassword(_emailCtrl.text.trim());
+          .forgotPassword(_emailCtrl.text.trim(), ref.read(localeProvider));
     } catch (_) {
       // Se ignora: la pantalla de exito se muestra igual, sin filtrar
       // si el email existe o no.
